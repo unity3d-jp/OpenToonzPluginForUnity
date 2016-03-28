@@ -103,6 +103,6 @@ otCLinkage otExport otPlugin*   otGetPlugin(otModule *mod, int i);
 otCLinkage otExport void        otGetPluginInfo(otPlugin *plugin, otPluginInfo *dst);
 otCLinkage otExport int         otGetNumParams(otPlugin *plugin);
 otCLinkage otExport void        otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo);
-otCLinkage otExport void        otApplyEffect(otPlugin *plugin, otParamData *pdata, void *pixels, int width, int height);
+otCLinkage otExport void        otApplyFx(otPlugin *plugin, otParamData *pdata, void *pixels, int width, int height);
 
 #endif // OpenToonzPluginForUnity_h

@@ -12,7 +12,7 @@ public:
     int                 getNumParams() const;
     const otParamInfo*  getParamInfo() const;
 
-    void        applyEffect(otParamData *params, void *pixels, int width, int height);
+    void        applyFx(otParamData *params, void *pixels, int width, int height);
 
 public:
     // internal
@@ -20,7 +20,6 @@ public:
 
 private:
     toonz_plugin_probe_t *m_probe;
-    toonz_param_group_t *m_param_info;
     otPluginInfo m_info;
     std::vector<otParamInfo> m_pinfo;
 };

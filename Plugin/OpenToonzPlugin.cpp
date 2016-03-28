@@ -60,8 +60,8 @@ fcCLinkage fcExport void otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo)
     memcpy(pinfo, plugin->getParamInfo(), sizeof(otParamInfo)*plugin->getNumParams());
 }
 
-fcCLinkage fcExport void otApplyEffect(otPlugin *plugin, otParamData *pdata, void *pixels, int width, int height)
+fcCLinkage fcExport void otApplyFx(otPlugin *plugin, otParamData *pdata, void *pixels, int width, int height)
 {
     if (!plugin) { return; }
-    plugin->applyEffect(pdata, pixels, width, height);
+    plugin->applyFx(pdata, pixels, width, height);
 }

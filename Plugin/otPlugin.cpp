@@ -17,7 +17,6 @@ extern toonz_host_interface_t g_toonz_host_interface;
 
 otPlugin::otPlugin(toonz_plugin_probe_t *probe)
     : m_probe(probe)
-    , m_param_info()
 {
     m_info.name = m_probe->name;
     m_info.vendor = m_probe->vendor;
@@ -70,7 +69,7 @@ const otParamInfo* otPlugin::getParamInfo() const
     return m_pinfo.empty() ? nullptr : &m_pinfo[0];
 }
 
-void otPlugin::applyEffect(otParamData *params, void *pixels, int width, int height)
+void otPlugin::applyFx(otParamData *params, void *pixels, int width, int height)
 {
     // todo
 }
