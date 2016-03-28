@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "OpenToonzPluginForUnity.h"
+#include "OpenToonzPlugin.h"
 #include "fcFoundation.h"
 #include "otPlugin.h"
 
@@ -7,7 +7,10 @@ typedef int(*toonz_plugin_init_t)(toonz_host_interface_t *hostif);
 typedef void(*toonz_plugin_exit_t)();
 
 
-static toonz_host_interface_t g_host_interface; // todo: implement this
+extern toonz_host_interface_t g_toonz_host_interface;
+
+
+
 
 
 
@@ -15,16 +18,21 @@ otPlugin::otPlugin(toonz_plugin_probe_t *probe)
     : m_probe(probe)
     , m_param_info()
 {
+    m_info.name = m_probe->name;
+    m_info.vendor = m_probe->vendor;
+    m_info.note = m_probe->note;
+    m_info.version_major = m_probe->ver.major;
+    m_info.version_minor = m_probe->ver.minor;
 }
 
 otPlugin::~otPlugin()
 {
 }
 
-const char* otPlugin::getName() const   { return m_probe->name; }
-const char* otPlugin::getVender() const { return m_probe->vendor; }
-const char* otPlugin::getNote() const   { return m_probe->note; }
-int         otPlugin::getVersion() const{ return m_probe->plugin_ver.major; }
+const otPluginInfo& otPlugin::getPluginInfo() const
+{
+    return m_info;
+}
 
 int otPlugin::getNumParams() const
 {
@@ -43,7 +51,7 @@ void otPlugin::getParamInfo(otParamInfo *dst)
     }
 }
 
-void otPlugin::applyEffect(otParamData *params, const void *src_pixels, void *dst_pixels)
+void otPlugin::applyEffect(otParamData *params, void *pixels, int width, int height)
 {
     // todo
 }
@@ -78,7 +86,7 @@ bool otModule::load(const char *path)
     // call toonz_plugin_init
     auto init_f = (toonz_plugin_init_t)DLLGetSymbol(m_module, "toonz_plugin_init");
     if (init_f) {
-        init_f(&g_host_interface);
+        init_f(&g_toonz_host_interface);
     }
 
     return true;
@@ -98,5 +106,13 @@ void otModule::unload()
     }
 }
 
-int         otModule::getNumPlugins() const { return (int)m_plugins.size(); }
-otPlugin*   otModule::getPlugin(int i)      { return &m_plugins[i]; }
+int otModule::getNumPlugins() const
+{
+    return (int)m_plugins.size();
+}
+
+otPlugin* otModule::getPlugin(int i)
+{
+    if (i >= m_plugins.size()) { return nullptr; }
+    return &m_plugins[i];
+}

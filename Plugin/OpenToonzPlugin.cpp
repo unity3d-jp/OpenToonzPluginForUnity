@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "OpenToonzPluginForUnity.h"
+#include "OpenToonzPlugin.h"
 #include "fcFoundation.h"
 #include "otPlugin.h"
 
@@ -54,8 +54,8 @@ fcCLinkage fcExport void otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo)
     plugin->getParamInfo(pinfo);
 }
 
-fcCLinkage fcExport void otApplyEffect(otPlugin *plugin, otParamData *pdata, const void *src_pixels, void *dst_pixels)
+fcCLinkage fcExport void otApplyEffect(otPlugin *plugin, otParamData *pdata, void *pixels, int width, int height)
 {
     if (!plugin) { return; }
-    plugin->applyEffect(pdata, src_pixels, dst_pixels);
+    plugin->applyEffect(pdata, pixels, width, height);
 }

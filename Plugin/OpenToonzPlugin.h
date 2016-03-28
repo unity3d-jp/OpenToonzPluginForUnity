@@ -1,6 +1,21 @@
 #ifndef OpenToonzPluginForUnity_h
 #define OpenToonzPluginForUnity_h
 
+#define otCLinkage extern "C"
+#ifdef _WIN32
+    #ifndef otStaticLink
+        #ifdef otImpl
+            #define otExport __declspec(dllexport)
+        #else
+            #define otExport __declspec(dllimport)
+        #endif
+    #else
+        #define otExport
+    #endif
+#else
+    #define otExport
+#endif
+
 class otModule;
 class otPlugin;
 
@@ -69,15 +84,24 @@ union otParamData
     ouToneCurveParam tonecurve_p;
 };
 
+struct otPluginInfo
+{
+    const char *name;
+    const char *vendor;
+    const char *note;
+    int version_major, version_minor;
+};
 
-fcCLinkage fcExport otModule*   otLoad(const char *path);
-fcCLinkage fcExport void        otUnload(otModule *mod);
 
-fcCLinkage fcExport int         otGetNumPlugins(otModule *mod);
-fcCLinkage fcExport otPlugin*   otGetPlugin(otModule *mod, int i);
+otCLinkage otExport otModule*   otLoad(const char *path);
+otCLinkage otExport void        otUnload(otModule *mod);
 
-fcCLinkage fcExport int         otGetNumParams(otPlugin *plugin);
-fcCLinkage fcExport void        otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo);
-fcCLinkage fcExport void        otApplyEffect(otPlugin *plugin, otParamData *pdata, const void *src_pixels, void *dst_pixels);
+otCLinkage otExport int         otGetNumPlugins(otModule *mod);
+otCLinkage otExport otPlugin*   otGetPlugin(otModule *mod, int i);
+
+otCLinkage otExport void        otGetPluginInfo(otPlugin *plugin, otPluginInfo *dst);
+otCLinkage otExport int         otGetNumParams(otPlugin *plugin);
+otCLinkage otExport void        otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo);
+otCLinkage otExport void        otApplyEffect(otPlugin *plugin, otParamData *pdata, void *pixels, int width, int height);
 
 #endif // OpenToonzPluginForUnity_h

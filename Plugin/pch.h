@@ -96,3 +96,10 @@
 #else
     #define fcExport
 #endif
+
+#ifdef fcStaticLink
+    #define otStaticLink
+#endif 
+#ifdef fcImpl
+    #define otImpl
+#endif 

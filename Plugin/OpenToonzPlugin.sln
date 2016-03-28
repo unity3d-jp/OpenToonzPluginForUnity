@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenToonzPlugin", "OpenToonzPlugin.vcxproj", "{08361722-5520-47AC-A0C2-31E8A062B73F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{4C1612D8-EA11-4668-BC52-7A38AE712DA2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj", "{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		MasterDLL|x64 = MasterDLL|x64
+		MasterDLL|x86 = MasterDLL|x86
+		MasterLib|x64 = MasterLib|x64
+		MasterLib|x86 = MasterLib|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{08361722-5520-47AC-A0C2-31E8A062B73F}.Debug|x64.ActiveCfg = Debug|x64
+		{08361722-5520-47AC-A0C2-31E8A062B73F}.Debug|x64.Build.0 = Debug|x64
+		{08361722-5520-47AC-A0C2-31E8A062B73F}.Debug|x86.ActiveCfg = Debug|x64
+		{08361722-5520-47AC-A0C2-31E8A062B73F}.MasterDLL|x64.ActiveCfg = MasterDLL|x64
+		{08361722-5520-47AC-A0C2-31E8A062B73F}.MasterDLL|x64.Build.0 = MasterDLL|x64
+		{08361722-5520-47AC-A0C2-31E8A062B73F}.MasterDLL|x86.ActiveCfg = MasterDLL|x64
+		{08361722-5520-47AC-A0C2-31E8A062B73F}.MasterLib|x64.ActiveCfg = MasterLib|x64
+		{08361722-5520-47AC-A0C2-31E8A062B73F}.MasterLib|x64.Build.0 = MasterLib|x64
+		{08361722-5520-47AC-A0C2-31E8A062B73F}.MasterLib|x86.ActiveCfg = MasterLib|x64
+		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.Debug|x64.ActiveCfg = Debug|x64
+		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.Debug|x64.Build.0 = Debug|x64
+		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.Debug|x86.ActiveCfg = Debug|x64
+		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.MasterDLL|x64.ActiveCfg = MasterDLL|x64
+		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.MasterDLL|x64.Build.0 = MasterDLL|x64
+		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.MasterDLL|x86.ActiveCfg = MasterDLL|x64
+		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.MasterLib|x64.ActiveCfg = MasterLib|x64
+		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.MasterLib|x64.Build.0 = MasterLib|x64
+		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.MasterLib|x86.ActiveCfg = MasterLib|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1} = {4C1612D8-EA11-4668-BC52-7A38AE712DA2}
+	EndGlobalSection
+EndGlobal
