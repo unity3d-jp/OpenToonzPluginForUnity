@@ -4,10 +4,8 @@
 class otPlugin
 {
 public:
-    otPlugin();
+    otPlugin(toonz_plugin_probe_t *probe);
     ~otPlugin();
-
-    bool        load(const char *path);
 
     const char* getName() const;
     const char* getVender() const;
@@ -20,9 +18,26 @@ public:
     void        applyEffect(otParamData *params, const void *src_pixels, void *dst_pixels);
 
 private:
-    module_t m_module;
     toonz_plugin_probe_t *m_probe;
     toonz_param_group_t *m_param_info;
+};
+
+
+class otModule
+{
+public:
+    otModule();
+    ~otModule();
+
+    bool        load(const char *path);
+    void        unload();
+
+    int         getNumPlugins() const;
+    otPlugin*   getPlugin(int i);
+
+private:
+    module_t m_module;
+    std::vector<otPlugin> m_plugins;
 };
 
 #endif // otPlugin_h

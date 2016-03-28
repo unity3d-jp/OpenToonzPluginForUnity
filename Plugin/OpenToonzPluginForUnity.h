@@ -1,6 +1,7 @@
 #ifndef OpenToonzPluginForUnity_h
 #define OpenToonzPluginForUnity_h
 
+class otModule;
 class otPlugin;
 
 enum otParamType {
@@ -69,11 +70,14 @@ union otParamData
 };
 
 
-otPlugin*   otLoadPlugin(const char *path);
-void        otUnloadPlugin(otPlugin *plugin);
+fcCLinkage fcExport otModule*   otLoad(const char *path);
+fcCLinkage fcExport void        otUnload(otModule *mod);
 
-int         otGetNumParams(otPlugin *plugin);
-void        otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo);
-void        otApplyEffect(otPlugin *plugin, otParamData *pdata, const void *src_pixels, void *dst_pixels);
+fcCLinkage fcExport int         otGetNumPlugins(otModule *mod);
+fcCLinkage fcExport otPlugin*   otGetPlugin(otModule *mod, int i);
+
+fcCLinkage fcExport int         otGetNumParams(otPlugin *plugin);
+fcCLinkage fcExport void        otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo);
+fcCLinkage fcExport void        otApplyEffect(otPlugin *plugin, otParamData *pdata, const void *src_pixels, void *dst_pixels);
 
 #endif // OpenToonzPluginForUnity_h
