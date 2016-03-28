@@ -42,6 +42,12 @@ fcCLinkage fcExport otPlugin* otGetPlugin(otModule *mod, int i)
 }
 
 
+otCLinkage otExport void otGetPluginInfo(otPlugin *plugin, otPluginInfo *dst)
+{
+    if (!plugin || !dst) { return; }
+    *dst = plugin->getPluginInfo();
+}
+
 fcCLinkage fcExport int otGetNumParams(otPlugin *plugin)
 {
     if (!plugin) { return 0; }
@@ -50,8 +56,8 @@ fcCLinkage fcExport int otGetNumParams(otPlugin *plugin)
 
 fcCLinkage fcExport void otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo)
 {
-    if (!plugin) { return; }
-    plugin->getParamInfo(pinfo);
+    if (!plugin || !pinfo) { return; }
+    memcpy(pinfo, plugin->getParamInfo(), sizeof(otParamInfo)*plugin->getNumParams());
 }
 
 fcCLinkage fcExport void otApplyEffect(otPlugin *plugin, otParamData *pdata, void *pixels, int width, int height)

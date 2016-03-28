@@ -2,6 +2,7 @@
 #include "OpenToonzPlugin.h"
 #include "fcFoundation.h"
 #include "otPlugin.h"
+#include "otHostInterface.h"
 
 typedef int(*toonz_plugin_init_t)(toonz_host_interface_t *hostif);
 typedef void(*toonz_plugin_exit_t)();
@@ -23,10 +24,35 @@ otPlugin::otPlugin(toonz_plugin_probe_t *probe)
     m_info.note = m_probe->note;
     m_info.version_major = m_probe->ver.major;
     m_info.version_minor = m_probe->ver.minor;
+
+    if (m_probe->handler && m_probe->handler->setup) {
+        othNode node(this);
+        m_probe->handler->setup(&node);
+    }
 }
 
 otPlugin::~otPlugin()
 {
+}
+
+void otPlugin::setParamInfo(toonz_param_page_t *pages, int num_pages)
+{
+    m_pinfo.clear();
+    for (int pi = 0; pi < num_pages; ++pi) {
+        toonz_param_page_t& page = pages[pi];
+        for (int gi = 0; gi < page.num; ++gi) {
+            toonz_param_group_t& group = page.array[gi];
+            for (int i = 0; i < group.num; ++i) {
+                toonz_param_desc_t& desc = group.array[i];
+
+                otParamInfo info;
+                info.name = desc.key;
+                info.note = desc.note;
+                info.type = (otParamType)desc.traits_tag;
+                m_pinfo.push_back(info);
+            }
+        }
+    }
 }
 
 const otPluginInfo& otPlugin::getPluginInfo() const
@@ -36,19 +62,12 @@ const otPluginInfo& otPlugin::getPluginInfo() const
 
 int otPlugin::getNumParams() const
 {
-    if (!m_param_info) { return 0; }
-
-    return m_param_info->num;
+    return (int)m_pinfo.size();
 }
 
-void otPlugin::getParamInfo(otParamInfo *dst)
+const otParamInfo* otPlugin::getParamInfo() const
 {
-    if (!m_param_info) { return; }
-
-    int n = m_param_info->num;
-    for (int i = 0; i < n; ++i) {
-        // todo
-    }
+    return m_pinfo.empty() ? nullptr : &m_pinfo[0];
 }
 
 void otPlugin::applyEffect(otParamData *params, void *pixels, int width, int height)
@@ -79,14 +98,14 @@ bool otModule::load(const char *path)
         return false;
     }
 
-    for (auto p = probes->begin; p < probes->end; ++p) {
-        m_plugins.emplace_back(otPlugin(p));
-    }
-
     // call toonz_plugin_init
     auto init_f = (toonz_plugin_init_t)DLLGetSymbol(m_module, "toonz_plugin_init");
     if (init_f) {
         init_f(&g_toonz_host_interface);
+    }
+
+    for (auto p = probes->begin; p < probes->end; ++p) {
+        m_plugins.emplace_back(otPlugin(p));
     }
 
     return true;

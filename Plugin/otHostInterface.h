@@ -37,11 +37,13 @@ private:
 class othNode
 {
 public:
-    othNode();
+    othNode(otPlugin *plugin);
     void        setParam(const char *name, otParamType type, const void *value);
     othParam*   getParam(const char *name);
+    void setParamInfo(toonz_param_page_t *pages, int num_pages);
 
 private:
+    otPlugin *m_plugin;
     std::map<std::string, othParam> m_params;
     void *m_userdata;
 };

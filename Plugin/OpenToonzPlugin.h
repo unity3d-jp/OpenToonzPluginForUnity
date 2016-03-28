@@ -34,6 +34,7 @@ enum otParamType {
 struct otParamInfo
 {
     const char *name;
+    const char *note;
     otParamType type;
 };
 

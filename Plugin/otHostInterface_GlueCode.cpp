@@ -206,12 +206,14 @@ static toonz_tile_interface_t g_toonz_tile_interface = {
 int setup_set_parameter_pages(toonz_node_handle_t handle, int num, toonz_param_page_t *pages)
 {
     auto obj = (othNode*)handle;
+    obj->setParamInfo(pages, num);
     return TOONZ_OK;
 }
 
 int setup_set_parameter_pages_with_error(toonz_node_handle_t handle, int num, toonz_param_page_t *pages, int *reason, void **position)
 {
     auto obj = (othNode*)handle;
+    obj->setParamInfo(pages, num);
     return TOONZ_OK;
 }
 
