@@ -23,6 +23,8 @@
     <ClCompile Include="Foundation\Misc.cpp">
       <Filter>Foundaion</Filter>
     </ClCompile>
+    <ClCompile Include="OpenToonzPluginForUnity.cpp" />
+    <ClCompile Include="otPlugin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -44,6 +46,8 @@
     <ClInclude Include="Foundation\PixelFormat.h">
       <Filter>Foundaion</Filter>
     </ClInclude>
+    <ClInclude Include="OpenToonzPluginForUnity.h" />
+    <ClInclude Include="otPlugin.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Foundaion">

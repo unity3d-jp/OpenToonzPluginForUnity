@@ -18,6 +18,9 @@
 #include <fstream>
 #include <sstream>
 #include <filesystem>
+#include "OpenToonzPluginAPI/toonz_plugin.h"
+#include "OpenToonzPluginAPI/toonz_params.h"
+#include "OpenToonzPluginAPI/toonz_hostif.h"
 
 #define fcImpl
 
