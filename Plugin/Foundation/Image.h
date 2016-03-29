@@ -9,40 +9,40 @@ template<class T, int L> union TPixel;
 template<class T>
 union TPixel<T, 1>
 {
-    typedef T value_type;
-    static const int length = 1;
+    typedef T element_type;
+    static const int num_elements = 1;
 
-    T r;
+    struct { T r; };
     T v[1];
 };
 
 template<class T>
 union TPixel<T, 2>
 {
-    typedef T value_type;
-    static const int length = 2;
+    typedef T element_type;
+    static const int num_elements = 2;
 
-    T r, g;
+    struct { T r, g; };
     T v[2];
 };
 
 template<class T>
 union TPixel<T, 3>
 {
-    typedef T value_type;
-    static const int length = 3;
+    typedef T element_type;
+    static const int num_elements = 3;
 
-    T r, g, b;
+    struct { T r, g, b; };
     T v[3];
 };
 
 template<class T>
 union TPixel<T, 4>
 {
-    typedef T value_type;
-    static const int length = 4;
+    typedef T element_type;
+    static const int num_elements = 4;
 
-    T r, g, b, a;
+    struct { T r, g, b, a; };
     T v[4];
 };
 
@@ -56,7 +56,7 @@ template<> struct TGetPixelFormatType<int32_t> { static const fcPixelFormat valu
 
 template<class T> struct TGetPixelFormat
 {
-    static const fcPixelFormat value = fcPixelFormat(TGetPixelFormatType<typename T::value_type>::value | T::length);
+    static const fcPixelFormat value = fcPixelFormat(TGetPixelFormatType<typename T::element_type>::value | T::num_elements);
 };
 
 
@@ -70,13 +70,20 @@ public:
     ImageBase() : m_width(), m_height() {}
     virtual ~ImageBase() {}
 
-    int         getWidth() const { return m_width; }
-    int         getHeight() const { return m_height; }
-    virtual int getPixelSize() const = 0;
+    virtual ImageBase*      create(int w, int h) const = 0;
+    virtual ImageBase*      clone() const = 0;
+
+    int                     getWidth() const { return m_width; }
+    int                     getHeight() const { return m_height; }
+    virtual int             getPixelSize() const = 0;
+    virtual fcPixelFormat   getPixelType() const = 0;
+
+    virtual void*           getData() = 0;
+    const void*             getData() const { return const_cast<ImageBase*>(this)->getData(); }
+    void*                   getData(int x, int y) { return (uint8_t*)getData() + (m_width*y + x) * getPixelSize(); }
+    const void*             getData(int x, int y) const { return const_cast<ImageBase*>(this)->getData(x, y); }
 
 protected:
-    virtual void* getPixelsImpl() = 0;
-
     int m_width;
     int m_height;
 };
@@ -88,17 +95,21 @@ public:
     typedef PixelT pixel_t;
     typedef TImage<pixel_t> image_t;
 
-    TImageBase() : m_width(), m_height() {}
+    TImageBase() {}
     virtual ~TImageBase() {}
 
-    pixel_t*        getPixels()                     { return (pixel_t*)getPixelsImpl(); }
-    const pixel_t*  getPixels() const               { return const_cast<TImageBase>(this)->getPixels(); }
+    ImageBase*      create(int w, int h) const override;
+    ImageBase*      clone() const override;
+
+    pixel_t*        getPixels()                     { return (pixel_t*)getData(); }
+    const pixel_t*  getPixels() const               { return const_cast<TImageBase*>(this)->getPixels(); }
     int             getPixelSize() const override   { return sizeof(pixel_t); }
+    fcPixelFormat   getPixelType() const override   { return TGetPixelFormat<pixel_t>::value; }
 
-    pixel_t&        get(int x, int y)        { return getPixels()[m_width*y + x]; }
-    const pixel_t&  get(int x, int y) const  { return getPixels()[m_width*y + x]; }
+    pixel_t&        getPixel(int x, int y)          { return getPixels()[m_width*y + x]; }
+    const pixel_t&  getPixel(int x, int y) const    { return getPixels()[m_width*y + x]; }
 
-    image_t copyRect(int x, int y, int w, int h) const;
+    image_t         copyRect(int x, int y, int w, int h) const;
 };
 
 template<class PixelT>
@@ -106,7 +117,13 @@ class TImage : public TImageBase<PixelT>
 {
 public:
     TImage() {}
-    TImage(int w, int h) { resize(w, h); }
+    TImage(int w, int h, const pixel_t *data = nullptr)
+    {
+        resize(w, h);
+        if (data) {
+            memcpy(getData(), data, w*h*sizeof(pixel_t));
+        }
+    }
 
     void resize(int w, int h)
     {
@@ -115,8 +132,9 @@ public:
         m_data.resize(w * h);
     }
 
+    void* getData() override { return m_data.empty() ? nullptr : &m_data[0]; }
+
 private:
-    void* getPixelsImpl() override { return m_data; }
 
     TBuffer<pixel_t> m_data;
 };
@@ -133,11 +151,23 @@ public:
         m_height = h;
     }
 
-protected:
-    void* getPixelsImpl() override { return m_data; }
+    void* getData() override { return m_data; }
 
+protected:
     pixel_t *m_data;
 };
+
+template<class PixelT>
+inline ImageBase* TImageBase<PixelT>::create(int w, int h) const
+{
+    return new TImage<PixelT>(w, h);
+}
+
+template<class PixelT>
+inline ImageBase* TImageBase<PixelT>::clone() const
+{
+    return new TImage<PixelT>(getWidth(), getHeight(), getPixels());
+}
 
 template<class PixelT>
 inline TImage<PixelT> TImageBase<PixelT>::copyRect(int x, int y, int w, int h) const
@@ -152,7 +182,7 @@ inline TImage<PixelT> TImageBase<PixelT>::copyRect(int x, int y, int w, int h) c
     const pixel_t* src = getPixels();
     pixel_t* dst = ret.getPixels();
     for (int iy = 0; iy < h; ++iy) {
-        memcpy(&dst[w * iy], &src[m_width * y + x], sizeof(pixel_t)*w);
+        memcpy(&dst[w * iy], &src[m_width * (y + iy) + x], sizeof(pixel_t)*w);
     }
     return ret;
 }

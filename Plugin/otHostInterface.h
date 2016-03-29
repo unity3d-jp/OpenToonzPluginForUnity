@@ -9,13 +9,6 @@ class othTile;
 class othSetup;
 
 
-class othPort
-{
-public:
-    othPort();
-
-private:
-};
 
 
 class othParam
@@ -53,34 +46,6 @@ class othFXNode
 {
 public:
     othFXNode();
-
-private:
-};
-
-
-class othTile
-{
-public:
-    othTile();
-    othTile(void *pixels, int width, int height);
-
-    int     getWidth() const;
-    int     getHeight() const;
-    void*   getRawData();
-    int     getRawStride() const;
-
-private:
-    bool    m_needs_delete;
-    void    *m_pixels;
-    int     m_width;
-    int     m_height;
-};
-
-
-class othSetup
-{
-public:
-    othSetup();
 
 private:
 };
