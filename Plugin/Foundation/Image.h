@@ -134,8 +134,15 @@ public:
 
     void* getData() override { return m_data.empty() ? nullptr : &m_data[0]; }
 
-private:
+    void move(TImage&& other)
+    {
+        m_width = other.m_width;
+        m_height = other.m_height;
+        m_data.clear();
+        m_data std::move(other.m_data);
+    }
 
+private:
     TBuffer<pixel_t> m_data;
 };
 

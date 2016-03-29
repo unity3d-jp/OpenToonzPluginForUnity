@@ -17,22 +17,36 @@ otParam::otParam(const otParamInfo& info)
     , m_data()
 {
 }
+otParamType otParam::getType() const { return (otParamType)m_info.type; }
+const char* otParam::getName() const { return m_info.name; }
+const char* otParam::getNote() const { return m_info.note; }
+const void* otParam::getData() const { return &m_data; }
 
-const otParamInfo& otParam::getInfo() const
+void otParam::setData(const void *data)
 {
-    return m_info;
+    switch (getType()) {
+    case otParamType_Double:    m_data.double_v = *(otDoubleValue*)data; break;
+    case otParamType_Range:     m_data.range_v = *(otRangeValue*)data; break;
+    case otParamType_Pixel:     m_data.pixel_v = *(otPixelValue*)data; break;
+    case otParamType_Point:     m_data.point_v = *(otPointValue*)data; break;
+    case otParamType_Enum:      m_data.enum_v = *(otEnumValue*)data; break;
+    case otParamType_Int:       m_data.int_v = *(otIntValue*)data; break;
+    case otParamType_Bool:      m_data.bool_v = *(otBoolValue*)data; break;
+    case otParamType_Spectrum:  m_data.spectrum_v = *(otSpectrumValue*)data; break;
+    case otParamType_String:    m_data.string_v = *(otStringValue*)data; break;
+    case otParamType_ToneCurve: m_data.tonecurve_v = *(otToneCurveValue*)data; break;
+    }
 }
 
-otParamData& otParam::getData()
-{
-    return m_data;
-}
+otParamInfo& otParam::getRawInfo() { return m_info; }
+otParamValue& otParam::getRawData() { return m_data; }
 
 
 
 
 otPlugin::otPlugin(toonz_plugin_probe_t *probe)
     : m_probe(probe)
+    , m_userdata()
 {
     m_info.name = m_probe->name;
     m_info.vendor = m_probe->vendor;
@@ -79,16 +93,46 @@ int otPlugin::getNumParams() const
     return (int)m_params.size();
 }
 
-otParam& otPlugin::getParam(int i)
+otParam* otPlugin::getParam(int i)
 {
-    return m_params[i];
+    return &m_params[i];
+}
+otParam* otPlugin::getParamByName(const char *name)
+{
+    for (auto& p : m_params) {
+        if (strcmp(p.getName(), name) == 0) {
+            return &p;
+        }
+    }
+    return nullptr;
 }
 
-void otPlugin::applyFx(otParamData *params, otImage *img, double frame)
+void* otPlugin::getUserData() const { return m_userdata; }
+void otPlugin::setUsertData(void *v) { m_userdata = v; }
+
+void otPlugin::applyFx(otParamValue *params, otImage *src, otImage *dst, double frame)
 {
-    toonz_rendering_setting_t rs;
-    // todo
-    m_probe->handler->do_compute(this, &rs, frame, img);
+    volatile int is_canceled = 0;
+    toonz_rendering_setting_t rs = {
+        {1, 0},
+        this,
+        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+        1.0,
+        1.0, 1.0,
+        1.0,
+        32,
+        1024,
+        100,
+        0,
+        0,
+        0,
+        0,
+        0,
+        {0.0, 0.0, (double)src->getWidth(), (double)src->getHeight()},
+        &is_canceled
+    };
+
+    m_probe->handler->do_compute(this, &rs, frame, src);
 }
 
 

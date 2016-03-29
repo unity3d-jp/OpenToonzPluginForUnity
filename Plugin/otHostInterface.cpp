@@ -13,6 +13,7 @@ int param_get_type(toonz_param_handle_t handle, double frame, int *type, int *co
 {
     Trace("handle: %p, frame: %.4lf", handle, frame);
     auto obj = (otParam*)handle;
+    *type = obj->getType();
     return TOONZ_OK;
 }
 
@@ -59,18 +60,27 @@ int node_get_input_port(toonz_node_handle_t handle, const char *name, toonz_port
 {
     Trace("handle: %p, name: %s", handle, name);
     auto obj = (otPlugin*)handle;
+    *port = obj;
     return TOONZ_OK;
 }
 
 int node_get_rect(toonz_rect_t *rect, double *x0, double *y0, double *x1, double *y1)
 {
     Trace("");
+    *x0 = rect->x0;
+    *y0 = rect->y0;
+    *x1 = rect->x1;
+    *y1 = rect->y1;
     return TOONZ_OK;
 }
 
 int node_set_rect(toonz_rect_t *rect, double x0, double y0, double x1, double y1)
 {
     Trace("");
+    rect->x0 = x0;
+    rect->y0 = y0;
+    rect->x1 = x1;
+    rect->y1 = y1;
     return TOONZ_OK;
 }
 
@@ -78,6 +88,7 @@ int node_get_param(toonz_node_handle_t handle, const char *name, toonz_param_han
 {
     Trace("handle: %p, name: %s", handle, name);
     auto obj = (otPlugin*)handle;
+    *param = obj->getParamByName(name);
     return TOONZ_OK;
 }
 
@@ -85,6 +96,7 @@ int node_set_user_data(toonz_node_handle_t handle, void *user_data)
 {
     Trace("handle: %p, user_data: %p", handle, user_data);
     auto obj = (otPlugin*)handle;
+    obj->setUsertData(user_data);
     return TOONZ_OK;
 }
 
@@ -92,6 +104,7 @@ int node_get_user_data(toonz_node_handle_t handle, void **user_data)
 {
     Trace("handle: %p", handle);
     auto obj = (otPlugin*)handle;
+    *user_data = obj->getUserData();
     return TOONZ_OK;
 }
 
@@ -213,7 +226,7 @@ int tile_create_from(toonz_tile_handle_t handle, toonz_tile_handle_t *newhandle)
 int tile_create(toonz_tile_handle_t *newhandle)
 {
     Trace("");
-    *newhandle = new TImage<TPixel<uint8_t, 4>>();
+    *newhandle = new ImageRGBAu8();
     return TOONZ_OK;
 }
 

@@ -84,12 +84,12 @@ fcCLinkage fcExport void otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo)
 
     int i = 0;
     plugin->eachParams([&](otParam& param) {
-        pinfo[i++] = param.getInfo();
+        pinfo[i++] = param.getRawInfo();
     });
 }
 
-fcCLinkage fcExport void otApplyFx(otPlugin *plugin, otParamData *pdata, otImage *img, double frame)
+fcCLinkage fcExport void otApplyFx(otPlugin *plugin, otParamValue *pdata, otImage *src, otImage *dst, double frame)
 {
     if (!plugin) { return; }
-    plugin->applyFx(pdata, img, frame);
+    plugin->applyFx(pdata, src, dst, frame);
 }

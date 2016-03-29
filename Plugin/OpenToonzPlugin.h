@@ -57,51 +57,56 @@ struct otParamInfo
 };
 
 
-struct otDoubleParam
-{
-    double value;
-};
-struct ouIntParam
+struct otIntValue
 {
     int value;
 };
-struct ouStringParam
+typedef otIntValue otBoolValue;
+typedef otIntValue otEnumValue;
+struct otDoubleValue
+{
+    double value;
+};
+struct otStringValue
 {
     const char *value;
 };
-struct otRangeParam
+struct otRangeValue
 {
     double min, max;
 };
-struct otColorParam
+struct otPixelValue
 {
     int value[4];
 };
-struct ouPointParam
+struct otPointValue
 {
     double x, y;
 };
-struct ouSpectrumParam
+struct otSpectrumValue
 {
     double w;
     double color[4];
 };
-struct ouToneCurveParam
+struct otToneCurveValue
 {
     double x, y;
     int channel;
     int interp;
 };
 
-union otParamData
+union otParamValue
 {
-    otDoubleParam    double_p;
-    ouIntParam       int_p, bool_p, enum_p;
-    ouStringParam    string_p;
-    otRangeParam     range_p;
-    otColorParam     color_p;
-    ouPointParam     point_p;
-    ouToneCurveParam tonecurve_p;
+    otDoubleValue    double_v;
+    otIntValue       int_v;
+    otBoolValue      bool_v;
+    otEnumValue      enum_v;
+    otStringValue    string_v;
+    otRangeValue     range_v;
+    otPixelValue     pixel_v;
+    otPointValue     point_v;
+    otSpectrumValue  spectrum_v;
+    otToneCurveValue tonecurve_v;
 };
 
 struct otPluginInfo
@@ -128,6 +133,6 @@ otCLinkage otExport otPlugin*   otGetPlugin(otModule *mod, int i);
 otCLinkage otExport void        otGetPluginInfo(otPlugin *plugin, otPluginInfo *dst);
 otCLinkage otExport int         otGetNumParams(otPlugin *plugin);
 otCLinkage otExport void        otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo);
-otCLinkage otExport void        otApplyFx(otPlugin *plugin, otParamData *pdata, otImage *img, double frame);
+otCLinkage otExport void        otApplyFx(otPlugin *plugin, otParamValue *pdata, otImage *src, otImage *dst, double frame);
 
 #endif // OpenToonzPluginForUnity_h

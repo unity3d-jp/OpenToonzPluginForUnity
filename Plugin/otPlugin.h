@@ -7,12 +7,20 @@ class otParam
 public:
     otParam();
     otParam(const otParamInfo& info);
-    const otParamInfo&  getInfo() const;
-    otParamData&        getData();
+
+    otParamType         getType() const;
+    const char*         getName() const;
+    const char*         getNote() const;
+
+    const void*         getData() const;
+    void                setData(const void *data);
+
+    otParamInfo&        getRawInfo();
+    otParamValue&       getRawData();
 
 private:
     otParamInfo m_info;
-    otParamData m_data;
+    otParamValue m_data;
 };
 
 
@@ -25,9 +33,13 @@ public:
     const otPluginInfo& getPluginInfo() const;
 
     int                 getNumParams() const;
-    otParam&            getParam(int i);
+    otParam*            getParam(int i);
+    otParam*            getParamByName(const char *name);
 
-    void                applyFx(otParamData *params, otImage *img, double frames);
+    void*               getUserData() const;
+    void                setUsertData(void *v);
+
+    void                applyFx(otParamValue *params, otImage *src, otImage *dst, double frames);
 
     template<class Body>
     void eachParams(const Body& b)
