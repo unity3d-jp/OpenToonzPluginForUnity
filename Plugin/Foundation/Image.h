@@ -187,6 +187,13 @@ inline TImage<PixelT> TImageBase<PixelT>::copyRect(int x, int y, int w, int h) c
     return ret;
 }
 
+typedef TPixel<uint8_t, 4>  RGBAu8;
+typedef TPixel<float, 4>    RGBAf32;
 
+typedef TImage<RGBAu8>      ImageRGBAu8;
+typedef TImage<RGBAf32>     ImageRGBAf32;
+
+typedef TImageIntrusive<RGBAu8>     ImageIntrusiveRGBAu8;
+typedef TImageIntrusive<RGBAf32>    ImageIntrusiveRGBAf32;
 
 #endif // Image_h

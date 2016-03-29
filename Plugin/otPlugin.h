@@ -27,7 +27,7 @@ public:
     int                 getNumParams() const;
     otParam&            getParam(int i);
 
-    void                applyFx(otParamData *params, void *pixels, int width, int height);
+    void                applyFx(otParamData *params, otImage *img, double frames);
 
     template<class Body>
     void eachParams(const Body& b)

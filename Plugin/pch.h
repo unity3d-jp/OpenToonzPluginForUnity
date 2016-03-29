@@ -106,3 +106,6 @@
 #ifdef fcMaster
     #define otMaster
 #endif 
+
+class ImageBase;
+typedef ImageBase otImage;

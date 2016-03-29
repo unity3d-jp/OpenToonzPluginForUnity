@@ -18,6 +18,16 @@
 
 class otModule;
 class otPlugin;
+#ifndef otImpl
+    class otImage;
+#endif // otImpl
+
+struct otImageData
+{
+    int width;
+    int height;
+    void *data;
+};
 
 enum otParamType {
     otParamType_Double,
@@ -55,10 +65,6 @@ struct ouIntParam
 {
     int value;
 };
-struct ouBoolParam
-{
-    bool value;
-};
 struct ouStringParam
 {
     const char *value;
@@ -75,17 +81,22 @@ struct ouPointParam
 {
     double x, y;
 };
+struct ouSpectrumParam
+{
+    double w;
+    double color[4];
+};
 struct ouToneCurveParam
 {
     double x, y;
-    double color[4];
+    int channel;
+    int interp;
 };
 
 union otParamData
 {
     otDoubleParam    double_p;
-    ouIntParam       int_p;
-    ouBoolParam      bool_p;
+    ouIntParam       int_p, bool_p, enum_p;
     ouStringParam    string_p;
     otRangeParam     range_p;
     otColorParam     color_p;
@@ -102,6 +113,12 @@ struct otPluginInfo
 };
 
 
+otCLinkage otExport otImage*    otImageCreate(int width, int height);
+otCLinkage otExport otImage*    otImageCreateIntrusive(void *data, int width, int height);
+otCLinkage otExport void        otImageDestroy(otImage *img);
+otCLinkage otExport void        otImageGetData(otImage *img, otImageData *data);
+
+
 otCLinkage otExport otModule*   otLoad(const char *path);
 otCLinkage otExport void        otUnload(otModule *mod);
 
@@ -111,6 +128,6 @@ otCLinkage otExport otPlugin*   otGetPlugin(otModule *mod, int i);
 otCLinkage otExport void        otGetPluginInfo(otPlugin *plugin, otPluginInfo *dst);
 otCLinkage otExport int         otGetNumParams(otPlugin *plugin);
 otCLinkage otExport void        otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo);
-otCLinkage otExport void        otApplyFx(otPlugin *plugin, otParamData *pdata, void *pixels, int width, int height);
+otCLinkage otExport void        otApplyFx(otPlugin *plugin, otParamData *pdata, otImage *img, double frame);
 
 #endif // OpenToonzPluginForUnity_h

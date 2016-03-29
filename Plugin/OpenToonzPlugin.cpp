@@ -7,6 +7,29 @@
 std::map<std::string, otModule*> g_plugins;
 
 
+otCLinkage otExport otImage* otImageCreate(int width, int height)
+{
+    return new ImageRGBAu8(width, height);
+}
+
+otCLinkage otExport otImage* otImageCreateIntrusive(void *data, int width, int height)
+{
+    return new ImageIntrusiveRGBAu8((RGBAu8*)data, width, height);
+}
+
+otCLinkage otExport void otImageDestroy(otImage *img)
+{
+    delete img;
+}
+
+otCLinkage otExport void otImageGetData(otImage *img, otImageData *data)
+{
+    data->width = img->getWidth();
+    data->height = img->getHeight();
+    data->data = img->getData();
+}
+
+
 fcCLinkage fcExport otModule* otLoad(const char *path)
 {
     auto i = g_plugins.find(path);
@@ -65,8 +88,8 @@ fcCLinkage fcExport void otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo)
     });
 }
 
-fcCLinkage fcExport void otApplyFx(otPlugin *plugin, otParamData *pdata, void *pixels, int width, int height)
+fcCLinkage fcExport void otApplyFx(otPlugin *plugin, otParamData *pdata, otImage *img, double frame)
 {
     if (!plugin) { return; }
-    plugin->applyFx(pdata, pixels, width, height);
+    plugin->applyFx(pdata, img, frame);
 }

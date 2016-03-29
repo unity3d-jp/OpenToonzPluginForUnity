@@ -84,9 +84,11 @@ otParam& otPlugin::getParam(int i)
     return m_params[i];
 }
 
-void otPlugin::applyFx(otParamData *params, void *pixels, int width, int height)
+void otPlugin::applyFx(otParamData *params, otImage *img, double frame)
 {
+    toonz_rendering_setting_t rs;
     // todo
+    m_probe->handler->do_compute(this, &rs, frame, img);
 }
 
 

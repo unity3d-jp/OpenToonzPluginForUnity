@@ -2,7 +2,6 @@
 #include "OpenToonzPlugin.h"
 #include "fcFoundation.h"
 #include "otPlugin.h"
-#include "Image.h"
 
 #ifndef otMaster
     #define Trace(Fmt, ...) printf(__FUNCTION__ " " Fmt "\n", __VA_ARGS__)
@@ -303,6 +302,7 @@ int port_get_fx(toonz_port_handle_t handle, toonz_fxnode_handle_t *fxnode)
 {
     Trace("handle: %p", handle);
     auto obj = (otPlugin*)handle;
+    *fxnode = obj;
     return TOONZ_OK;
 }
 
