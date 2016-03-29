@@ -29,7 +29,7 @@ int param_get_value(toonz_param_handle_t handle, double frame, int *pcounts, voi
     if (!handle || !pvalue) { return TOONZ_ERROR_NULL; }
 
     auto obj = (otParam*)handle;
-    obj->copyValue(pvalue);
+    obj->getValue(pvalue);
     *pcounts = obj->getLength();
     return TOONZ_OK;
 }
@@ -50,7 +50,14 @@ int param_get_string_value(toonz_param_handle_t handle, int *wholesize, int rcvb
     if (!handle || !pvalue) { return TOONZ_ERROR_NULL; }
 
     auto obj = (otParam*)handle;
-    obj->setValue(pvalue); // todo
+    if (obj->getType() != otParamType_String) {
+        return TOONZ_PARAM_ERROR_TYPE;
+    }
+    *wholesize = obj->getLength();
+    if (rcvbufsize < obj->getLength()) {
+        return TOONZ_ERROR_OUT_OF_MEMORY;
+    }
+    obj->getValue(pvalue);
     return TOONZ_OK;
 }
 
@@ -60,7 +67,10 @@ int param_get_spectrum_value(toonz_param_handle_t handle, double frame, double x
     if (!handle || !pvalue) { return TOONZ_ERROR_NULL; }
 
     auto obj = (otParam*)handle;
-    obj->setValue(pvalue); // todo
+    if (obj->getType() != otParamType_Spectrum) {
+        return TOONZ_PARAM_ERROR_TYPE;
+    }
+    obj->getValue(pvalue);
     return TOONZ_OK;
 }
 
@@ -179,7 +189,7 @@ int fxnode_compute_to_tile(toonz_fxnode_handle_t handle, const toonz_rendering_s
 
     auto dst = (ImageRGBAu8*)outtile;
     dst->resize(int(rect->x1 - rect->x0), int(rect->y1 - rect->y0));
-    ((otContext*)rs)->dst = dst;
+    obj->setDstImage(dst);
 
     return TOONZ_OK;
 }

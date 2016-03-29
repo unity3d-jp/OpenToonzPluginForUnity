@@ -16,11 +16,12 @@
     #define otExport
 #endif
 
-class otModule;
-class otPlugin;
 #ifndef otImpl
     class otImage;
 #endif // otImpl
+class otModule;
+class otPlugin;
+class otParam;
 
 struct otImageData
 {
@@ -79,7 +80,7 @@ struct otRangeValue
 };
 struct otPixelValue
 {
-    int value[4];
+    int c0, c1, c2, m;
 };
 struct otPointValue
 {
@@ -88,7 +89,7 @@ struct otPointValue
 struct otSpectrumValue
 {
     double w;
-    double color[4];
+    double c0, c1, c2, m;
 };
 struct otToneCurveValue
 {
@@ -97,17 +98,6 @@ struct otToneCurveValue
     int interp;
 };
 
-union otParamValue
-{
-    otDoubleValue    double_v;
-    otIntValue       int_v;
-    otBoolValue      bool_v;
-    otEnumValue      enum_v;
-    otRangeValue     range_v;
-    otPixelValue     pixel_v;
-    otPointValue     point_v;
-    otSpectrumValue  spectrum_v;
-};
 
 struct otPluginInfo
 {
@@ -132,7 +122,13 @@ otCLinkage otExport otPlugin*   otGetPlugin(otModule *mod, int i);
 
 otCLinkage otExport void        otGetPluginInfo(otPlugin *plugin, otPluginInfo *dst);
 otCLinkage otExport int         otGetNumParams(otPlugin *plugin);
-otCLinkage otExport void        otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo);
-otCLinkage otExport otImage*    otApplyFx(otPlugin *plugin, otParamValue *pdata, otImage *src, double frame);
+otCLinkage otExport void        otGetParamInfo(otPlugin *plugin, int i, otParamInfo *pinfo);
+// return count of elements if param type is string or tonecurve. otherwise 1
+otCLinkage otExport int         otGetParamLength(otPlugin *plugin, int i);
+otCLinkage otExport void        otGetParamValue(otPlugin *plugin, int i, void *dst);
+otCLinkage otExport void        otSetParamValue(otPlugin *plugin, int i, const void *src);
+
+// return result image. user should otImageDestroy() returned image
+otCLinkage otExport otImage*    otApplyFx(otPlugin *plugin, otImage *src, double frame);
 
 #endif // OpenToonzPluginForUnity_h

@@ -77,19 +77,32 @@ fcCLinkage fcExport int otGetNumParams(otPlugin *plugin)
     return plugin->getNumParams();
 }
 
-fcCLinkage fcExport void otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo)
+otCLinkage otExport void otGetParamInfo(otPlugin *plugin, int i, otParamInfo *pinfo)
 {
     if (!plugin || !pinfo) { return; }
-    int n = plugin->getNumParams();
-
-    int i = 0;
-    plugin->eachParams([&](otParam& param) {
-        pinfo[i++] = param.getRawInfo();
-    });
+    *pinfo = plugin->getParam(i)->getRawInfo();
 }
 
-fcCLinkage fcExport otImage* otApplyFx(otPlugin *plugin, otParamValue *pdata, otImage *src, double frame)
+otCLinkage otExport int otGetParamLength(otPlugin *plugin, int i)
+{
+    if (!plugin) { return 0; }
+    return plugin->getParam(i)->getLength();
+}
+
+otCLinkage otExport void otGetParamValue(otPlugin *plugin, int i, void *dst)
+{
+    if (!plugin) { return; }
+    plugin->getParam(i)->getValue(dst);
+}
+
+otCLinkage otExport void otSetParamValue(otPlugin *plugin, int i, const void *src)
+{
+    if (!plugin) { return; }
+    plugin->getParam(i)->setValue(src);
+}
+
+fcCLinkage fcExport otImage* otApplyFx(otPlugin *plugin, otImage *src, double frame)
 {
     if (!plugin) { return nullptr; }
-    return plugin->applyFx(pdata, src, frame);
+    return plugin->applyFx(src, frame);
 }

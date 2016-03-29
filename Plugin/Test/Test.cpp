@@ -37,17 +37,17 @@ int main(int argc, char *argv[])
         printf("\n");
     }
 
-    std::vector<otParamInfo> param_info;
-    param_info.resize(otGetNumParams(plugin));
-    if (!param_info.empty()) {
-        otGetParamInfo(plugin, &param_info[0]);
-        for (int i = 0; i < (int)param_info.size(); ++i) {
-            printf("plugin param %d: %s\n", i, param_info[i].name);
+    {
+        int n = otGetNumParams(plugin);
+        otParamInfo pinfo;
+        for (int i = 0; i < n; ++i) {
+            otGetParamInfo(plugin, i, &pinfo);
+            printf("plugin param %d: %s\n", i, pinfo.name);
         }
     }
 
     otImage *src = otImageCreate(128, 128);
-    otImage *dst = otApplyFx(plugin, nullptr, src, 0.0);
+    otImage *dst = otApplyFx(plugin, src, 0.0);
 
     otImageDestroy(dst);
     otImageDestroy(src);

@@ -14,7 +14,6 @@ otParam::otParam()
 
 otParam::otParam(const otParamInfo& info)
     : m_info(info)
-    , m_data()
 {
 }
 
@@ -25,30 +24,29 @@ otParam::~otParam()
 otParamType otParam::getType() const { return (otParamType)m_info.type; }
 const char* otParam::getName() const { return m_info.name; }
 const char* otParam::getNote() const { return m_info.note; }
-const void* otParam::getValue() const { return &m_data; }
 
 int otParam::getLength() const
 {
     switch (getType()) {
-    case otParamType_String: return (int)m_string.size();
+    case otParamType_String: return m_string.empty() ? 0 : m_string.size() + 1;
     case otParamType_ToneCurve: return (int)m_tonecurve.size();
     }
     return 1;
 }
 
-void otParam::copyValue(void *dst) const
+void otParam::getValue(void *dst) const
 {
     if (!dst) { return; }
 
     switch (getType()) {
-    case otParamType_Double:    *(otDoubleValue*)dst = m_data.double_v; break;
-    case otParamType_Range:     *(otRangeValue*)dst = m_data.range_v; break;
-    case otParamType_Pixel:     *(otPixelValue*)dst = m_data.pixel_v; break;
-    case otParamType_Point:     *(otPointValue*)dst = m_data.point_v; break;
-    case otParamType_Enum:      *(otEnumValue*)dst = m_data.enum_v; break;
-    case otParamType_Int:       *(otIntValue*)dst = m_data.int_v; break;
-    case otParamType_Bool:      *(otBoolValue*)dst = m_data.bool_v; break;
-    case otParamType_Spectrum:  *(otSpectrumValue*)dst = m_data.spectrum_v; break;
+    case otParamType_Double:    *(otDoubleValue*)dst = m_value.double_v; break;
+    case otParamType_Range:     *(otRangeValue*)dst = m_value.range_v; break;
+    case otParamType_Pixel:     *(otPixelValue*)dst = m_value.pixel_v; break;
+    case otParamType_Point:     *(otPointValue*)dst = m_value.point_v; break;
+    case otParamType_Enum:      *(otEnumValue*)dst = m_value.enum_v; break;
+    case otParamType_Int:       *(otIntValue*)dst = m_value.int_v; break;
+    case otParamType_Bool:      *(otBoolValue*)dst = m_value.bool_v; break;
+    case otParamType_Spectrum:  *(otSpectrumValue*)dst = m_value.spectrum_v; break;
     case otParamType_String:    memcpy(dst, m_string.c_str(), m_string.size()); break;
     case otParamType_ToneCurve: memcpy(dst, &m_tonecurve[0], sizeof(otToneCurveValue)*m_tonecurve.size()); break;
     }
@@ -59,14 +57,14 @@ void otParam::setValue(const void *src, int len)
     if (!src) { return; }
 
     switch (getType()) {
-    case otParamType_Double:    m_data.double_v = *(otDoubleValue*)src; break;
-    case otParamType_Range:     m_data.range_v = *(otRangeValue*)src; break;
-    case otParamType_Pixel:     m_data.pixel_v = *(otPixelValue*)src; break;
-    case otParamType_Point:     m_data.point_v = *(otPointValue*)src; break;
-    case otParamType_Enum:      m_data.enum_v = *(otEnumValue*)src; break;
-    case otParamType_Int:       m_data.int_v = *(otIntValue*)src; break;
-    case otParamType_Bool:      m_data.bool_v = *(otBoolValue*)src; break;
-    case otParamType_Spectrum:  m_data.spectrum_v = *(otSpectrumValue*)src; break;
+    case otParamType_Double:    m_value.double_v = *(otDoubleValue*)src; break;
+    case otParamType_Range:     m_value.range_v = *(otRangeValue*)src; break;
+    case otParamType_Pixel:     m_value.pixel_v = *(otPixelValue*)src; break;
+    case otParamType_Point:     m_value.point_v = *(otPointValue*)src; break;
+    case otParamType_Enum:      m_value.enum_v = *(otEnumValue*)src; break;
+    case otParamType_Int:       m_value.int_v = *(otIntValue*)src; break;
+    case otParamType_Bool:      m_value.bool_v = *(otBoolValue*)src; break;
+    case otParamType_Spectrum:  m_value.spectrum_v = *(otSpectrumValue*)src; break;
     case otParamType_String:
         m_string = (const char*)src;
         break;
@@ -77,39 +75,15 @@ void otParam::setValue(const void *src, int len)
 }
 
 otParamInfo& otParam::getRawInfo() { return m_info; }
-otParamValue& otParam::getRawValue() { return m_data; }
 
 
-
-otContext::otContext()
-    : dst()
-    , is_canceled(0)
-
-{
-    rs = {
-        { 1, 0 },
-        this,
-        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-        1.0,
-        1.0, 1.0,
-        1.0,
-        32,
-        1024,
-        100,
-        0,
-        0,
-        0,
-        0,
-        0,
-        { 0.0, 0.0, 0.0, 0.0 },
-        &is_canceled
-    };
-}
 
 
 otPlugin::otPlugin(toonz_plugin_probe_t *probe)
     : m_probe(probe)
     , m_userdata()
+    , m_dst_image()
+    , m_canceled()
 {
     m_info.name = m_probe->name;
     m_info.vendor = m_probe->vendor;
@@ -130,12 +104,9 @@ otPlugin::~otPlugin()
 static void To_otParam(toonz_param_desc_t& desc, otParam& dst)
 {
     otParamInfo& info = dst.getRawInfo();
-    otParamValue& val = dst.getRawValue();
     info.name = desc.key;
     info.note = desc.note;
     info.type = (otParamType)desc.traits_tag;
-
-    ;
 
     switch (info.type) {
     case otParamType_Double:    dst.setValue(&desc.traits.d.def); break;
@@ -145,10 +116,13 @@ static void To_otParam(toonz_param_desc_t& desc, otParam& dst)
     case otParamType_Enum:      dst.setValue(&desc.traits.e.def); break;
     case otParamType_Int:       dst.setValue(&desc.traits.i.def); break;
     case otParamType_Bool:      dst.setValue(&desc.traits.b.def); break;
-    case otParamType_Spectrum:  dst.setValue(&desc.traits.g.def); break;
+    case otParamType_Spectrum:
+        if (desc.traits.g.points > 0) {
+            dst.setValue(&desc.traits.g.array[0]);
+        }
+        break;
     case otParamType_String:    dst.setValue(desc.traits.s.def); break;
     case otParamType_ToneCurve: /* no default value*/ break;
-
     }
 }
 
@@ -196,12 +170,37 @@ otParam* otPlugin::getParamByName(const char *name)
 void* otPlugin::getUserData() const { return m_userdata; }
 void otPlugin::setUsertData(void *v) { m_userdata = v; }
 
-otImage* otPlugin::applyFx(otParamValue *params, otImage *src, double frame)
-{
-    otContext ctx;
-    m_probe->handler->do_compute(this, &ctx.rs, frame, src);
 
-    return ctx.dst;
+void otPlugin::setDstImage(ImageRGBAu8 *img)
+{
+    m_dst_image = img;
+}
+
+otImage* otPlugin::applyFx(otImage *src, double frame)
+{
+    m_canceled = 0;
+
+    toonz_rendering_setting_t rs = {
+        { 1, 0 },
+        this,
+        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+        1.0,
+        1.0, 1.0,
+        1.0,
+        32,
+        1024,
+        100,
+        0,
+        0,
+        0,
+        0,
+        0,
+        { 0.0, 0.0, 0.0, 0.0 },
+        &m_canceled
+    };
+    m_probe->handler->do_compute(this, &rs, frame, src);
+
+    return m_dst_image;
 }
 
 
