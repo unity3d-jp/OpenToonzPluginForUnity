@@ -51,6 +51,9 @@
     <ClInclude Include="otPlugin.h" />
     <ClInclude Include="otHostInterface.h" />
     <ClInclude Include="OpenToonzPlugin.h" />
+    <ClInclude Include="Foundation\Image.h">
+      <Filter>Foundaion</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Foundaion">

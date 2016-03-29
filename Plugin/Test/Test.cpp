@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        printf("usage: %s plugin_path plugin_index=0\n", argv[0]);
+        printf("usage: %s plugin_path plugin_index(default:0)\n", argv[0]);
         return 0;
     }
 
@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
         printf("plugin vendor: %s\n", info.vendor);
         printf("plugin note: %s\n", info.note);
         printf("plugin version: %d.%d\n", info.version_major, info.version_minor);
+        printf("\n");
     }
 
     std::vector<otParamInfo> param_info;

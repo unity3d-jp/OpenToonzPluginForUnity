@@ -103,3 +103,6 @@
 #ifdef fcImpl
     #define otImpl
 #endif 
+#ifdef fcMaster
+    #define otMaster
+#endif 

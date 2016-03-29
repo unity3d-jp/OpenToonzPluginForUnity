@@ -36,6 +36,7 @@
     <ClInclude Include="Foundation\Buffer.h" />
     <ClInclude Include="Foundation\fcFoundation.h" />
     <ClInclude Include="Foundation\fcThreadPool.h" />
+    <ClInclude Include="Foundation\Image.h" />
     <ClInclude Include="Foundation\Misc.h" />
     <ClInclude Include="Foundation\PixelFormat.h" />
     <ClInclude Include="GraphicsDevice\fcGraphicsDevice.h" />
