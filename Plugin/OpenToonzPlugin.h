@@ -31,11 +31,19 @@ enum otParamType {
     otParamType_String,
     otParamType_ToneCurve,
 };
+
 struct otParamInfo
 {
     const char *name;
     const char *note;
     otParamType type;
+
+    otParamInfo(
+        const char *name_ = nullptr,
+        const char *note_ = nullptr,
+        otParamType type_ = otParamType_Double)
+        : name(name_), note(note_), type(type_)
+    {}
 };
 
 

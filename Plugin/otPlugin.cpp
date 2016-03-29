@@ -2,15 +2,31 @@
 #include "OpenToonzPlugin.h"
 #include "fcFoundation.h"
 #include "otPlugin.h"
-#include "otHostInterface.h"
 
 typedef int(*toonz_plugin_init_t)(toonz_host_interface_t *hostif);
 typedef void(*toonz_plugin_exit_t)();
-
-
 extern toonz_host_interface_t g_toonz_host_interface;
 
 
+otParam::otParam()
+{
+}
+
+otParam::otParam(const otParamInfo& info)
+    : m_info(info)
+    , m_data()
+{
+}
+
+const otParamInfo& otParam::getInfo() const
+{
+    return m_info;
+}
+
+otParamData& otParam::getData()
+{
+    return m_data;
+}
 
 
 
@@ -25,8 +41,7 @@ otPlugin::otPlugin(toonz_plugin_probe_t *probe)
     m_info.version_minor = m_probe->ver.minor;
 
     if (m_probe->handler && m_probe->handler->setup) {
-        othNode node(this);
-        m_probe->handler->setup(&node);
+        m_probe->handler->setup(this);
     }
 }
 
@@ -36,7 +51,7 @@ otPlugin::~otPlugin()
 
 void otPlugin::setParamInfo(toonz_param_page_t *pages, int num_pages)
 {
-    m_pinfo.clear();
+    m_params.clear();
     for (int pi = 0; pi < num_pages; ++pi) {
         toonz_param_page_t& page = pages[pi];
         for (int gi = 0; gi < page.num; ++gi) {
@@ -48,7 +63,7 @@ void otPlugin::setParamInfo(toonz_param_page_t *pages, int num_pages)
                 info.name = desc.key;
                 info.note = desc.note;
                 info.type = (otParamType)desc.traits_tag;
-                m_pinfo.push_back(info);
+                m_params.push_back(info);
             }
         }
     }
@@ -61,12 +76,12 @@ const otPluginInfo& otPlugin::getPluginInfo() const
 
 int otPlugin::getNumParams() const
 {
-    return (int)m_pinfo.size();
+    return (int)m_params.size();
 }
 
-const otParamInfo* otPlugin::getParamInfo() const
+otParam& otPlugin::getParam(int i)
 {
-    return m_pinfo.empty() ? nullptr : &m_pinfo[0];
+    return m_params[i];
 }
 
 void otPlugin::applyFx(otParamData *params, void *pixels, int width, int height)

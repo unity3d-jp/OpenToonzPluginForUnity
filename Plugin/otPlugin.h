@@ -1,6 +1,21 @@
 #ifndef otPlugin_h
 #define otPlugin_h
 
+
+class otParam
+{
+public:
+    otParam();
+    otParam(const otParamInfo& info);
+    const otParamInfo&  getInfo() const;
+    otParamData&        getData();
+
+private:
+    otParamInfo m_info;
+    otParamData m_data;
+};
+
+
 class otPlugin
 {
 public:
@@ -10,9 +25,15 @@ public:
     const otPluginInfo& getPluginInfo() const;
 
     int                 getNumParams() const;
-    const otParamInfo*  getParamInfo() const;
+    otParam&            getParam(int i);
 
-    void        applyFx(otParamData *params, void *pixels, int width, int height);
+    void                applyFx(otParamData *params, void *pixels, int width, int height);
+
+    template<class Body>
+    void eachParams(const Body& b)
+    {
+        for (auto& param : m_params) { b(param); }
+    }
 
 public:
     // internal
@@ -21,7 +42,8 @@ public:
 private:
     toonz_plugin_probe_t *m_probe;
     otPluginInfo m_info;
-    std::vector<otParamInfo> m_pinfo;
+    std::vector<otParam> m_params;
+    void *m_userdata;
 };
 
 
