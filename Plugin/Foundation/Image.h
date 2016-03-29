@@ -125,6 +125,13 @@ public:
         }
     }
 
+    void clear()
+    {
+        m_width = 0;
+        m_height = 0;
+        m_data.clear();
+    }
+
     void resize(int w, int h)
     {
         m_width = w;
@@ -134,12 +141,13 @@ public:
 
     void* getData() override { return m_data.empty() ? nullptr : &m_data[0]; }
 
-    void move(TImage&& other)
+    void move(TImage& other)
     {
         m_width = other.m_width;
         m_height = other.m_height;
         m_data.clear();
-        m_data std::move(other.m_data);
+        m_data = std::move(other.m_data);
+        other.clear();
     }
 
 private:

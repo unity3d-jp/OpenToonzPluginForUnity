@@ -12,36 +12,55 @@
 int param_get_type(toonz_param_handle_t handle, double frame, int *type, int *counts)
 {
     Trace("handle: %p, frame: %.4lf", handle, frame);
+    if (!handle || !counts) {
+        *type = otParamType_Unknown;
+        return TOONZ_ERROR_NULL;
+    }
+
     auto obj = (otParam*)handle;
     *type = obj->getType();
+    *counts = obj->getLength();
     return TOONZ_OK;
 }
 
 int param_get_value(toonz_param_handle_t handle, double frame, int *pcounts, void *pvalue)
 {
     Trace("handle: %p, frame: %.4lf", handle, frame);
+    if (!handle || !pvalue) { return TOONZ_ERROR_NULL; }
+
     auto obj = (otParam*)handle;
+    obj->copyValue(pvalue);
+    *pcounts = obj->getLength();
     return TOONZ_OK;
 }
 
 int param_set_value(toonz_param_handle_t handle, double frame, int counts, const void *pvalue)
 {
     Trace("handle: %p, frame: %.4lf", handle, frame);
+    if (!handle || !pvalue) { return TOONZ_ERROR_NULL; }
+
     auto obj = (otParam*)handle;
+    obj->setValue(pvalue, counts);
     return TOONZ_OK;
 }
 
 int param_get_string_value(toonz_param_handle_t handle, int *wholesize, int rcvbufsize, char *pvalue)
 {
     Trace("handle: %p", handle);
+    if (!handle || !pvalue) { return TOONZ_ERROR_NULL; }
+
     auto obj = (otParam*)handle;
+    obj->setValue(pvalue); // todo
     return TOONZ_OK;
 }
 
 int param_get_spectrum_value(toonz_param_handle_t handle, double frame, double x, toonz_param_spectrum_t *pvalue)
 {
     Trace("handle: %p, frame: %.4lf", handle, frame);
+    if (!handle || !pvalue) { return TOONZ_ERROR_NULL; }
+
     auto obj = (otParam*)handle;
+    obj->setValue(pvalue); // todo
     return TOONZ_OK;
 }
 
@@ -59,6 +78,8 @@ static toonz_param_interface_t g_toonz_param_interface = {
 int node_get_input_port(toonz_node_handle_t handle, const char *name, toonz_port_handle_t *port)
 {
     Trace("handle: %p, name: %s", handle, name);
+    if (!handle || !port) { return TOONZ_ERROR_NULL; }
+
     auto obj = (otPlugin*)handle;
     *port = obj;
     return TOONZ_OK;
@@ -131,6 +152,7 @@ int fxnode_can_handle(toonz_fxnode_handle_t handle, const toonz_rendering_settin
 {
     Trace("handle: %p", handle);
     auto obj = (otPlugin*)handle;
+    *can_handle = 1;
     return TOONZ_OK;
 }
 
@@ -138,6 +160,7 @@ int fxnode_get_input_port_count(toonz_fxnode_handle_t handle, int *count)
 {
     Trace("handle: %p", handle);
     auto obj = (otPlugin*)handle;
+    *count = 1;
     return TOONZ_OK;
 }
 
@@ -145,13 +168,19 @@ int fxnode_get_input_port(toonz_fxnode_handle_t handle, int index, toonz_port_ha
 {
     Trace("handle: %p", handle);
     auto obj = (otPlugin*)handle;
+    *port = obj;
     return TOONZ_OK;
 }
 
-int fxnode_compute_to_tile(toonz_fxnode_handle_t handle, const toonz_rendering_setting_t *, double frame, const toonz_rect_t *rect, toonz_tile_handle_t intile, toonz_tile_handle_t outtile)
+int fxnode_compute_to_tile(toonz_fxnode_handle_t handle, const toonz_rendering_setting_t *rs, double frame, const toonz_rect_t *rect, toonz_tile_handle_t intile, toonz_tile_handle_t outtile)
 {
     Trace("handle: %p", handle);
     auto obj = (otPlugin*)handle;
+
+    auto dst = (ImageRGBAu8*)outtile;
+    dst->resize(int(rect->x1 - rect->x0), int(rect->y1 - rect->y0));
+    ((otContext*)rs)->dst = dst;
+
     return TOONZ_OK;
 }
 

@@ -40,6 +40,8 @@ enum otParamType {
     otParamType_Spectrum,
     otParamType_String,
     otParamType_ToneCurve,
+    otParamType_Unknown,
+
 };
 
 struct otParamInfo
@@ -51,7 +53,7 @@ struct otParamInfo
     otParamInfo(
         const char *name_ = nullptr,
         const char *note_ = nullptr,
-        otParamType type_ = otParamType_Double)
+        otParamType type_ = otParamType_Unknown)
         : name(name_), note(note_), type(type_)
     {}
 };
@@ -101,12 +103,10 @@ union otParamValue
     otIntValue       int_v;
     otBoolValue      bool_v;
     otEnumValue      enum_v;
-    otStringValue    string_v;
     otRangeValue     range_v;
     otPixelValue     pixel_v;
     otPointValue     point_v;
     otSpectrumValue  spectrum_v;
-    otToneCurveValue tonecurve_v;
 };
 
 struct otPluginInfo
@@ -133,6 +133,6 @@ otCLinkage otExport otPlugin*   otGetPlugin(otModule *mod, int i);
 otCLinkage otExport void        otGetPluginInfo(otPlugin *plugin, otPluginInfo *dst);
 otCLinkage otExport int         otGetNumParams(otPlugin *plugin);
 otCLinkage otExport void        otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo);
-otCLinkage otExport void        otApplyFx(otPlugin *plugin, otParamValue *pdata, otImage *src, otImage *dst, double frame);
+otCLinkage otExport otImage*    otApplyFx(otPlugin *plugin, otParamValue *pdata, otImage *src, double frame);
 
 #endif // OpenToonzPluginForUnity_h

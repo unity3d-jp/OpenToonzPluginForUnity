@@ -46,8 +46,10 @@ int main(int argc, char *argv[])
         }
     }
 
-    // todo
+    otImage *src = otImageCreate(128, 128);
+    otImage *dst = otApplyFx(plugin, nullptr, src, 0.0);
 
-
+    otImageDestroy(dst);
+    otImageDestroy(src);
     otUnload(module);
 }

@@ -7,20 +7,34 @@ class otParam
 public:
     otParam();
     otParam(const otParamInfo& info);
+    ~otParam();
 
     otParamType         getType() const;
     const char*         getName() const;
     const char*         getNote() const;
 
-    const void*         getData() const;
-    void                setData(const void *data);
+    const void*         getValue() const;
+    int                 getLength() const;
+    void                copyValue(void *dst) const;
+    void                setValue(const void *data, int len=1); // len is relevant only if type is tonecurve
 
     otParamInfo&        getRawInfo();
-    otParamValue&       getRawData();
+    otParamValue&       getRawValue();
 
 private:
     otParamInfo m_info;
     otParamValue m_data;
+    std::string m_string;
+    std::vector<otToneCurveValue> m_tonecurve;
+};
+
+struct otContext
+{
+    toonz_rendering_setting_t rs;
+    ImageRGBAu8 *dst;
+    int is_canceled;
+
+    otContext();
 };
 
 
@@ -39,7 +53,7 @@ public:
     void*               getUserData() const;
     void                setUsertData(void *v);
 
-    void                applyFx(otParamValue *params, otImage *src, otImage *dst, double frames);
+    otImage*            applyFx(otParamValue *params, otImage *src, double frames);
 
     template<class Body>
     void eachParams(const Body& b)

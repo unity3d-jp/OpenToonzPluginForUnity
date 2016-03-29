@@ -88,8 +88,8 @@ fcCLinkage fcExport void otGetParamInfo(otPlugin *plugin, otParamInfo *pinfo)
     });
 }
 
-fcCLinkage fcExport void otApplyFx(otPlugin *plugin, otParamValue *pdata, otImage *src, otImage *dst, double frame)
+fcCLinkage fcExport otImage* otApplyFx(otPlugin *plugin, otParamValue *pdata, otImage *src, double frame)
 {
-    if (!plugin) { return; }
-    plugin->applyFx(pdata, src, dst, frame);
+    if (!plugin) { return nullptr; }
+    return plugin->applyFx(pdata, src, frame);
 }

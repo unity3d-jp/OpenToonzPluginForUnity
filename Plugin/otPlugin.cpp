@@ -17,31 +17,94 @@ otParam::otParam(const otParamInfo& info)
     , m_data()
 {
 }
+
+otParam::~otParam()
+{
+}
+
 otParamType otParam::getType() const { return (otParamType)m_info.type; }
 const char* otParam::getName() const { return m_info.name; }
 const char* otParam::getNote() const { return m_info.note; }
-const void* otParam::getData() const { return &m_data; }
+const void* otParam::getValue() const { return &m_data; }
 
-void otParam::setData(const void *data)
+int otParam::getLength() const
 {
     switch (getType()) {
-    case otParamType_Double:    m_data.double_v = *(otDoubleValue*)data; break;
-    case otParamType_Range:     m_data.range_v = *(otRangeValue*)data; break;
-    case otParamType_Pixel:     m_data.pixel_v = *(otPixelValue*)data; break;
-    case otParamType_Point:     m_data.point_v = *(otPointValue*)data; break;
-    case otParamType_Enum:      m_data.enum_v = *(otEnumValue*)data; break;
-    case otParamType_Int:       m_data.int_v = *(otIntValue*)data; break;
-    case otParamType_Bool:      m_data.bool_v = *(otBoolValue*)data; break;
-    case otParamType_Spectrum:  m_data.spectrum_v = *(otSpectrumValue*)data; break;
-    case otParamType_String:    m_data.string_v = *(otStringValue*)data; break;
-    case otParamType_ToneCurve: m_data.tonecurve_v = *(otToneCurveValue*)data; break;
+    case otParamType_String: return (int)m_string.size();
+    case otParamType_ToneCurve: return (int)m_tonecurve.size();
+    }
+    return 1;
+}
+
+void otParam::copyValue(void *dst) const
+{
+    if (!dst) { return; }
+
+    switch (getType()) {
+    case otParamType_Double:    *(otDoubleValue*)dst = m_data.double_v; break;
+    case otParamType_Range:     *(otRangeValue*)dst = m_data.range_v; break;
+    case otParamType_Pixel:     *(otPixelValue*)dst = m_data.pixel_v; break;
+    case otParamType_Point:     *(otPointValue*)dst = m_data.point_v; break;
+    case otParamType_Enum:      *(otEnumValue*)dst = m_data.enum_v; break;
+    case otParamType_Int:       *(otIntValue*)dst = m_data.int_v; break;
+    case otParamType_Bool:      *(otBoolValue*)dst = m_data.bool_v; break;
+    case otParamType_Spectrum:  *(otSpectrumValue*)dst = m_data.spectrum_v; break;
+    case otParamType_String:    memcpy(dst, m_string.c_str(), m_string.size()); break;
+    case otParamType_ToneCurve: memcpy(dst, &m_tonecurve[0], sizeof(otToneCurveValue)*m_tonecurve.size()); break;
+    }
+}
+
+void otParam::setValue(const void *src, int len)
+{
+    if (!src) { return; }
+
+    switch (getType()) {
+    case otParamType_Double:    m_data.double_v = *(otDoubleValue*)src; break;
+    case otParamType_Range:     m_data.range_v = *(otRangeValue*)src; break;
+    case otParamType_Pixel:     m_data.pixel_v = *(otPixelValue*)src; break;
+    case otParamType_Point:     m_data.point_v = *(otPointValue*)src; break;
+    case otParamType_Enum:      m_data.enum_v = *(otEnumValue*)src; break;
+    case otParamType_Int:       m_data.int_v = *(otIntValue*)src; break;
+    case otParamType_Bool:      m_data.bool_v = *(otBoolValue*)src; break;
+    case otParamType_Spectrum:  m_data.spectrum_v = *(otSpectrumValue*)src; break;
+    case otParamType_String:
+        m_string = (const char*)src;
+        break;
+    case otParamType_ToneCurve:
+        m_tonecurve.assign((otToneCurveValue*)src, (otToneCurveValue*)src + len);
+        break;
     }
 }
 
 otParamInfo& otParam::getRawInfo() { return m_info; }
-otParamValue& otParam::getRawData() { return m_data; }
+otParamValue& otParam::getRawValue() { return m_data; }
 
 
+
+otContext::otContext()
+    : dst()
+    , is_canceled(0)
+
+{
+    rs = {
+        { 1, 0 },
+        this,
+        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+        1.0,
+        1.0, 1.0,
+        1.0,
+        32,
+        1024,
+        100,
+        0,
+        0,
+        0,
+        0,
+        0,
+        { 0.0, 0.0, 0.0, 0.0 },
+        &is_canceled
+    };
+}
 
 
 otPlugin::otPlugin(toonz_plugin_probe_t *probe)
@@ -53,6 +116,7 @@ otPlugin::otPlugin(toonz_plugin_probe_t *probe)
     m_info.note = m_probe->note;
     m_info.version_major = m_probe->ver.major;
     m_info.version_minor = m_probe->ver.minor;
+    m_userdata = this;
 
     if (m_probe->handler && m_probe->handler->setup) {
         m_probe->handler->setup(this);
@@ -61,6 +125,31 @@ otPlugin::otPlugin(toonz_plugin_probe_t *probe)
 
 otPlugin::~otPlugin()
 {
+}
+
+static void To_otParam(toonz_param_desc_t& desc, otParam& dst)
+{
+    otParamInfo& info = dst.getRawInfo();
+    otParamValue& val = dst.getRawValue();
+    info.name = desc.key;
+    info.note = desc.note;
+    info.type = (otParamType)desc.traits_tag;
+
+    ;
+
+    switch (info.type) {
+    case otParamType_Double:    dst.setValue(&desc.traits.d.def); break;
+    case otParamType_Range:     dst.setValue(&desc.traits.rd.def); break;
+    case otParamType_Pixel:     dst.setValue(&desc.traits.c.def); break;
+    case otParamType_Point:     dst.setValue(&desc.traits.p.def); break;
+    case otParamType_Enum:      dst.setValue(&desc.traits.e.def); break;
+    case otParamType_Int:       dst.setValue(&desc.traits.i.def); break;
+    case otParamType_Bool:      dst.setValue(&desc.traits.b.def); break;
+    case otParamType_Spectrum:  dst.setValue(&desc.traits.g.def); break;
+    case otParamType_String:    dst.setValue(desc.traits.s.def); break;
+    case otParamType_ToneCurve: /* no default value*/ break;
+
+    }
 }
 
 void otPlugin::setParamInfo(toonz_param_page_t *pages, int num_pages)
@@ -73,11 +162,8 @@ void otPlugin::setParamInfo(toonz_param_page_t *pages, int num_pages)
             for (int i = 0; i < group.num; ++i) {
                 toonz_param_desc_t& desc = group.array[i];
 
-                otParamInfo info;
-                info.name = desc.key;
-                info.note = desc.note;
-                info.type = (otParamType)desc.traits_tag;
-                m_params.push_back(info);
+                m_params.push_back(otParam());
+                To_otParam(desc, m_params.back());
             }
         }
     }
@@ -110,29 +196,12 @@ otParam* otPlugin::getParamByName(const char *name)
 void* otPlugin::getUserData() const { return m_userdata; }
 void otPlugin::setUsertData(void *v) { m_userdata = v; }
 
-void otPlugin::applyFx(otParamValue *params, otImage *src, otImage *dst, double frame)
+otImage* otPlugin::applyFx(otParamValue *params, otImage *src, double frame)
 {
-    volatile int is_canceled = 0;
-    toonz_rendering_setting_t rs = {
-        {1, 0},
-        this,
-        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-        1.0,
-        1.0, 1.0,
-        1.0,
-        32,
-        1024,
-        100,
-        0,
-        0,
-        0,
-        0,
-        0,
-        {0.0, 0.0, (double)src->getWidth(), (double)src->getHeight()},
-        &is_canceled
-    };
+    otContext ctx;
+    m_probe->handler->do_compute(this, &ctx.rs, frame, src);
 
-    m_probe->handler->do_compute(this, &rs, frame, src);
+    return ctx.dst;
 }
 
 
