@@ -5,6 +5,16 @@
 typedef fcPixelFormat twPixelFormat;
 #include "TextureWriter.h"
 
+twCLinkage twExport void* twMalloc(int size)
+{
+    return malloc(size);
+}
+
+twCLinkage twExport void twFree(void *ptr)
+{
+    free(ptr);
+}
+
 
 twCLinkage twExport bool twWriteTexture(
     void *dst_tex, int dst_width, int dst_height, twPixelFormat dst_fmt,

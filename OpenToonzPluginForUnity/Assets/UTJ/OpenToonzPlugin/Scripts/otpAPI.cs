@@ -12,19 +12,6 @@ namespace UTJ
 {
     public static class otpAPI
     {
-        public struct otpModule { public IntPtr ptr; }
-        public struct otpInstance { public IntPtr ptr; }
-        public struct otpParam { public IntPtr ptr; }
-        public struct otpImage { public IntPtr ptr; }
-
-        public struct otpPluginInfo
-        {
-            public IntPtr name;
-            public IntPtr vendor;
-            public IntPtr note;
-            public int version_major, version_minor;
-        };
-
         public enum otParamType
         {
             Double,
@@ -39,10 +26,41 @@ namespace UTJ
             ToneCurve,
         };
 
+        public struct otpImage
+        {
+            public IntPtr ptr;
+            public static implicit operator bool(otpImage v) { return v.ptr != IntPtr.Zero; }
+        }
+        public struct otpModule
+        {
+            public IntPtr ptr;
+            public static implicit operator bool(otpModule v) { return v.ptr != IntPtr.Zero; }
+        }
+        public struct otpInstance
+        {
+            public IntPtr ptr;
+            public static implicit operator bool(otpInstance v) { return v.ptr != IntPtr.Zero; }
+        }
+        public struct otpParam
+        {
+            public IntPtr ptr;
+            public static implicit operator bool(otpParam v) { return v.ptr != IntPtr.Zero; }
+        }
+
         public struct otpImageData
         {
-
+            public int width;
+            public int height;
+            public IntPtr data;
         }
+
+        public struct otpPluginInfo
+        {
+            public IntPtr name;
+            public IntPtr vendor;
+            public IntPtr note;
+            public int version_major, version_minor;
+        };
 
         public struct otpParamInfo
         {
@@ -51,10 +69,50 @@ namespace UTJ
             public otParamType type;
         };
 
-        public struct otpParamData
+
+        public struct otpIntValue
         {
-            public double double_value; // todo
-        }
+            public int value;
+        };
+        public struct otpBoolValue
+        {
+            public int value;
+        };
+        public struct otpEnumValue
+        {
+            public int value;
+        };
+        public struct otpDoubleValue
+        {
+            public double value;
+        };
+        public struct otpStringValue
+        {
+            public IntPtr value;
+        };
+        public struct otpRangeValue
+        {
+            public double min, max;
+        };
+        public struct otpPixelValue
+        {
+            public int c0, c1, c2, m;
+        };
+        public struct otpPointValue
+        {
+            public double x, y;
+        };
+        public struct otpSpectrumValue
+        {
+            public double w;
+            public double c0, c1, c2, m;
+        };
+        public struct otpToneCurveValue
+        {
+            public double x, y;
+            public int channel;
+            public int interp;
+        };
 
 
         [DllImport("OpenToonzPlugin")] public static extern otpImage    otpCreateImage(int width, int height);

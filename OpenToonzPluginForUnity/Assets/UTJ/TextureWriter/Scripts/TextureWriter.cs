@@ -83,6 +83,39 @@ namespace UTJ
             return twPixelFormat.Unknown;
         }
 
+        public static int twGetPixelSize(twPixelFormat format)
+        {
+            switch (format)
+            {
+                case twPixelFormat.RGBAu8: return 4;
+                case twPixelFormat.RGBu8: return 3;
+                case twPixelFormat.RGu8: return 2;
+                case twPixelFormat.Ru8: return 1;
+
+                case twPixelFormat.RGBAf16:
+                case twPixelFormat.RGBAi16: return 8;
+                case twPixelFormat.RGBf16:
+                case twPixelFormat.RGBi16: return 6;
+                case twPixelFormat.RGf16:
+                case twPixelFormat.RGi16: return 4;
+                case twPixelFormat.Rf16:
+                case twPixelFormat.Ri16: return 2;
+
+                case twPixelFormat.RGBAf32:
+                case twPixelFormat.RGBAi32: return 16;
+                case twPixelFormat.RGBf32:
+                case twPixelFormat.RGBi32: return 12;
+                case twPixelFormat.RGf32:
+                case twPixelFormat.RGi32: return 8;
+                case twPixelFormat.Rf32:
+                case twPixelFormat.Ri32: return 4;
+            }
+            return 0;
+        }
+
+
+        [DllImport ("TextureWriter")] public static extern IntPtr   twMalloc(int size);
+        [DllImport ("TextureWriter")] public static extern void     twFree(IntPtr ptr);
 
         [DllImport ("TextureWriter")] public static extern IntPtr   GetRenderEventFunc();
         [DllImport ("TextureWriter")] public static extern void     twGuardBegin();

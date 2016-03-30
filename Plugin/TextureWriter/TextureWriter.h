@@ -53,6 +53,9 @@ enum twPixelFormat
 };
 #endif // twImpl
 
+twCLinkage twExport void* twMalloc(int size);
+twCLinkage twExport void twFree(void *ptr);
+
 
 // dst_tex: texture object. ID3D11Texture* on d3d11, GLuint (texture handle) on OpenGL, etc.
 twCLinkage twExport bool twWriteTexture(
