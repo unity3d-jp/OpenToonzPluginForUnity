@@ -93,8 +93,6 @@ namespace UTJ
                 TextureWriter.Write(m_rt_tmp, dst_data.data, dst_data.width * dst_data.height, TextureWriter.twPixelFormat.RGBAu8);
                 Graphics.Blit(m_rt_tmp, rt_dst);
             }
-
-            otpAPI.otpDestroyImage(img_dst);
         }
 
     }
