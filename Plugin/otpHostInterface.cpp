@@ -90,7 +90,7 @@ int node_get_input_port(toonz_node_handle_t handle, const char *name, toonz_port
     Trace("handle: %p, name: %s", handle, name);
     if (!handle || !port) { return TOONZ_ERROR_NULL; }
 
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     *port = obj;
     return TOONZ_OK;
 }
@@ -118,7 +118,7 @@ int node_set_rect(toonz_rect_t *rect, double x0, double y0, double x1, double y1
 int node_get_param(toonz_node_handle_t handle, const char *name, toonz_param_handle_t *param)
 {
     Trace("handle: %p, name: %s", handle, name);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     *param = obj->getParamByName(name);
     return TOONZ_OK;
 }
@@ -126,7 +126,7 @@ int node_get_param(toonz_node_handle_t handle, const char *name, toonz_param_han
 int node_set_user_data(toonz_node_handle_t handle, void *user_data)
 {
     Trace("handle: %p, user_data: %p", handle, user_data);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     obj->setUsertData(user_data);
     return TOONZ_OK;
 }
@@ -134,7 +134,7 @@ int node_set_user_data(toonz_node_handle_t handle, void *user_data)
 int node_get_user_data(toonz_node_handle_t handle, void **user_data)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     *user_data = obj->getUserData();
     return TOONZ_OK;
 }
@@ -154,14 +154,14 @@ static toonz_node_interface_t g_toonz_node_interface = {
 int fxnode_get_bbox(toonz_fxnode_handle_t handle, const toonz_rendering_setting_t *, double frame, toonz_rect_t *rect, int *get_bbox)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     return TOONZ_OK;
 }
 
 int fxnode_can_handle(toonz_fxnode_handle_t handle, const toonz_rendering_setting_t *, double frame, int *can_handle)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     *can_handle = 1;
     return TOONZ_OK;
 }
@@ -169,7 +169,7 @@ int fxnode_can_handle(toonz_fxnode_handle_t handle, const toonz_rendering_settin
 int fxnode_get_input_port_count(toonz_fxnode_handle_t handle, int *count)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     *count = 1;
     return TOONZ_OK;
 }
@@ -177,7 +177,7 @@ int fxnode_get_input_port_count(toonz_fxnode_handle_t handle, int *count)
 int fxnode_get_input_port(toonz_fxnode_handle_t handle, int index, toonz_port_handle_t *port)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     *port = obj;
     return TOONZ_OK;
 }
@@ -185,7 +185,7 @@ int fxnode_get_input_port(toonz_fxnode_handle_t handle, int index, toonz_port_ha
 int fxnode_compute_to_tile(toonz_fxnode_handle_t handle, const toonz_rendering_setting_t *rs, double frame, const toonz_rect_t *rect, toonz_tile_handle_t intile, toonz_tile_handle_t outtile)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
 
     auto dst = (ImageRGBAu8*)outtile;
     dst->resize(int(rect->x1 - rect->x0), int(rect->y1 - rect->y0));
@@ -313,7 +313,7 @@ static toonz_tile_interface_t g_toonz_tile_interface = {
 int setup_set_parameter_pages(toonz_node_handle_t handle, int num, toonz_param_page_t *pages)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     obj->setParamInfo(pages, num);
     return TOONZ_OK;
 }
@@ -321,7 +321,7 @@ int setup_set_parameter_pages(toonz_node_handle_t handle, int num, toonz_param_p
 int setup_set_parameter_pages_with_error(toonz_node_handle_t handle, int num, toonz_param_page_t *pages, int *reason, void **position)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     obj->setParamInfo(pages, num);
     return TOONZ_OK;
 }
@@ -329,7 +329,7 @@ int setup_set_parameter_pages_with_error(toonz_node_handle_t handle, int num, to
 int setup_add_input_port(toonz_node_handle_t handle, const char *name, int type)
 {
     Trace("handle: %p, name: %s, type: %d", handle, name, type);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     return TOONZ_OK;
 }
 
@@ -345,7 +345,7 @@ static toonz_setup_interface_t g_toonz_setup_interface = {
 int port_is_connected(toonz_port_handle_t handle, int *is_connected)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     *is_connected = 1;
     return TOONZ_OK;
 }
@@ -353,7 +353,7 @@ int port_is_connected(toonz_port_handle_t handle, int *is_connected)
 int port_get_fx(toonz_port_handle_t handle, toonz_fxnode_handle_t *fxnode)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpPlugin*)handle;
+    auto obj = (otpInstance*)handle;
     *fxnode = obj;
     return TOONZ_OK;
 }

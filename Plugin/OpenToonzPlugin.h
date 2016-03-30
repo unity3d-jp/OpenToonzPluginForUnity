@@ -20,7 +20,7 @@
     class otpImage;
 #endif // otImpl
 class otpModule;
-class otpPlugin;
+class otpInstance;
 class otpParam;
 
 struct otpImageData
@@ -108,27 +108,28 @@ struct otpPluginInfo
 };
 
 
-otpCLinkage otpExport otpImage*     otpImageCreate(int width, int height);
-otpCLinkage otpExport otpImage*     otpImageCreateIntrusive(void *data, int width, int height);
-otpCLinkage otpExport void          otpImageDestroy(otpImage *img);
-otpCLinkage otpExport void          otpImageGetData(otpImage *img, otpImageData *data);
+otpCLinkage otpExport otpImage*     otpCreateImage(int width, int height);
+otpCLinkage otpExport otpImage*     otpCreateIntrusiveImage(void *data, int width, int height);
+otpCLinkage otpExport void          otpDestroyImage(otpImage *img);
+otpCLinkage otpExport void          otpGetImageData(otpImage *img, otpImageData *data);
 
 
-otpCLinkage otpExport otpModule*    otpLoad(const char *path);
-otpCLinkage otpExport void          otpUnload(otpModule *mod);
+otpCLinkage otpExport otpModule*    otpLoadModule(const char *path);
+otpCLinkage otpExport void          otpUnloadModule(otpModule *mod);
 
 otpCLinkage otpExport int           otpGetNumPlugins(otpModule *mod);
-otpCLinkage otpExport otpPlugin*    otpGetPlugin(otpModule *mod, int i);
+otpCLinkage otpExport void          otpGetPluginInfo(otpModule *inst, int i, otpPluginInfo *dst);
+otpCLinkage otpExport otpInstance*  otpCreateInstance(otpModule *mod, int i);
+otpCLinkage otpExport void          otpDestroyInstance(otpInstance *inst);
 
-otpCLinkage otpExport void          otpGetPluginInfo(otpPlugin *plugin, otpPluginInfo *dst);
-otpCLinkage otpExport int           otpGetNumParams(otpPlugin *plugin);
-otpCLinkage otpExport void          otpGetParamInfo(otpPlugin *plugin, int i, otpParamInfo *pinfo);
+otpCLinkage otpExport int           otpGetNumParams(otpInstance *inst);
+otpCLinkage otpExport void          otpGetParamInfo(otpInstance *inst, int i, otpParamInfo *pinfo);
 // return count of elements if param type is string or tonecurve. otherwise 1
-otpCLinkage otpExport int           otpGetParamLength(otpPlugin *plugin, int i);
-otpCLinkage otpExport void          otpGetParamValue(otpPlugin *plugin, int i, void *dst);
-otpCLinkage otpExport void          otpSetParamValue(otpPlugin *plugin, int i, const void *src);
+otpCLinkage otpExport int           otpGetParamLength(otpInstance *inst, int i);
+otpCLinkage otpExport void          otpGetParamValue(otpInstance *inst, int i, void *dst);
+otpCLinkage otpExport void          otpSetParamValue(otpInstance *inst, int i, const void *src);
 
 // return result image. user should otImageDestroy() returned image
-otpCLinkage otpExport otpImage*     otpApplyFx(otpPlugin *plugin, otpImage *src, double frame);
+otpCLinkage otpExport otpImage*     otpApplyFx(otpInstance *inst, otpImage *src, double frame);
 
 #endif // OpenToonzPluginForUnity_h

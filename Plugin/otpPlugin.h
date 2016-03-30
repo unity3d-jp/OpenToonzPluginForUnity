@@ -37,11 +37,11 @@ private:
 };
 
 
-class otpPlugin
+class otpInstance
 {
 public:
-    otpPlugin(toonz_plugin_probe_t *probe);
-    ~otpPlugin();
+    otpInstance(otpModule *module, toonz_plugin_probe_t *probe);
+    ~otpInstance();
 
     const otpPluginInfo& getPluginInfo() const;
 
@@ -66,6 +66,7 @@ public:
     void setDstImage(ImageRGBAu8 *img);
 
 private:
+    otpModule *m_module;
     toonz_plugin_probe_t *m_probe;
     otpPluginInfo m_info;
     std::vector<otpParam> m_params;
@@ -81,15 +82,16 @@ public:
     otpModule();
     ~otpModule();
 
-    bool        load(const char *path);
-    void        unload();
+    bool            load(const char *path);
+    void            unload();
 
-    int         getNumPlugins() const;
-    otpPlugin*   getPlugin(int i);
+    int             getNumPlugins() const;
+    otpPluginInfo   getPluginInfo(int i);
+    otpInstance*    createPluginInstance(int i);
 
 private:
     module_t m_module;
-    std::vector<otpPlugin> m_plugins;
+    toonz_plugin_probe_list_t *m_probes;
 };
 
 #endif // otPlugin_h

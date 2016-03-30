@@ -77,27 +77,31 @@ void otpParam::setValue(const void *src, int len)
 otpParamInfo& otpParam::getRawInfo() { return m_info; }
 
 
+static otpPluginInfo otpProbeToInfo(toonz_plugin_probe_t *probe)
+{
+    otpPluginInfo r;
+    r.name = probe->name;
+    r.vendor = probe->vendor;
+    r.note = probe->note;
+    r.version_major = probe->ver.major;
+    r.version_minor = probe->ver.minor;
+    return r;
+}
 
-
-otpPlugin::otpPlugin(toonz_plugin_probe_t *probe)
-    : m_probe(probe)
+otpInstance::otpInstance(otpModule *module, toonz_plugin_probe_t *probe)
+    : m_module(module)
+    , m_probe(probe)
+    , m_info(otpProbeToInfo(probe))
     , m_userdata()
     , m_dst_image()
     , m_canceled()
 {
-    m_info.name = m_probe->name;
-    m_info.vendor = m_probe->vendor;
-    m_info.note = m_probe->note;
-    m_info.version_major = m_probe->ver.major;
-    m_info.version_minor = m_probe->ver.minor;
-    m_userdata = this;
-
     if (m_probe->handler && m_probe->handler->setup) {
         m_probe->handler->setup(this);
     }
 }
 
-otpPlugin::~otpPlugin()
+otpInstance::~otpInstance()
 {
 }
 
@@ -126,7 +130,7 @@ static void To_otParam(toonz_param_desc_t& desc, otpParam& dst)
     }
 }
 
-void otpPlugin::setParamInfo(toonz_param_page_t *pages, int num_pages)
+void otpInstance::setParamInfo(toonz_param_page_t *pages, int num_pages)
 {
     m_params.clear();
     for (int pi = 0; pi < num_pages; ++pi) {
@@ -143,21 +147,21 @@ void otpPlugin::setParamInfo(toonz_param_page_t *pages, int num_pages)
     }
 }
 
-const otpPluginInfo& otpPlugin::getPluginInfo() const
+const otpPluginInfo& otpInstance::getPluginInfo() const
 {
     return m_info;
 }
 
-int otpPlugin::getNumParams() const
+int otpInstance::getNumParams() const
 {
     return (int)m_params.size();
 }
 
-otpParam* otpPlugin::getParam(int i)
+otpParam* otpInstance::getParam(int i)
 {
     return &m_params[i];
 }
-otpParam* otpPlugin::getParamByName(const char *name)
+otpParam* otpInstance::getParamByName(const char *name)
 {
     for (auto& p : m_params) {
         if (strcmp(p.getName(), name) == 0) {
@@ -167,16 +171,16 @@ otpParam* otpPlugin::getParamByName(const char *name)
     return nullptr;
 }
 
-void* otpPlugin::getUserData() const { return m_userdata; }
-void otpPlugin::setUsertData(void *v) { m_userdata = v; }
+void* otpInstance::getUserData() const { return m_userdata; }
+void otpInstance::setUsertData(void *v) { m_userdata = v; }
 
 
-void otpPlugin::setDstImage(ImageRGBAu8 *img)
+void otpInstance::setDstImage(ImageRGBAu8 *img)
 {
     m_dst_image = img;
 }
 
-otpImage* otpPlugin::applyFx(otpImage *src, double frame)
+otpImage* otpInstance::applyFx(otpImage *src, double frame)
 {
     m_canceled = 0;
 
@@ -207,6 +211,7 @@ otpImage* otpPlugin::applyFx(otpImage *src, double frame)
 
 otpModule::otpModule()
     : m_module()
+    , m_probes()
 {
 }
 otpModule::~otpModule()
@@ -220,8 +225,8 @@ bool otpModule::load(const char *path)
     if (!m_module) { return false; }
 
     // check if m_module is OpenToonz plug-in
-    toonz_plugin_probe_list_t *probes = (toonz_plugin_probe_list_t*)DLLGetSymbol(m_module, "toonz_plugin_info_list");
-    if (probes == nullptr) {
+    m_probes = (toonz_plugin_probe_list_t*)DLLGetSymbol(m_module, "toonz_plugin_info_list");
+    if (m_probes == nullptr) {
         unload();
         return false;
     }
@@ -230,10 +235,6 @@ bool otpModule::load(const char *path)
     auto init_f = (toonz_plugin_init_t)DLLGetSymbol(m_module, "toonz_plugin_init");
     if (init_f) {
         init_f(&g_toonz_host_interface);
-    }
-
-    for (auto p = probes->begin; p < probes->end; ++p) {
-        m_plugins.emplace_back(otpPlugin(p));
     }
 
     return true;
@@ -255,11 +256,15 @@ void otpModule::unload()
 
 int otpModule::getNumPlugins() const
 {
-    return (int)m_plugins.size();
+    return int(((size_t)m_probes->end - (size_t)m_probes->begin) / sizeof(void*));
 }
 
-otpPlugin* otpModule::getPlugin(int i)
+otpPluginInfo otpModule::getPluginInfo(int i)
 {
-    if (i >= m_plugins.size()) { return nullptr; }
-    return &m_plugins[i];
+    return otpProbeToInfo(m_probes->begin + i);
+}
+
+otpInstance* otpModule::createPluginInstance(int i)
+{
+    return new otpInstance(this, m_probes->begin + i);
 }
