@@ -8,12 +8,8 @@ typedef void(*toonz_plugin_exit_t)();
 extern toonz_host_interface_t g_toonz_host_interface;
 
 
-otpParam::otpParam()
-{
-}
-
-otpParam::otpParam(const otpParamInfo& info)
-    : m_info(info)
+otpParam::otpParam(otpInstance *parent)
+    : m_parent(parent)
 {
 }
 
@@ -96,16 +92,26 @@ otpInstance::otpInstance(otpModule *module, toonz_plugin_probe_t *probe)
     , m_dst_image()
     , m_canceled()
 {
-    if (m_probe->handler && m_probe->handler->setup) {
-        m_probe->handler->setup(this);
+    if (m_probe->handler) {
+        if (m_probe->handler->setup) {
+            m_probe->handler->setup(this);
+        }
+        if (m_probe->handler->create) {
+            m_probe->handler->create(this);
+        }
     }
 }
 
 otpInstance::~otpInstance()
 {
+    if (m_probe->handler) {
+        if (m_probe->handler->destroy) {
+            m_probe->handler->destroy(this);
+        }
+    }
 }
 
-static void To_otParam(toonz_param_desc_t& desc, otpParam& dst)
+static void otpSetupParam(toonz_param_desc_t& desc, otpParam& dst)
 {
     otpParamInfo& info = dst.getRawInfo();
     info.name = desc.key;
@@ -140,8 +146,8 @@ void otpInstance::setParamInfo(toonz_param_page_t *pages, int num_pages)
             for (int i = 0; i < group.num; ++i) {
                 toonz_param_desc_t& desc = group.array[i];
 
-                m_params.push_back(otpParam());
-                To_otParam(desc, m_params.back());
+                m_params.emplace_back(otpParam(this));
+                otpSetupParam(desc, m_params.back());
             }
         }
     }

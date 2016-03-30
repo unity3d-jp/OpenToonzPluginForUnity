@@ -5,11 +5,12 @@
 class otpParam
 {
 public:
-    otpParam();
-    otpParam(const otpParamInfo& info);
+    otpParam(otpInstance *parent = nullptr);
     ~otpParam();
 
-    otpParamType         getType() const;
+    otpInstance*        getParent() const;
+
+    otpParamType        getType() const;
     const char*         getName() const;
     const char*         getNote() const;
 
@@ -17,9 +18,10 @@ public:
     void                getValue(void *dst) const;
     void                setValue(const void *data, int len=1); // len is relevant only if type is tonecurve
 
-    otpParamInfo&        getRawInfo();
+    otpParamInfo&       getRawInfo();
 
 private:
+    otpInstance *m_parent;
     otpParamInfo m_info;
     union
     {
@@ -43,14 +45,14 @@ public:
     otpInstance(otpModule *module, toonz_plugin_probe_t *probe);
     ~otpInstance();
 
-    const otpPluginInfo& getPluginInfo() const;
+    const otpPluginInfo&    getPluginInfo() const;
 
-    int                 getNumParams() const;
-    otpParam*            getParam(int i);
-    otpParam*            getParamByName(const char *name);
+    int                     getNumParams() const;
+    otpParam*               getParam(int i);
+    otpParam*               getParamByName(const char *name);
 
-    void*               getUserData() const;
-    void                setUsertData(void *v);
+    void*                   getUserData() const;
+    void                    setUsertData(void *v);
 
     otpImage*            applyFx(otpImage *src, double frames);
 
