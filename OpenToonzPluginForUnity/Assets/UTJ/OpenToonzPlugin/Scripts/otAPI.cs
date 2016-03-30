@@ -10,12 +10,14 @@ using UnityEditor;
 
 namespace UTJ
 {
-    public static class otAPI
+    public static class otpAPI
     {
-        public struct otModule { public IntPtr ptr; }
-        public struct otPlugin { public IntPtr ptr; }
+        public struct otpModule { public IntPtr ptr; }
+        public struct otpInstance { public IntPtr ptr; }
+        public struct otpParam { public IntPtr ptr; }
+        public struct otpImage { public IntPtr ptr; }
 
-        public struct otPluginInfo
+        public struct otpPluginInfo
         {
             public IntPtr name;
             public IntPtr vendor;
@@ -37,29 +39,49 @@ namespace UTJ
             ToneCurve,
         };
 
-        public struct otParamInfo
+        public struct otpImageData
+        {
+
+        }
+
+        public struct otpParamInfo
         {
             public IntPtr name;
             public IntPtr note;
             public otParamType type;
         };
 
-        public struct otParamData
+        public struct otpParamData
         {
             public double double_value; // todo
         }
 
 
+        [DllImport("OpenToonzPlugin")] public static extern otpImage    otpCreateImage(int width, int height);
+        [DllImport("OpenToonzPlugin")] public static extern otpImage    otpCreateIntrusiveImage(IntPtr data, int width, int height);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpDestroyImage(otpImage img);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetImageData(otpImage img, ref otpImageData data);
 
-        [DllImport("OpenToonzPlugin")] public static extern otModule    otLoad();
-        [DllImport("OpenToonzPlugin")] public static extern void        otUnload(otModule mod);
 
-        [DllImport("OpenToonzPlugin")] public static extern int         otGetNumPlugins(otModule mod);
-        [DllImport("OpenToonzPlugin")] public static extern otPlugin    otGetPlugin(otModule mod, int i);
+        [DllImport("OpenToonzPlugin")] public static extern otpModule   otpLoadModule(string path);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpUnloadModule(otpModule mod);
 
-        [DllImport("OpenToonzPlugin")] public static extern void        otGetPluginInfo(otPlugin plugin, ref otPluginInfo info);
-        [DllImport("OpenToonzPlugin")] public static extern int         otGetNumParams(otPlugin plugin);
-        [DllImport("OpenToonzPlugin")] public static extern void        otGetParamInfo(otPlugin plugin, ref otParamInfo pinfo);
-        [DllImport("OpenToonzPlugin")] public static extern void        otApplyFx(otPlugin plugin, ref otParamData pdata, IntPtr pixels, int width, int height);
+        [DllImport("OpenToonzPlugin")] public static extern int         otpGetNumPlugins(otpModule mod);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetPluginInfo(otpModule mod, int i, ref otpPluginInfo dst);
+        [DllImport("OpenToonzPlugin")] public static extern otpInstance otpCreateInstance(otpModule mod, int i);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpDestroyInstance(otpInstance inst);
+
+        [DllImport("OpenToonzPlugin")] public static extern int         otpGetNumParams(otpInstance inst);
+        [DllImport("OpenToonzPlugin")] public static extern otpParam    otpGetParam(otpInstance inst, int i);
+        [DllImport("OpenToonzPlugin")] public static extern otpParam    otpGetParamByName(otpInstance inst, string name);
+
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamInfo(otpParam param, ref otpParamInfo pinfo);
+        // return count of elements if param type is string or tonecurve. otherwise 1
+        [DllImport("OpenToonzPlugin")] public static extern int         otpGetParamLength(otpParam param);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, IntPtr dst);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, IntPtr src);
+
+        // return result image. user should otImageDestroy() returned image
+        [DllImport("OpenToonzPlugin")] public static extern otpImage    otpApplyFx(otpInstance inst, otpImage src, double frame);
     }
 }

@@ -1,0 +1,111 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+using System.Reflection;
+using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+namespace UTJ
+{
+    public class TextureWriter
+    {
+        public enum twPixelFormat
+        {
+            Unknown = 0,
+
+            ChannelMask = 0xF,
+            TypeMask = 0xF << 4,
+            Type_f16 = 0x1 << 4,
+            Type_f32 = 0x2 << 4,
+            Type_u8  = 0x3 << 4,
+            Type_i16 = 0x4 << 4,
+            Type_i32 = 0x5 << 4,
+
+            Rf16     = Type_f16 | 1,
+            RGf16    = Type_f16 | 2,
+            RGBf16   = Type_f16 | 3,
+            RGBAf16  = Type_f16 | 4,
+            Rf32     = Type_f32 | 1,
+            RGf32    = Type_f32 | 2,
+            RGBf32   = Type_f32 | 3,
+            RGBAf32  = Type_f32 | 4,
+            Ru8      = Type_u8  | 1,
+            RGu8     = Type_u8  | 2,
+            RGBu8    = Type_u8  | 3,
+            RGBAu8   = Type_u8  | 4,
+            Ri16     = Type_i16 | 1,
+            RGi16    = Type_i16 | 2,
+            RGBi16   = Type_i16 | 3,
+            RGBAi16  = Type_i16 | 4,
+            Ri32     = Type_i32 | 1,
+            RGi32    = Type_i32 | 2,
+            RGBi32   = Type_i32 | 3,
+            RGBAi32  = Type_i32 | 4,
+        };
+
+        public static twPixelFormat twGetPixelFormat(RenderTextureFormat v)
+        {
+            switch (v)
+            {
+                case RenderTextureFormat.ARGB32:    return twPixelFormat.RGBAu8;
+                case RenderTextureFormat.ARGBHalf:  return twPixelFormat.RGBAf16;
+                case RenderTextureFormat.RGHalf:    return twPixelFormat.RGf16;
+                case RenderTextureFormat.RHalf:     return twPixelFormat.Rf16;
+                case RenderTextureFormat.ARGBFloat: return twPixelFormat.RGBAf32;
+                case RenderTextureFormat.RGFloat:   return twPixelFormat.RGf32;
+                case RenderTextureFormat.RFloat:    return twPixelFormat.Rf32;
+                case RenderTextureFormat.ARGBInt:   return twPixelFormat.RGBAi32;
+                case RenderTextureFormat.RGInt:     return twPixelFormat.RGi32;
+                case RenderTextureFormat.RInt:      return twPixelFormat.Ri32;
+            }
+            return twPixelFormat.Unknown;
+        }
+
+        public static twPixelFormat twGetPixelFormat(TextureFormat v)
+        {
+            switch (v)
+            {
+                case TextureFormat.Alpha8:      return twPixelFormat.Ru8;
+                case TextureFormat.RGB24:       return twPixelFormat.RGBu8;
+                case TextureFormat.RGBA32:      return twPixelFormat.RGBAu8;
+                case TextureFormat.ARGB32:      return twPixelFormat.RGBAu8;
+                case TextureFormat.RGBAHalf:    return twPixelFormat.RGBAf16;
+                case TextureFormat.RGHalf:      return twPixelFormat.RGf16;
+                case TextureFormat.RHalf:       return twPixelFormat.Rf16;
+                case TextureFormat.RGBAFloat:   return twPixelFormat.RGBAf32;
+                case TextureFormat.RGFloat:     return twPixelFormat.RGf32;
+                case TextureFormat.RFloat:      return twPixelFormat.Rf32;
+            }
+            return twPixelFormat.Unknown;
+        }
+
+
+        [DllImport ("TextureWriter")] public static extern IntPtr   GetRenderEventFunc();
+        [DllImport ("TextureWriter")] public static extern void     twGuardBegin();
+        [DllImport ("TextureWriter")] public static extern void     twGuardEnd();
+        [DllImport ("TextureWriter")] public static extern void     twEraseDeferredCall(int id);
+
+        [DllImport("TextureWriter")]
+        private static extern bool twWriteTexture(
+            IntPtr dst_tex, int dst_width, int dst_height, twPixelFormat dst_fmt,
+            IntPtr src, int src_num, twPixelFormat src_fmt);
+
+        public static bool Write(RenderTexture dst_tex, IntPtr src, int src_num, twPixelFormat src_fmt)
+        {
+            return twWriteTexture(
+                dst_tex.GetNativeTexturePtr(), dst_tex.width, dst_tex.height,
+                twGetPixelFormat(dst_tex.format), src, src_num, src_fmt);
+        }
+
+        public static bool Write(Texture2D dst_tex, IntPtr src, int src_num, twPixelFormat src_fmt)
+        {
+            return twWriteTexture(
+                dst_tex.GetNativeTexturePtr(), dst_tex.width, dst_tex.height,
+                twGetPixelFormat(dst_tex.format), src, src_num, src_fmt);
+        }
+    }
+}

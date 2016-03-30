@@ -110,10 +110,12 @@ static void UNITY_INTERFACE_API UnityOnGraphicsDeviceEvent(UnityGfxDeviceEventTy
     }
 }
 
-fcCLinkage fcExport void fcCallDeferredCall(int id);
+// user must implement this
+void RenderEventCallback(int id);
+
 static void UNITY_INTERFACE_API UnityRenderEvent(int eventID)
 {
-    //fcCallDeferredCall(eventID);
+    RenderEventCallback(eventID);
 }
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
@@ -131,7 +133,7 @@ UnityPluginUnload()
     unity_gfx->UnregisterDeviceEventCallback(UnityOnGraphicsDeviceEvent);
 }
 
-fcCLinkage fcExport UnityRenderingEvent fcGetRenderEventFunc()
+fcCLinkage fcExport UnityRenderingEvent GetRenderEventFunc()
 {
     return UnityRenderEvent;
 }
