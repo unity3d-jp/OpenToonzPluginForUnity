@@ -151,10 +151,18 @@ static toonz_node_interface_t g_toonz_node_interface = {
 
 
 
-int fxnode_get_bbox(toonz_fxnode_handle_t handle, const toonz_rendering_setting_t *, double frame, toonz_rect_t *rect, int *get_bbox)
+int fxnode_get_bbox(toonz_fxnode_handle_t handle, const toonz_rendering_setting_t *rs, double frame, toonz_rect_t *rect, int *get_bbox)
 {
     Trace("handle: %p", handle);
     auto obj = (otpInstance*)handle;
+
+    auto img = obj->getSrcImage();
+    rect->x0 = 0.0;
+    rect->y0 = 0.0;
+    rect->x1 = (double)img->getWidth();
+    rect->y1 = (double)img->getHeight();
+
+    if(get_bbox) { *get_bbox = 1; }
     return TOONZ_OK;
 }
 
