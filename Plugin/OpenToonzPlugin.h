@@ -42,7 +42,14 @@ enum otpParamType {
     otParamType_String,
     otParamType_ToneCurve,
     otParamType_Unknown,
+};
 
+struct otpPluginInfo
+{
+    const char *name;
+    const char *vendor;
+    const char *note;
+    int version_major, version_minor;
 };
 
 struct otpParamInfo
@@ -99,14 +106,6 @@ struct otpToneCurveValue
 };
 
 
-struct otpPluginInfo
-{
-    const char *name;
-    const char *vendor;
-    const char *note;
-    int version_major, version_minor;
-};
-
 
 otpCLinkage otpExport otpImage*     otpCreateImage(int width, int height);
 otpCLinkage otpExport otpImage*     otpCreateIntrusiveImage(void *data, int width, int height);
@@ -123,11 +122,14 @@ otpCLinkage otpExport otpInstance*  otpCreateInstance(otpModule *mod, int i);
 otpCLinkage otpExport void          otpDestroyInstance(otpInstance *inst);
 
 otpCLinkage otpExport int           otpGetNumParams(otpInstance *inst);
-otpCLinkage otpExport void          otpGetParamInfo(otpInstance *inst, int i, otpParamInfo *pinfo);
+otpCLinkage otpExport otpParam*     otpGetParam(otpInstance *inst, int i);
+otpCLinkage otpExport otpParam*     otpGetParamByName(otpInstance *inst, const char *name);
+
+otpCLinkage otpExport void          otpGetParamInfo(otpParam *param, otpParamInfo *pinfo);
 // return count of elements if param type is string or tonecurve. otherwise 1
-otpCLinkage otpExport int           otpGetParamLength(otpInstance *inst, int i);
-otpCLinkage otpExport void          otpGetParamValue(otpInstance *inst, int i, void *dst);
-otpCLinkage otpExport void          otpSetParamValue(otpInstance *inst, int i, const void *src);
+otpCLinkage otpExport int           otpGetParamLength(otpParam *param);
+otpCLinkage otpExport void          otpGetParamValue(otpParam *param, void *dst);
+otpCLinkage otpExport void          otpSetParamValue(otpParam *param, const void *src);
 
 // return result image. user should otImageDestroy() returned image
 otpCLinkage otpExport otpImage*     otpApplyFx(otpInstance *inst, otpImage *src, double frame);

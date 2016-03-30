@@ -43,7 +43,8 @@ int main(int argc, char *argv[])
         int n = otpGetNumParams(inst);
         otpParamInfo pinfo;
         for (int i = 0; i < n; ++i) {
-            otpGetParamInfo(inst, i, &pinfo);
+            otpParam *param = otpGetParam(inst, i);
+            otpGetParamInfo(param, &pinfo);
             printf("inst param %d: %s\n", i, pinfo.name);
         }
     }

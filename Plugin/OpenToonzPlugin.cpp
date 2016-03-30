@@ -82,32 +82,48 @@ fcCLinkage fcExport int otpGetNumParams(otpInstance *inst)
     return inst->getNumParams();
 }
 
-otpCLinkage otpExport void otpGetParamInfo(otpInstance *inst, int i, otpParamInfo *pinfo)
-{
-    if (!inst || !pinfo) { return; }
-    *pinfo = inst->getParam(i)->getRawInfo();
-}
-
-otpCLinkage otpExport int otpGetParamLength(otpInstance *inst, int i)
+otpCLinkage otpExport otpParam* otpGetParam(otpInstance *inst, int i)
 {
     if (!inst) { return 0; }
-    return inst->getParam(i)->getLength();
+    return inst->getParam(i);
 }
 
-otpCLinkage otpExport void otpGetParamValue(otpInstance *inst, int i, void *dst)
+otpCLinkage otpExport otpParam* otpGetParamByName(otpInstance *inst, const char *name)
 {
-    if (!inst) { return; }
-    inst->getParam(i)->getValue(dst);
+    if (!inst) { return 0; }
+    return inst->getParamByName(name);
 }
 
-otpCLinkage otpExport void otpSetParamValue(otpInstance *inst, int i, const void *src)
+
+
+otpCLinkage otpExport void otpGetParamInfo(otpParam *param, otpParamInfo *pinfo)
 {
-    if (!inst) { return; }
-    inst->getParam(i)->setValue(src);
+    if (!param || !pinfo) { return; }
+    *pinfo = param->getRawInfo();
 }
 
-fcCLinkage fcExport otpImage* otpApplyFx(otpInstance *inst, otpImage *src, double frame)
+otpCLinkage otpExport int otpGetParamLength(otpParam *param)
 {
-    if (!inst) { return nullptr; }
-    return inst->applyFx(src, frame);
+    if (!param) { return 0; }
+    return param->getLength();
+}
+
+otpCLinkage otpExport void otpGetParamValue(otpParam *param, void *dst)
+{
+    if (!param) { return; }
+    param->getValue(dst);
+}
+
+otpCLinkage otpExport void otpSetParamValue(otpParam *param, const void *src)
+{
+    if (!param) { return; }
+    param->setValue(src);
+}
+
+
+
+fcCLinkage fcExport otpImage* otpApplyFx(otpInstance *node, otpImage *src, double frame)
+{
+    if (!node) { return nullptr; }
+    return node->applyFx(src, frame);
 }
