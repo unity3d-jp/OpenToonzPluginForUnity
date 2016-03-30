@@ -19,8 +19,8 @@ namespace UTJ
         public int m_pluginIndex;
 
         otpAPI.otpInstance m_inst;
-        otpAPI.otpImage m_img;
-        RenderTexture m_tmpRT;
+        otpAPI.otpImage m_img_src;
+        RenderTexture m_rt_tmp;
 
 
         void OnEnable()
@@ -34,32 +34,61 @@ namespace UTJ
             otpAPI.otpDestroyInstance(m_inst);
             m_inst.ptr = IntPtr.Zero;
 
-            otpAPI.otpDestroyImage(m_img);
+            otpAPI.otpDestroyImage(m_img_src);
             m_inst.ptr = IntPtr.Zero;
 
-            if(m_tmpRT != null)
+            if(m_rt_tmp != null)
             {
-                m_tmpRT.Release();
-                m_tmpRT = null;
+                m_rt_tmp.Release();
+                m_rt_tmp = null;
             }
         }
 
-        void OnRenderImage(RenderTexture src, RenderTexture dst)
+        void OnRenderImage(RenderTexture rt_src, RenderTexture rt_dst)
         {
             if(!m_inst) {
-                Graphics.Blit(src, dst);
+                Graphics.Blit(rt_src, rt_dst);
                 return;
             }
 
-            if(!m_img)
+            // copy rt_src content to memory
+            if(!m_img_src)
             {
-                m_img = otpAPI.otpCreateImage(src.width, src.height);
+                m_img_src = otpAPI.otpCreateImage(rt_src.width, rt_src.height);
             }
-            var result = otpAPI.otpApplyFx(m_inst, m_img, Time.time);
+            var src_data = default(otpAPI.otpImageData);
+            otpAPI.otpGetImageData(m_img_src, ref src_data);
+            TextureWriter.Read(src_data.data, src_data.width * src_data.height, TextureWriter.twPixelFormat.RGBAu8, rt_src);
 
-            // todo
+            // apply toonz fx
+            var img_dst = otpAPI.otpApplyFx(m_inst, m_img_src, Time.time);
+            if(!img_dst)
+            {
+                Graphics.Blit(rt_src, rt_dst);
+                return;
+            }
 
-            otpAPI.otpDestroyImage(result);
+            var dst_data = default(otpAPI.otpImageData);
+            otpAPI.otpGetImageData(img_dst, ref dst_data);
+
+            if (dst_data.width == rt_dst.width && dst_data.height == rt_dst.height)
+            {
+                TextureWriter.Write(rt_dst, dst_data.data, dst_data.width * dst_data.height, TextureWriter.twPixelFormat.RGBAu8);
+            }
+            else
+            {
+                // blit & resize if size of img_dst != size of rt_dst
+                if (m_rt_tmp == null)
+                {
+                    m_rt_tmp = new RenderTexture(dst_data.width, dst_data.height, 0, RenderTextureFormat.ARGB32);
+                    m_rt_tmp.filterMode = FilterMode.Bilinear;
+                    m_rt_tmp.Create();
+                }
+                TextureWriter.Write(m_rt_tmp, dst_data.data, dst_data.width * dst_data.height, TextureWriter.twPixelFormat.RGBAu8);
+                Graphics.Blit(m_rt_tmp, rt_dst);
+            }
+
+            otpAPI.otpDestroyImage(img_dst);
         }
 
     }

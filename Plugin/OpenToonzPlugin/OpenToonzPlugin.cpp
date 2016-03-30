@@ -24,6 +24,7 @@ otpCLinkage otpExport void otpDestroyImage(otpImage *img)
 
 otpCLinkage otpExport void otpGetImageData(otpImage *img, otpImageData *data)
 {
+    if (!img || !data) { return; }
     data->width = img->getWidth();
     data->height = img->getHeight();
     data->data = img->getData();
@@ -35,6 +36,11 @@ fcCLinkage fcExport otpModule* otpLoadModule(const char *path)
     auto i = g_plugins.find(path);
     if (i != g_plugins.end()) {
         return i->second;
+    }
+
+    {
+        auto dir_file = SplitDirFile(path);
+        DLLAddSearchPath(dir_file.first.c_str());
     }
 
     otpModule *inst = new otpModule();

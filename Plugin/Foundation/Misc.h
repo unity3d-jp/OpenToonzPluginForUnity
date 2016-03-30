@@ -27,6 +27,11 @@ double      GetCurrentTimeSec();
 // return exit-code
 int         Execute(const char *command);
 
+typedef std::pair<std::string, std::string> StringPair;
+StringPair SplitDirFile(const std::string &path);
+StringPair SplitFileExt(const std::string &path);
+void Glob(const char *pattern, const std::function<void(const char*)>& f);
+
 
 // -------------------------------------------------------------
 // Math functions

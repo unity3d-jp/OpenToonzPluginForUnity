@@ -140,5 +140,25 @@ namespace UTJ
                 dst_tex.GetNativeTexturePtr(), dst_tex.width, dst_tex.height,
                 twGetPixelFormat(dst_tex.format), src, src_num, src_fmt);
         }
+
+
+        [DllImport("TextureWriter")]
+        private static extern bool twReadTexture(
+            IntPtr dst, int dst_num, twPixelFormat dst_fmt,
+            IntPtr src_tex, int src_width, int src_height, twPixelFormat src_fmt);
+
+        public static bool Read(IntPtr dst, int dst_num, twPixelFormat dst_fmt, RenderTexture src_tex)
+        {
+            return twReadTexture(
+                dst, dst_num, dst_fmt,
+                src_tex.GetNativeTexturePtr(), src_tex.width, src_tex.height, twGetPixelFormat(src_tex.format));
+        }
+
+        public static bool Read(IntPtr dst, int dst_num, twPixelFormat dst_fmt, Texture2D src_tex)
+        {
+            return twReadTexture(
+                dst, dst_num, dst_fmt,
+                src_tex.GetNativeTexturePtr(), src_tex.width, src_tex.height, twGetPixelFormat(src_tex.format));
+        }
     }
 }
