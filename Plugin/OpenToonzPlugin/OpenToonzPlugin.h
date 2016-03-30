@@ -131,7 +131,7 @@ otpCLinkage otpExport int           otpGetParamLength(otpParam *param);
 otpCLinkage otpExport void          otpGetParamValue(otpParam *param, void *dst);
 otpCLinkage otpExport void          otpSetParamValue(otpParam *param, const void *src);
 
-// return result image. user should otImageDestroy() returned image
+// return result image. user *should not* otpImageDestroy() returned image
 otpCLinkage otpExport otpImage*     otpApplyFx(otpInstance *inst, otpImage *src, double frame);
 
 #endif // OpenToonzPluginForUnity_h

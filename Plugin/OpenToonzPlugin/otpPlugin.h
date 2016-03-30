@@ -71,7 +71,6 @@ public:
 public:
     // internal
     void            setParamInfo(toonz_param_page_t *pages, int num_pages);
-    void            setDstImage(ImageRGBAu8 *img);
     double          getFrame() const;
     ImageRGBAu8*    getSrcImage();
     ImageRGBAu8*    getDstImage();
@@ -88,7 +87,7 @@ private:
 
     double m_frame;
     ImageRGBAu8 *m_src_image;
-    ImageRGBAu8 *m_dst_image;
+    std::unique_ptr<ImageRGBAu8> m_dst_image;
     int m_canceled;
 };
 

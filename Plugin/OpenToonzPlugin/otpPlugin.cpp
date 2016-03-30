@@ -179,14 +179,18 @@ otpParam* otpInstance::getParamByName(const char *name)
 
 void* otpInstance::getUserData() const { return m_userdata; }
 void otpInstance::setUsertData(void *v) { m_userdata = v; }
-void otpInstance::setDstImage(ImageRGBAu8 *img) { m_dst_image = img; }
 ImageRGBAu8* otpInstance::getSrcImage() { return m_src_image; }
-ImageRGBAu8* otpInstance::getDstImage() { return m_dst_image; }
+ImageRGBAu8* otpInstance::getDstImage() { return m_dst_image.get(); }
 double otpInstance::getFrame() const { return m_frame; }
 
 otpImage* otpInstance::applyFx(otpImage *src, double frame)
 {
     m_src_image = (ImageRGBAu8*)src;
+    if (!m_dst_image || (src->getWidth() != m_dst_image->getWidth() || src->getHeight() != m_dst_image->getHeight())) {
+        m_dst_image.reset(new ImageRGBAu8(src->getWidth(), src->getHeight()));
+    }
+    auto dst = m_dst_image.get();
+
     m_frame = frame;
     m_canceled = 0;
 
@@ -208,9 +212,8 @@ otpImage* otpInstance::applyFx(otpImage *src, double frame)
         { 0.0, 0.0, 0.0, 0.0 },
         &m_canceled
     };
-    m_probe->handler->do_compute(this, &rs, frame, src);
-
-    return m_dst_image;
+    m_probe->handler->do_compute(this, &rs, frame, dst);
+    return dst;
 }
 
 

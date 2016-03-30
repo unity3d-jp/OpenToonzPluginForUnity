@@ -50,9 +50,29 @@ int main(int argc, char *argv[])
     }
 
     otpImage *src = otpCreateImage(128, 128);
-    otpImage *dst = otpApplyFx(inst, src, 0.0);
+    {
+        otpImageData sd;
+        otpGetImageData(src, &sd);
+        printf("src image: %p\n", sd.data);
 
-    otpDestroyImage(dst);
+        int n = sd.width * sd.height;
+        const int block = 8;
+        uint32_t *pixels = (uint32_t*)sd.data;
+        for (int i = 0; i < n / block; ++i) {
+            if (i % 2 == 0) {
+                uint32_t *dst = pixels + (block * i);
+                memset(dst, 0xff, block *4);
+            }
+        }
+    }
+
+    otpImage *dst = otpApplyFx(inst, src, 0.0);
+    {
+        otpImageData dd;
+        otpGetImageData(dst, &dd);
+        printf("dst image: %p\n", dd.data);
+    }
+
     otpDestroyImage(src);
 
     otpDestroyInstance(inst);

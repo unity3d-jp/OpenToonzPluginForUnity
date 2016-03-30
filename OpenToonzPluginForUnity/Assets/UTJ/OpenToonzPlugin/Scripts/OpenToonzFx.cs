@@ -44,9 +44,15 @@ namespace UTJ
             }
         }
 
+        [ImageEffectOpaque]
         void OnRenderImage(RenderTexture rt_src, RenderTexture rt_dst)
         {
-            if(!m_inst) {
+            if (rt_dst == null)
+            {
+                Debug.Log("OpenToonzFx: dst is null");
+                return;
+            }
+            if (!m_inst) {
                 Graphics.Blit(rt_src, rt_dst);
                 return;
             }

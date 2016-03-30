@@ -195,9 +195,10 @@ int fxnode_compute_to_tile(toonz_fxnode_handle_t handle, const toonz_rendering_s
     Trace("handle: %p", handle);
     auto obj = (otpInstance*)handle;
 
-    auto dst = (ImageRGBAu8*)outtile;
-    dst->resize(int(rect->x1 - rect->x0), int(rect->y1 - rect->y0));
-    obj->setDstImage(dst);
+    if (outtile) {
+        auto dst = (ImageRGBAu8*)outtile;
+        *dst = *obj->getSrcImage();
+    }
 
     return TOONZ_OK;
 }
