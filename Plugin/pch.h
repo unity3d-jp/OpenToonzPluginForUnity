@@ -98,13 +98,16 @@
 #endif
 
 #ifdef fcStaticLink
-    #define otStaticLink
+    #define otpStaticLink
+    #define twStaticLink
 #endif 
 #ifdef fcImpl
-    #define otImpl
+    #define otpImpl
+    #define twImpl
 #endif 
 #ifdef fcMaster
-    #define otMaster
+    #define otpMaster
+    #define twMaster
 #endif 
 
 class ImageBase;

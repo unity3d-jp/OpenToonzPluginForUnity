@@ -3,8 +3,8 @@
 
 #define otpCLinkage extern "C"
 #ifdef _WIN32
-    #ifndef otStaticLink
-        #ifdef otImpl
+    #ifndef otpStaticLink
+        #ifdef otpImpl
             #define otpExport __declspec(dllexport)
         #else
             #define otpExport __declspec(dllimport)
@@ -16,7 +16,7 @@
     #define otpExport
 #endif
 
-#ifndef otImpl
+#ifndef otpImpl
     class otpImage;
 #endif // otImpl
 class otpModule;

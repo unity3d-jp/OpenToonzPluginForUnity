@@ -15,16 +15,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Foundation\fcThreadPool.cpp" />
     <ClCompile Include="Foundation\Misc.cpp" />
     <ClCompile Include="Foundation\PixelFormat.cpp" />
-    <ClCompile Include="GraphicsDevice\fcGraphicsDevice.cpp" />
-    <ClCompile Include="GraphicsDevice\fcGraphicsDeviceD3D11.cpp" />
-    <ClCompile Include="GraphicsDevice\fcGraphicsDeviceD3D9.cpp" />
-    <ClCompile Include="GraphicsDevice\fcGraphicsDeviceOpenGL.cpp" />
-    <ClCompile Include="OpenToonzPlugin.cpp" />
-    <ClCompile Include="otpHostInterface.cpp" />
-    <ClCompile Include="otpPlugin.cpp" />
+    <ClCompile Include="OpenToonzPlugin\OpenToonzPlugin.cpp" />
+    <ClCompile Include="OpenToonzPlugin\otpHostInterface.cpp" />
+    <ClCompile Include="OpenToonzPlugin\otpPlugin.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MasterDLL|x64'">Create</PrecompiledHeader>
@@ -34,13 +29,11 @@
   <ItemGroup>
     <ClInclude Include="Foundation\Buffer.h" />
     <ClInclude Include="Foundation\fcFoundation.h" />
-    <ClInclude Include="Foundation\fcThreadPool.h" />
     <ClInclude Include="Foundation\Image.h" />
     <ClInclude Include="Foundation\Misc.h" />
     <ClInclude Include="Foundation\PixelFormat.h" />
-    <ClInclude Include="GraphicsDevice\fcGraphicsDevice.h" />
-    <ClInclude Include="OpenToonzPlugin.h" />
-    <ClInclude Include="otpPlugin.h" />
+    <ClInclude Include="OpenToonzPlugin\OpenToonzPlugin.h" />
+    <ClInclude Include="OpenToonzPlugin\otpPlugin.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>

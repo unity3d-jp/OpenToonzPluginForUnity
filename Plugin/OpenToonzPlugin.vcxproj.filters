@@ -2,43 +2,28 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="GraphicsDevice\fcGraphicsDevice.cpp">
-      <Filter>GraphicsDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsDevice\fcGraphicsDeviceD3D9.cpp">
-      <Filter>GraphicsDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsDevice\fcGraphicsDeviceD3D11.cpp">
-      <Filter>GraphicsDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsDevice\fcGraphicsDeviceOpenGL.cpp">
-      <Filter>GraphicsDevice</Filter>
-    </ClCompile>
     <ClCompile Include="Foundation\PixelFormat.cpp">
-      <Filter>Foundaion</Filter>
-    </ClCompile>
-    <ClCompile Include="Foundation\fcThreadPool.cpp">
       <Filter>Foundaion</Filter>
     </ClCompile>
     <ClCompile Include="Foundation\Misc.cpp">
       <Filter>Foundaion</Filter>
     </ClCompile>
-    <ClCompile Include="OpenToonzPlugin.cpp" />
-    <ClCompile Include="otpHostInterface.cpp" />
-    <ClCompile Include="otpPlugin.cpp" />
+    <ClCompile Include="OpenToonzPlugin\OpenToonzPlugin.cpp">
+      <Filter>OpenToonzPlugin</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenToonzPlugin\otpHostInterface.cpp">
+      <Filter>OpenToonzPlugin</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenToonzPlugin\otpPlugin.cpp">
+      <Filter>OpenToonzPlugin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="GraphicsDevice\fcGraphicsDevice.h">
-      <Filter>GraphicsDevice</Filter>
-    </ClInclude>
     <ClInclude Include="Foundation\Buffer.h">
       <Filter>Foundaion</Filter>
     </ClInclude>
     <ClInclude Include="Foundation\fcFoundation.h">
-      <Filter>Foundaion</Filter>
-    </ClInclude>
-    <ClInclude Include="Foundation\fcThreadPool.h">
       <Filter>Foundaion</Filter>
     </ClInclude>
     <ClInclude Include="Foundation\Misc.h">
@@ -47,18 +32,22 @@
     <ClInclude Include="Foundation\PixelFormat.h">
       <Filter>Foundaion</Filter>
     </ClInclude>
-    <ClInclude Include="OpenToonzPlugin.h" />
     <ClInclude Include="Foundation\Image.h">
       <Filter>Foundaion</Filter>
     </ClInclude>
-    <ClInclude Include="otpPlugin.h" />
+    <ClInclude Include="OpenToonzPlugin\OpenToonzPlugin.h">
+      <Filter>OpenToonzPlugin</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenToonzPlugin\otpPlugin.h">
+      <Filter>OpenToonzPlugin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Foundaion">
       <UniqueIdentifier>{28750fd5-a7a5-49f2-9f06-622265629d19}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GraphicsDevice">
-      <UniqueIdentifier>{c009521a-dafd-4e1d-b9c9-a3dde87e2cd6}</UniqueIdentifier>
+    <Filter Include="OpenToonzPlugin">
+      <UniqueIdentifier>{9462a179-3515-4d09-93e4-a4ad5d9b299e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

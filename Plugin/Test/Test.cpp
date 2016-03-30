@@ -1,6 +1,6 @@
 #include <cstdio>
 #include <vector>
-#include "../OpenToonzPlugin.h"
+#include "../OpenToonzPlugin/OpenToonzPlugin.h"
 #pragma warning(disable:4996)
 
 

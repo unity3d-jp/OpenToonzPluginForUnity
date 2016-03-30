@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{4C1612D8-E
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj", "{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TextureWriter", "TextureWriter.vcxproj", "{507CAB8D-B1AC-4A9C-9CA5-6C0A953A6794}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -37,6 +39,15 @@ Global
 		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.MasterLib|x64.ActiveCfg = MasterLib|x64
 		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.MasterLib|x64.Build.0 = MasterLib|x64
 		{2E766DA9-F367-4363-A7D7-05EE6C11F5D1}.MasterLib|x86.ActiveCfg = MasterLib|x64
+		{507CAB8D-B1AC-4A9C-9CA5-6C0A953A6794}.Debug|x64.ActiveCfg = Debug|x64
+		{507CAB8D-B1AC-4A9C-9CA5-6C0A953A6794}.Debug|x64.Build.0 = Debug|x64
+		{507CAB8D-B1AC-4A9C-9CA5-6C0A953A6794}.Debug|x86.ActiveCfg = Debug|x64
+		{507CAB8D-B1AC-4A9C-9CA5-6C0A953A6794}.MasterDLL|x64.ActiveCfg = MasterDLL|x64
+		{507CAB8D-B1AC-4A9C-9CA5-6C0A953A6794}.MasterDLL|x64.Build.0 = MasterDLL|x64
+		{507CAB8D-B1AC-4A9C-9CA5-6C0A953A6794}.MasterDLL|x86.ActiveCfg = MasterDLL|x64
+		{507CAB8D-B1AC-4A9C-9CA5-6C0A953A6794}.MasterLib|x64.ActiveCfg = MasterLib|x64
+		{507CAB8D-B1AC-4A9C-9CA5-6C0A953A6794}.MasterLib|x64.Build.0 = MasterLib|x64
+		{507CAB8D-B1AC-4A9C-9CA5-6C0A953A6794}.MasterLib|x86.ActiveCfg = MasterLib|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
