@@ -17,19 +17,21 @@ int main(int argc, char *argv[])
         sscanf(argv[2], "%d", &plugin_index);
     }
 
-    otModule *module = otLoad(module_path);
+    otpModule *module = otpLoad(module_path);
     if (!module) {
         printf("failed to load %s\n", module_path);
+        return 1;
     }
 
-    otPlugin *plugin = otGetPlugin(module, plugin_index);
+    otpPlugin *plugin = otpGetPlugin(module, plugin_index);
     if (!plugin) {
         printf("failed to get plugin %d\n", plugin_index);
+        return 1;
     }
 
     {
-        otPluginInfo info;
-        otGetPluginInfo(plugin, &info);
+        otpPluginInfo info;
+        otpGetPluginInfo(plugin, &info);
         printf("plugin name: %s\n", info.name);
         printf("plugin vendor: %s\n", info.vendor);
         printf("plugin note: %s\n", info.note);
@@ -38,18 +40,18 @@ int main(int argc, char *argv[])
     }
 
     {
-        int n = otGetNumParams(plugin);
-        otParamInfo pinfo;
+        int n = otpGetNumParams(plugin);
+        otpParamInfo pinfo;
         for (int i = 0; i < n; ++i) {
-            otGetParamInfo(plugin, i, &pinfo);
+            otpGetParamInfo(plugin, i, &pinfo);
             printf("plugin param %d: %s\n", i, pinfo.name);
         }
     }
 
-    otImage *src = otImageCreate(128, 128);
-    otImage *dst = otApplyFx(plugin, src, 0.0);
+    otpImage *src = otpImageCreate(128, 128);
+    otpImage *dst = otpApplyFx(plugin, src, 0.0);
 
-    otImageDestroy(dst);
-    otImageDestroy(src);
-    otUnload(module);
+    otpImageDestroy(dst);
+    otpImageDestroy(src);
+    otpUnload(module);
 }

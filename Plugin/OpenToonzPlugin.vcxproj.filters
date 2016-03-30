@@ -23,9 +23,9 @@
     <ClCompile Include="Foundation\Misc.cpp">
       <Filter>Foundaion</Filter>
     </ClCompile>
-    <ClCompile Include="otPlugin.cpp" />
     <ClCompile Include="OpenToonzPlugin.cpp" />
-    <ClCompile Include="otHostInterface.cpp" />
+    <ClCompile Include="otpHostInterface.cpp" />
+    <ClCompile Include="otpPlugin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -47,11 +47,11 @@
     <ClInclude Include="Foundation\PixelFormat.h">
       <Filter>Foundaion</Filter>
     </ClInclude>
-    <ClInclude Include="otPlugin.h" />
     <ClInclude Include="OpenToonzPlugin.h" />
     <ClInclude Include="Foundation\Image.h">
       <Filter>Foundaion</Filter>
     </ClInclude>
+    <ClInclude Include="otpPlugin.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Foundaion">

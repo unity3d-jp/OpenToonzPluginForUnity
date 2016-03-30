@@ -108,4 +108,4 @@
 #endif 
 
 class ImageBase;
-typedef ImageBase otImage;
+typedef ImageBase otpImage;

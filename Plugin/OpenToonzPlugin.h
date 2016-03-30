@@ -1,36 +1,36 @@
 #ifndef OpenToonzPluginForUnity_h
 #define OpenToonzPluginForUnity_h
 
-#define otCLinkage extern "C"
+#define otpCLinkage extern "C"
 #ifdef _WIN32
     #ifndef otStaticLink
         #ifdef otImpl
-            #define otExport __declspec(dllexport)
+            #define otpExport __declspec(dllexport)
         #else
-            #define otExport __declspec(dllimport)
+            #define otpExport __declspec(dllimport)
         #endif
     #else
-        #define otExport
+        #define otpExport
     #endif
 #else
-    #define otExport
+    #define otpExport
 #endif
 
 #ifndef otImpl
-    class otImage;
+    class otpImage;
 #endif // otImpl
-class otModule;
-class otPlugin;
-class otParam;
+class otpModule;
+class otpPlugin;
+class otpParam;
 
-struct otImageData
+struct otpImageData
 {
     int width;
     int height;
     void *data;
 };
 
-enum otParamType {
+enum otpParamType {
     otParamType_Double,
     otParamType_Range,
     otParamType_Pixel,
@@ -45,53 +45,53 @@ enum otParamType {
 
 };
 
-struct otParamInfo
+struct otpParamInfo
 {
     const char *name;
     const char *note;
-    otParamType type;
+    otpParamType type;
 
-    otParamInfo(
+    otpParamInfo(
         const char *name_ = nullptr,
         const char *note_ = nullptr,
-        otParamType type_ = otParamType_Unknown)
+        otpParamType type_ = otParamType_Unknown)
         : name(name_), note(note_), type(type_)
     {}
 };
 
 
-struct otIntValue
+struct otpIntValue
 {
     int value;
 };
-typedef otIntValue otBoolValue;
-typedef otIntValue otEnumValue;
-struct otDoubleValue
+typedef otpIntValue otpBoolValue;
+typedef otpIntValue otpEnumValue;
+struct otpDoubleValue
 {
     double value;
 };
-struct otStringValue
+struct otpStringValue
 {
     const char *value;
 };
-struct otRangeValue
+struct otpRangeValue
 {
     double min, max;
 };
-struct otPixelValue
+struct otpPixelValue
 {
     int c0, c1, c2, m;
 };
-struct otPointValue
+struct otpPointValue
 {
     double x, y;
 };
-struct otSpectrumValue
+struct otpSpectrumValue
 {
     double w;
     double c0, c1, c2, m;
 };
-struct otToneCurveValue
+struct otpToneCurveValue
 {
     double x, y;
     int channel;
@@ -99,7 +99,7 @@ struct otToneCurveValue
 };
 
 
-struct otPluginInfo
+struct otpPluginInfo
 {
     const char *name;
     const char *vendor;
@@ -108,27 +108,27 @@ struct otPluginInfo
 };
 
 
-otCLinkage otExport otImage*    otImageCreate(int width, int height);
-otCLinkage otExport otImage*    otImageCreateIntrusive(void *data, int width, int height);
-otCLinkage otExport void        otImageDestroy(otImage *img);
-otCLinkage otExport void        otImageGetData(otImage *img, otImageData *data);
+otpCLinkage otpExport otpImage*     otpImageCreate(int width, int height);
+otpCLinkage otpExport otpImage*     otpImageCreateIntrusive(void *data, int width, int height);
+otpCLinkage otpExport void          otpImageDestroy(otpImage *img);
+otpCLinkage otpExport void          otpImageGetData(otpImage *img, otpImageData *data);
 
 
-otCLinkage otExport otModule*   otLoad(const char *path);
-otCLinkage otExport void        otUnload(otModule *mod);
+otpCLinkage otpExport otpModule*    otpLoad(const char *path);
+otpCLinkage otpExport void          otpUnload(otpModule *mod);
 
-otCLinkage otExport int         otGetNumPlugins(otModule *mod);
-otCLinkage otExport otPlugin*   otGetPlugin(otModule *mod, int i);
+otpCLinkage otpExport int           otpGetNumPlugins(otpModule *mod);
+otpCLinkage otpExport otpPlugin*    otpGetPlugin(otpModule *mod, int i);
 
-otCLinkage otExport void        otGetPluginInfo(otPlugin *plugin, otPluginInfo *dst);
-otCLinkage otExport int         otGetNumParams(otPlugin *plugin);
-otCLinkage otExport void        otGetParamInfo(otPlugin *plugin, int i, otParamInfo *pinfo);
+otpCLinkage otpExport void          otpGetPluginInfo(otpPlugin *plugin, otpPluginInfo *dst);
+otpCLinkage otpExport int           otpGetNumParams(otpPlugin *plugin);
+otpCLinkage otpExport void          otpGetParamInfo(otpPlugin *plugin, int i, otpParamInfo *pinfo);
 // return count of elements if param type is string or tonecurve. otherwise 1
-otCLinkage otExport int         otGetParamLength(otPlugin *plugin, int i);
-otCLinkage otExport void        otGetParamValue(otPlugin *plugin, int i, void *dst);
-otCLinkage otExport void        otSetParamValue(otPlugin *plugin, int i, const void *src);
+otpCLinkage otpExport int           otpGetParamLength(otpPlugin *plugin, int i);
+otpCLinkage otpExport void          otpGetParamValue(otpPlugin *plugin, int i, void *dst);
+otpCLinkage otpExport void          otpSetParamValue(otpPlugin *plugin, int i, const void *src);
 
 // return result image. user should otImageDestroy() returned image
-otCLinkage otExport otImage*    otApplyFx(otPlugin *plugin, otImage *src, double frame);
+otpCLinkage otpExport otpImage*     otpApplyFx(otpPlugin *plugin, otpImage *src, double frame);
 
 #endif // OpenToonzPluginForUnity_h

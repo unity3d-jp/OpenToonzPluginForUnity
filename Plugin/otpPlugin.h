@@ -2,14 +2,14 @@
 #define otPlugin_h
 
 
-class otParam
+class otpParam
 {
 public:
-    otParam();
-    otParam(const otParamInfo& info);
-    ~otParam();
+    otpParam();
+    otpParam(const otpParamInfo& info);
+    ~otpParam();
 
-    otParamType         getType() const;
+    otpParamType         getType() const;
     const char*         getName() const;
     const char*         getNote() const;
 
@@ -17,42 +17,42 @@ public:
     void                getValue(void *dst) const;
     void                setValue(const void *data, int len=1); // len is relevant only if type is tonecurve
 
-    otParamInfo&        getRawInfo();
+    otpParamInfo&        getRawInfo();
 
 private:
-    otParamInfo m_info;
+    otpParamInfo m_info;
     union
     {
-        otDoubleValue    double_v;
-        otIntValue       int_v;
-        otBoolValue      bool_v;
-        otEnumValue      enum_v;
-        otRangeValue     range_v;
-        otPixelValue     pixel_v;
-        otPointValue     point_v;
-        otSpectrumValue  spectrum_v;
+        otpDoubleValue    double_v;
+        otpIntValue       int_v;
+        otpBoolValue      bool_v;
+        otpEnumValue      enum_v;
+        otpRangeValue     range_v;
+        otpPixelValue     pixel_v;
+        otpPointValue     point_v;
+        otpSpectrumValue  spectrum_v;
     } m_value;
     std::string m_string;
-    std::vector<otToneCurveValue> m_tonecurve;
+    std::vector<otpToneCurveValue> m_tonecurve;
 };
 
 
-class otPlugin
+class otpPlugin
 {
 public:
-    otPlugin(toonz_plugin_probe_t *probe);
-    ~otPlugin();
+    otpPlugin(toonz_plugin_probe_t *probe);
+    ~otpPlugin();
 
-    const otPluginInfo& getPluginInfo() const;
+    const otpPluginInfo& getPluginInfo() const;
 
     int                 getNumParams() const;
-    otParam*            getParam(int i);
-    otParam*            getParamByName(const char *name);
+    otpParam*            getParam(int i);
+    otpParam*            getParamByName(const char *name);
 
     void*               getUserData() const;
     void                setUsertData(void *v);
 
-    otImage*            applyFx(otImage *src, double frames);
+    otpImage*            applyFx(otpImage *src, double frames);
 
     template<class Body>
     void eachParams(const Body& b)
@@ -67,29 +67,29 @@ public:
 
 private:
     toonz_plugin_probe_t *m_probe;
-    otPluginInfo m_info;
-    std::vector<otParam> m_params;
+    otpPluginInfo m_info;
+    std::vector<otpParam> m_params;
     void *m_userdata;
     ImageRGBAu8 *m_dst_image;
     int m_canceled;
 };
 
 
-class otModule
+class otpModule
 {
 public:
-    otModule();
-    ~otModule();
+    otpModule();
+    ~otpModule();
 
     bool        load(const char *path);
     void        unload();
 
     int         getNumPlugins() const;
-    otPlugin*   getPlugin(int i);
+    otpPlugin*   getPlugin(int i);
 
 private:
     module_t m_module;
-    std::vector<otPlugin> m_plugins;
+    std::vector<otpPlugin> m_plugins;
 };
 
 #endif // otPlugin_h

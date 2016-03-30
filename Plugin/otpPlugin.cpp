@@ -1,85 +1,85 @@
 #include "pch.h"
 #include "OpenToonzPlugin.h"
 #include "fcFoundation.h"
-#include "otPlugin.h"
+#include "otpPlugin.h"
 
 typedef int(*toonz_plugin_init_t)(toonz_host_interface_t *hostif);
 typedef void(*toonz_plugin_exit_t)();
 extern toonz_host_interface_t g_toonz_host_interface;
 
 
-otParam::otParam()
+otpParam::otpParam()
 {
 }
 
-otParam::otParam(const otParamInfo& info)
+otpParam::otpParam(const otpParamInfo& info)
     : m_info(info)
 {
 }
 
-otParam::~otParam()
+otpParam::~otpParam()
 {
 }
 
-otParamType otParam::getType() const { return (otParamType)m_info.type; }
-const char* otParam::getName() const { return m_info.name; }
-const char* otParam::getNote() const { return m_info.note; }
+otpParamType otpParam::getType() const { return (otpParamType)m_info.type; }
+const char* otpParam::getName() const { return m_info.name; }
+const char* otpParam::getNote() const { return m_info.note; }
 
-int otParam::getLength() const
+int otpParam::getLength() const
 {
     switch (getType()) {
-    case otParamType_String: return m_string.empty() ? 0 : m_string.size() + 1;
+    case otParamType_String: return m_string.empty() ? 0 : (int)m_string.size() + 1;
     case otParamType_ToneCurve: return (int)m_tonecurve.size();
     }
     return 1;
 }
 
-void otParam::getValue(void *dst) const
+void otpParam::getValue(void *dst) const
 {
     if (!dst) { return; }
 
     switch (getType()) {
-    case otParamType_Double:    *(otDoubleValue*)dst = m_value.double_v; break;
-    case otParamType_Range:     *(otRangeValue*)dst = m_value.range_v; break;
-    case otParamType_Pixel:     *(otPixelValue*)dst = m_value.pixel_v; break;
-    case otParamType_Point:     *(otPointValue*)dst = m_value.point_v; break;
-    case otParamType_Enum:      *(otEnumValue*)dst = m_value.enum_v; break;
-    case otParamType_Int:       *(otIntValue*)dst = m_value.int_v; break;
-    case otParamType_Bool:      *(otBoolValue*)dst = m_value.bool_v; break;
-    case otParamType_Spectrum:  *(otSpectrumValue*)dst = m_value.spectrum_v; break;
+    case otParamType_Double:    *(otpDoubleValue*)dst = m_value.double_v; break;
+    case otParamType_Range:     *(otpRangeValue*)dst = m_value.range_v; break;
+    case otParamType_Pixel:     *(otpPixelValue*)dst = m_value.pixel_v; break;
+    case otParamType_Point:     *(otpPointValue*)dst = m_value.point_v; break;
+    case otParamType_Enum:      *(otpEnumValue*)dst = m_value.enum_v; break;
+    case otParamType_Int:       *(otpIntValue*)dst = m_value.int_v; break;
+    case otParamType_Bool:      *(otpBoolValue*)dst = m_value.bool_v; break;
+    case otParamType_Spectrum:  *(otpSpectrumValue*)dst = m_value.spectrum_v; break;
     case otParamType_String:    memcpy(dst, m_string.c_str(), m_string.size()); break;
-    case otParamType_ToneCurve: memcpy(dst, &m_tonecurve[0], sizeof(otToneCurveValue)*m_tonecurve.size()); break;
+    case otParamType_ToneCurve: memcpy(dst, &m_tonecurve[0], sizeof(otpToneCurveValue)*m_tonecurve.size()); break;
     }
 }
 
-void otParam::setValue(const void *src, int len)
+void otpParam::setValue(const void *src, int len)
 {
     if (!src) { return; }
 
     switch (getType()) {
-    case otParamType_Double:    m_value.double_v = *(otDoubleValue*)src; break;
-    case otParamType_Range:     m_value.range_v = *(otRangeValue*)src; break;
-    case otParamType_Pixel:     m_value.pixel_v = *(otPixelValue*)src; break;
-    case otParamType_Point:     m_value.point_v = *(otPointValue*)src; break;
-    case otParamType_Enum:      m_value.enum_v = *(otEnumValue*)src; break;
-    case otParamType_Int:       m_value.int_v = *(otIntValue*)src; break;
-    case otParamType_Bool:      m_value.bool_v = *(otBoolValue*)src; break;
-    case otParamType_Spectrum:  m_value.spectrum_v = *(otSpectrumValue*)src; break;
+    case otParamType_Double:    m_value.double_v = *(otpDoubleValue*)src; break;
+    case otParamType_Range:     m_value.range_v = *(otpRangeValue*)src; break;
+    case otParamType_Pixel:     m_value.pixel_v = *(otpPixelValue*)src; break;
+    case otParamType_Point:     m_value.point_v = *(otpPointValue*)src; break;
+    case otParamType_Enum:      m_value.enum_v = *(otpEnumValue*)src; break;
+    case otParamType_Int:       m_value.int_v = *(otpIntValue*)src; break;
+    case otParamType_Bool:      m_value.bool_v = *(otpBoolValue*)src; break;
+    case otParamType_Spectrum:  m_value.spectrum_v = *(otpSpectrumValue*)src; break;
     case otParamType_String:
         m_string = (const char*)src;
         break;
     case otParamType_ToneCurve:
-        m_tonecurve.assign((otToneCurveValue*)src, (otToneCurveValue*)src + len);
+        m_tonecurve.assign((otpToneCurveValue*)src, (otpToneCurveValue*)src + len);
         break;
     }
 }
 
-otParamInfo& otParam::getRawInfo() { return m_info; }
+otpParamInfo& otpParam::getRawInfo() { return m_info; }
 
 
 
 
-otPlugin::otPlugin(toonz_plugin_probe_t *probe)
+otpPlugin::otpPlugin(toonz_plugin_probe_t *probe)
     : m_probe(probe)
     , m_userdata()
     , m_dst_image()
@@ -97,16 +97,16 @@ otPlugin::otPlugin(toonz_plugin_probe_t *probe)
     }
 }
 
-otPlugin::~otPlugin()
+otpPlugin::~otpPlugin()
 {
 }
 
-static void To_otParam(toonz_param_desc_t& desc, otParam& dst)
+static void To_otParam(toonz_param_desc_t& desc, otpParam& dst)
 {
-    otParamInfo& info = dst.getRawInfo();
+    otpParamInfo& info = dst.getRawInfo();
     info.name = desc.key;
     info.note = desc.note;
-    info.type = (otParamType)desc.traits_tag;
+    info.type = (otpParamType)desc.traits_tag;
 
     switch (info.type) {
     case otParamType_Double:    dst.setValue(&desc.traits.d.def); break;
@@ -126,7 +126,7 @@ static void To_otParam(toonz_param_desc_t& desc, otParam& dst)
     }
 }
 
-void otPlugin::setParamInfo(toonz_param_page_t *pages, int num_pages)
+void otpPlugin::setParamInfo(toonz_param_page_t *pages, int num_pages)
 {
     m_params.clear();
     for (int pi = 0; pi < num_pages; ++pi) {
@@ -136,28 +136,28 @@ void otPlugin::setParamInfo(toonz_param_page_t *pages, int num_pages)
             for (int i = 0; i < group.num; ++i) {
                 toonz_param_desc_t& desc = group.array[i];
 
-                m_params.push_back(otParam());
+                m_params.push_back(otpParam());
                 To_otParam(desc, m_params.back());
             }
         }
     }
 }
 
-const otPluginInfo& otPlugin::getPluginInfo() const
+const otpPluginInfo& otpPlugin::getPluginInfo() const
 {
     return m_info;
 }
 
-int otPlugin::getNumParams() const
+int otpPlugin::getNumParams() const
 {
     return (int)m_params.size();
 }
 
-otParam* otPlugin::getParam(int i)
+otpParam* otpPlugin::getParam(int i)
 {
     return &m_params[i];
 }
-otParam* otPlugin::getParamByName(const char *name)
+otpParam* otpPlugin::getParamByName(const char *name)
 {
     for (auto& p : m_params) {
         if (strcmp(p.getName(), name) == 0) {
@@ -167,16 +167,16 @@ otParam* otPlugin::getParamByName(const char *name)
     return nullptr;
 }
 
-void* otPlugin::getUserData() const { return m_userdata; }
-void otPlugin::setUsertData(void *v) { m_userdata = v; }
+void* otpPlugin::getUserData() const { return m_userdata; }
+void otpPlugin::setUsertData(void *v) { m_userdata = v; }
 
 
-void otPlugin::setDstImage(ImageRGBAu8 *img)
+void otpPlugin::setDstImage(ImageRGBAu8 *img)
 {
     m_dst_image = img;
 }
 
-otImage* otPlugin::applyFx(otImage *src, double frame)
+otpImage* otpPlugin::applyFx(otpImage *src, double frame)
 {
     m_canceled = 0;
 
@@ -205,16 +205,16 @@ otImage* otPlugin::applyFx(otImage *src, double frame)
 
 
 
-otModule::otModule()
+otpModule::otpModule()
     : m_module()
 {
 }
-otModule::~otModule()
+otpModule::~otpModule()
 {
     unload();
 }
 
-bool otModule::load(const char *path)
+bool otpModule::load(const char *path)
 {
     m_module = DLLLoad(path);
     if (!m_module) { return false; }
@@ -233,13 +233,13 @@ bool otModule::load(const char *path)
     }
 
     for (auto p = probes->begin; p < probes->end; ++p) {
-        m_plugins.emplace_back(otPlugin(p));
+        m_plugins.emplace_back(otpPlugin(p));
     }
 
     return true;
 }
 
-void otModule::unload()
+void otpModule::unload()
 {
     if (m_module) {
         // call toonz_plugin_exit
@@ -253,12 +253,12 @@ void otModule::unload()
     }
 }
 
-int otModule::getNumPlugins() const
+int otpModule::getNumPlugins() const
 {
     return (int)m_plugins.size();
 }
 
-otPlugin* otModule::getPlugin(int i)
+otpPlugin* otpModule::getPlugin(int i)
 {
     if (i >= m_plugins.size()) { return nullptr; }
     return &m_plugins[i];
