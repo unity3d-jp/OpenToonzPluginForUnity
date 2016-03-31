@@ -1,5 +1,5 @@
-﻿#ifndef fcMisc_h
-#define fcMisc_h
+﻿#ifndef utj_Misc_h
+#define utj_Misc_h
 
 #ifdef fcWindows
     #define fcDLLExt ".dll"
@@ -10,6 +10,8 @@
         #define fcDLLExt ".so"
     #endif
 #endif
+
+namespace utj {
 
 typedef void* module_t;
 module_t    DLLLoad(const char *path);
@@ -85,4 +87,6 @@ inline IntType ceildiv(IntType a, IntType b)
     return a / b + (a%b == 0 ? 0 : 1);
 }
 
-#endif // fcMisc_h
+} // namespace utj
+
+#endif // utj_Misc_h

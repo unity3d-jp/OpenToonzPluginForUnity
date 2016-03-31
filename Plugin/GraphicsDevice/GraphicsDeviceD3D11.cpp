@@ -1,26 +1,26 @@
 ﻿#include "pch.h"
 
 #ifdef fcSupportD3D11
-#include "fcFoundation.h"
-#include "fcGraphicsDevice.h"
+#include "Foundation.h"
+#include "GraphicsDevice.h"
 #include <d3d11.h>
 const int fcD3D11MaxStagingTextures = 32;
 
-
-class fcGraphicsDeviceD3D11 : public fcIGraphicsDevice
+namespace utj {
+class GraphicsDeviceD3D11 : public GraphicsDevice
 {
 public:
-    fcGraphicsDeviceD3D11(void *device);
-    ~fcGraphicsDeviceD3D11();
+    GraphicsDeviceD3D11(void *device);
+    ~GraphicsDeviceD3D11();
     void* getDevicePtr() override;
-    fcGfxDeviceType getDeviceType() override;
+    GfxDeviceType getDeviceType() override;
     void sync() override;
-    bool readTexture(void *o_buf, size_t bufsize, void *tex, int width, int height, fcPixelFormat format) override;
-    bool writeTexture(void *o_tex, int width, int height, fcPixelFormat format, const void *buf, size_t bufsize) override;
+    bool readTexture(void *o_buf, size_t bufsize, void *tex, int width, int height, PixelFormat format) override;
+    bool writeTexture(void *o_tex, int width, int height, PixelFormat format, const void *buf, size_t bufsize) override;
 
 private:
     void clearStagingTextures();
-    ID3D11Texture2D* findOrCreateStagingTexture(int width, int height, fcPixelFormat format);
+    ID3D11Texture2D* findOrCreateStagingTexture(int width, int height, PixelFormat format);
 
 private:
     ID3D11Device *m_device;
@@ -30,12 +30,12 @@ private:
 };
 
 
-fcIGraphicsDevice* fcCreateGraphicsDeviceD3D11(void *device)
+GraphicsDevice* fcCreateGraphicsDeviceD3D11(void *device)
 {
-    return new fcGraphicsDeviceD3D11(device);
+    return new GraphicsDeviceD3D11(device);
 }
 
-fcGraphicsDeviceD3D11::fcGraphicsDeviceD3D11(void *device)
+GraphicsDeviceD3D11::GraphicsDeviceD3D11(void *device)
     : m_device((ID3D11Device*)device)
     , m_context(nullptr)
     , m_query_event(nullptr)
@@ -50,7 +50,7 @@ fcGraphicsDeviceD3D11::fcGraphicsDeviceD3D11(void *device)
     }
 }
 
-fcGraphicsDeviceD3D11::~fcGraphicsDeviceD3D11()
+GraphicsDeviceD3D11::~GraphicsDeviceD3D11()
 {
     if (m_context != nullptr)
     {
@@ -62,33 +62,33 @@ fcGraphicsDeviceD3D11::~fcGraphicsDeviceD3D11()
     }
 }
 
-void* fcGraphicsDeviceD3D11::getDevicePtr() { return m_device; }
-fcGfxDeviceType fcGraphicsDeviceD3D11::getDeviceType() { return fcGfxDeviceType_D3D11; }
+void* GraphicsDeviceD3D11::getDevicePtr() { return m_device; }
+GfxDeviceType GraphicsDeviceD3D11::getDeviceType() { return GfxDeviceType_D3D11; }
 
 
-static DXGI_FORMAT fcGetInternalFormatD3D11(fcPixelFormat fmt)
+static DXGI_FORMAT fcGetInternalFormatD3D11(PixelFormat fmt)
 {
     switch (fmt)
     {
-    case fcPixelFormat_RGBAu8:  return DXGI_FORMAT_R8G8B8A8_TYPELESS;
+    case PixelFormat_RGBAu8:  return DXGI_FORMAT_R8G8B8A8_TYPELESS;
 
-    case fcPixelFormat_RGBAf16: return DXGI_FORMAT_R16G16B16A16_FLOAT;
-    case fcPixelFormat_RGf16:   return DXGI_FORMAT_R16G16_FLOAT;
-    case fcPixelFormat_Rf16:    return DXGI_FORMAT_R16_FLOAT;
+    case PixelFormat_RGBAf16: return DXGI_FORMAT_R16G16B16A16_FLOAT;
+    case PixelFormat_RGf16:   return DXGI_FORMAT_R16G16_FLOAT;
+    case PixelFormat_Rf16:    return DXGI_FORMAT_R16_FLOAT;
 
-    case fcPixelFormat_RGBAf32: return DXGI_FORMAT_R32G32B32A32_FLOAT;
-    case fcPixelFormat_RGf32:   return DXGI_FORMAT_R32G32_FLOAT;
-    case fcPixelFormat_Rf32:    return DXGI_FORMAT_R32_FLOAT;
+    case PixelFormat_RGBAf32: return DXGI_FORMAT_R32G32B32A32_FLOAT;
+    case PixelFormat_RGf32:   return DXGI_FORMAT_R32G32_FLOAT;
+    case PixelFormat_Rf32:    return DXGI_FORMAT_R32_FLOAT;
 
-    case fcPixelFormat_RGBAi32: return DXGI_FORMAT_R32G32B32A32_SINT;
-    case fcPixelFormat_RGi32:   return DXGI_FORMAT_R32G32_SINT;
-    case fcPixelFormat_Ri32:    return DXGI_FORMAT_R32_SINT;
+    case PixelFormat_RGBAi32: return DXGI_FORMAT_R32G32B32A32_SINT;
+    case PixelFormat_RGi32:   return DXGI_FORMAT_R32G32_SINT;
+    case PixelFormat_Ri32:    return DXGI_FORMAT_R32_SINT;
     }
     return DXGI_FORMAT_UNKNOWN;
 }
 
 
-ID3D11Texture2D* fcGraphicsDeviceD3D11::findOrCreateStagingTexture(int width, int height, fcPixelFormat format)
+ID3D11Texture2D* GraphicsDeviceD3D11::findOrCreateStagingTexture(int width, int height, PixelFormat format)
 {
     if (m_staging_textures.size() >= fcD3D11MaxStagingTextures) {
         clearStagingTextures();
@@ -117,7 +117,7 @@ ID3D11Texture2D* fcGraphicsDeviceD3D11::findOrCreateStagingTexture(int width, in
     return ret;
 }
 
-void fcGraphicsDeviceD3D11::clearStagingTextures()
+void GraphicsDeviceD3D11::clearStagingTextures()
 {
     for (auto& pair : m_staging_textures)
     {
@@ -126,7 +126,7 @@ void fcGraphicsDeviceD3D11::clearStagingTextures()
     m_staging_textures.clear();
 }
 
-void fcGraphicsDeviceD3D11::sync()
+void GraphicsDeviceD3D11::sync()
 {
     m_context->End(m_query_event);
     while (m_context->GetData(m_query_event, nullptr, 0, 0) == S_FALSE) {
@@ -134,10 +134,10 @@ void fcGraphicsDeviceD3D11::sync()
     }
 }
 
-bool fcGraphicsDeviceD3D11::readTexture(void *o_buf, size_t bufsize, void *tex_, int width, int height, fcPixelFormat format)
+bool GraphicsDeviceD3D11::readTexture(void *o_buf, size_t bufsize, void *tex_, int width, int height, PixelFormat format)
 {
     if (m_context == nullptr || tex_ == nullptr) { return false; }
-    int psize = fcGetPixelSize(format);
+    int psize = GetPixelSize(format);
 
     // Unity の D3D11 の RenderTexture の内容は CPU からはアクセス不可能になっている。
     // なので staging texture を用意してそれに内容を移し、CPU はそれ経由でデータを読む。
@@ -154,7 +154,7 @@ bool fcGraphicsDeviceD3D11::readTexture(void *o_buf, size_t bufsize, void *tex_,
     if (SUCCEEDED(hr))
     {
         char *wpixels = (char*)o_buf;
-        int wpitch = width * fcGetPixelSize(format);
+        int wpitch = width * GetPixelSize(format);
         const char *rpixels = (const char*)mapped.pData;
         int rpitch = mapped.RowPitch;
 
@@ -180,9 +180,9 @@ bool fcGraphicsDeviceD3D11::readTexture(void *o_buf, size_t bufsize, void *tex_,
     return false;
 }
 
-bool fcGraphicsDeviceD3D11::writeTexture(void *o_tex, int width, int height, fcPixelFormat format, const void *buf, size_t bufsize)
+bool GraphicsDeviceD3D11::writeTexture(void *o_tex, int width, int height, PixelFormat format, const void *buf, size_t bufsize)
 {
-    int psize = fcGetPixelSize(format);
+    int psize = GetPixelSize(format);
     int pitch = psize * width;
     const size_t num_pixels = bufsize / psize;
 
@@ -198,4 +198,5 @@ bool fcGraphicsDeviceD3D11::writeTexture(void *o_tex, int width, int height, fcP
     return true;
 }
 
+} // namespace utj
 #endif // fcSupportD3D11

@@ -23,9 +23,6 @@
     <ClInclude Include="Foundation\Buffer.h">
       <Filter>Foundaion</Filter>
     </ClInclude>
-    <ClInclude Include="Foundation\fcFoundation.h">
-      <Filter>Foundaion</Filter>
-    </ClInclude>
     <ClInclude Include="Foundation\Misc.h">
       <Filter>Foundaion</Filter>
     </ClInclude>
@@ -40,6 +37,9 @@
     </ClInclude>
     <ClInclude Include="OpenToonzPlugin\otpPlugin.h">
       <Filter>OpenToonzPlugin</Filter>
+    </ClInclude>
+    <ClInclude Include="Foundation\Foundation.h">
+      <Filter>Foundaion</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

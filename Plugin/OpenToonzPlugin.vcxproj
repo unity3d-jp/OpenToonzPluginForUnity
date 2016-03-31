@@ -28,7 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Foundation\Buffer.h" />
-    <ClInclude Include="Foundation\fcFoundation.h" />
+    <ClInclude Include="Foundation\Foundation.h" />
     <ClInclude Include="Foundation\Image.h" />
     <ClInclude Include="Foundation\Misc.h" />
     <ClInclude Include="Foundation\PixelFormat.h" />

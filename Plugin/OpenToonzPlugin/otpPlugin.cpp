@@ -1,6 +1,8 @@
 #include "pch.h"
+#include "Foundation.h"
+using namespace utj;
+
 #include "OpenToonzPlugin.h"
-#include "fcFoundation.h"
 #include "otpPlugin.h"
 
 typedef int(*toonz_plugin_init_t)(toonz_host_interface_t *hostif);

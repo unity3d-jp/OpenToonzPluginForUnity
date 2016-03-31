@@ -76,8 +76,8 @@
 
 
 #ifdef fcEnableLogging
-    void DebugLogImpl(const char* fmt, ...);
-    #define fcDebugLog(...) DebugLogImpl(__VA_ARGS__)
+    namespace utj { void DebugLogImpl(const char* fmt, ...); }
+    #define fcDebugLog(...) utj::DebugLogImpl(__VA_ARGS__)
 #else
     #define fcDebugLog(...)
 #endif
@@ -110,5 +110,7 @@
     #define twMaster
 #endif 
 
-class ImageBase;
-typedef ImageBase otpImage;
+namespace utj {
+    class ImageBase;
+}
+typedef utj::ImageBase otpImage;

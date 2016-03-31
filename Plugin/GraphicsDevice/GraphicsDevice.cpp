@@ -1,16 +1,17 @@
 ﻿#include "pch.h"
-#include "fcFoundation.h"
-#include "fcGraphicsDevice.h"
+#include "Foundation.h"
+#include "GraphicsDevice.h"
 
 
+namespace utj {
 
-fcIGraphicsDevice* fcCreateGraphicsDeviceOpenGL();
-fcIGraphicsDevice* fcCreateGraphicsDeviceD3D9(void *device);
-fcIGraphicsDevice* fcCreateGraphicsDeviceD3D11(void *device);
+GraphicsDevice* fcCreateGraphicsDeviceOpenGL();
+GraphicsDevice* fcCreateGraphicsDeviceD3D9(void *device);
+GraphicsDevice* fcCreateGraphicsDeviceD3D11(void *device);
 
 
-static fcIGraphicsDevice *g_gfx_device;
-fcCLinkage fcExport fcIGraphicsDevice* fcGetGraphicsDevice() { return g_gfx_device; }
+static GraphicsDevice *g_gfx_device;
+fcCLinkage fcExport GraphicsDevice* fcGetGraphicsDevice() { return g_gfx_device; }
 
 
 #ifdef fcSupportOpenGL
@@ -59,6 +60,8 @@ fcCLinkage fcExport void fcGfxSync()
     }
 }
 
+} // namespace utj
+
 
 
 #ifndef fcStaticLink
@@ -76,6 +79,8 @@ fcCLinkage fcExport void fcGfxSync()
     #include <d3d12.h>
     #include "PluginAPI/IUnityGraphicsD3D12.h"
 #endif
+
+namespace utj {
 
 static IUnityInterfaces* g_unity_interface;
 
@@ -109,6 +114,9 @@ static void UNITY_INTERFACE_API UnityOnGraphicsDeviceEvent(UnityGfxDeviceEventTy
         fcGfxFinalize();
     }
 }
+} // namespace utj
+
+using namespace utj;
 
 // user must implement this
 void RenderEventCallback(int id);

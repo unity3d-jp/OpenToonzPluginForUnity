@@ -1,25 +1,27 @@
 ﻿#include "pch.h"
 
 #ifdef fcSupportD3D9
-#include "fcFoundation.h"
-#include "fcGraphicsDevice.h"
+#include "Foundation.h"
+#include "GraphicsDevice.h"
 #include <d3d9.h>
+
+namespace utj {
 const int fcD3D9MaxStagingTextures = 32;
 
-class fcGraphicsDeviceD3D9 : public fcIGraphicsDevice
+class GraphicsDeviceD3D9 : public GraphicsDevice
 {
 public:
-    fcGraphicsDeviceD3D9(void *device);
-    ~fcGraphicsDeviceD3D9();
+    GraphicsDeviceD3D9(void *device);
+    ~GraphicsDeviceD3D9();
     void* getDevicePtr() override;
-    fcGfxDeviceType getDeviceType() override;
+    GfxDeviceType getDeviceType() override;
     void sync() override;
-    bool readTexture(void *o_buf, size_t bufsize, void *tex, int width, int height, fcPixelFormat format) override;
-    bool writeTexture(void *o_tex, int width, int height, fcPixelFormat format, const void *buf, size_t bufsize) override;
+    bool readTexture(void *o_buf, size_t bufsize, void *tex, int width, int height, PixelFormat format) override;
+    bool writeTexture(void *o_tex, int width, int height, PixelFormat format, const void *buf, size_t bufsize) override;
 
 private:
     void clearStagingTextures();
-    IDirect3DSurface9* findOrCreateStagingTexture(int width, int height, fcPixelFormat format);
+    IDirect3DSurface9* findOrCreateStagingTexture(int width, int height, PixelFormat format);
 
 private:
     IDirect3DDevice9 *m_device;
@@ -28,13 +30,13 @@ private:
 };
 
 
-fcIGraphicsDevice* fcCreateGraphicsDeviceD3D9(void *device)
+GraphicsDevice* fcCreateGraphicsDeviceD3D9(void *device)
 {
-    return new fcGraphicsDeviceD3D9(device);
+    return new GraphicsDeviceD3D9(device);
 }
 
 
-fcGraphicsDeviceD3D9::fcGraphicsDeviceD3D9(void *device)
+GraphicsDeviceD3D9::GraphicsDeviceD3D9(void *device)
     : m_device((IDirect3DDevice9*)device)
     , m_query_event(nullptr)
 {
@@ -44,16 +46,16 @@ fcGraphicsDeviceD3D9::fcGraphicsDeviceD3D9(void *device)
     }
 }
 
-fcGraphicsDeviceD3D9::~fcGraphicsDeviceD3D9()
+GraphicsDeviceD3D9::~GraphicsDeviceD3D9()
 {
     clearStagingTextures();
 }
 
-void* fcGraphicsDeviceD3D9::getDevicePtr() { return m_device; }
-fcGfxDeviceType fcGraphicsDeviceD3D9::getDeviceType() { return fcGfxDeviceType_D3D9; }
+void* GraphicsDeviceD3D9::getDevicePtr() { return m_device; }
+GfxDeviceType GraphicsDeviceD3D9::getDeviceType() { return GfxDeviceType_D3D9; }
 
 
-void fcGraphicsDeviceD3D9::clearStagingTextures()
+void GraphicsDeviceD3D9::clearStagingTextures()
 {
     for (auto& pair : m_staging_textures)
     {
@@ -64,24 +66,24 @@ void fcGraphicsDeviceD3D9::clearStagingTextures()
 
 
 
-static D3DFORMAT fcGetInternalFormatD3D9(fcPixelFormat fmt)
+static D3DFORMAT fcGetInternalFormatD3D9(PixelFormat fmt)
 {
     switch (fmt)
     {
-    case fcPixelFormat_RGBAu8:    return D3DFMT_A8R8G8B8;
+    case PixelFormat_RGBAu8:    return D3DFMT_A8R8G8B8;
 
-    case fcPixelFormat_RGBAf16:  return D3DFMT_A16B16G16R16F;
-    case fcPixelFormat_RGf16:    return D3DFMT_G16R16F;
-    case fcPixelFormat_Rf16:     return D3DFMT_R16F;
+    case PixelFormat_RGBAf16:  return D3DFMT_A16B16G16R16F;
+    case PixelFormat_RGf16:    return D3DFMT_G16R16F;
+    case PixelFormat_Rf16:     return D3DFMT_R16F;
 
-    case fcPixelFormat_RGBAf32: return D3DFMT_A32B32G32R32F;
-    case fcPixelFormat_RGf32:   return D3DFMT_G32R32F;
-    case fcPixelFormat_Rf32:    return D3DFMT_R32F;
+    case PixelFormat_RGBAf32: return D3DFMT_A32B32G32R32F;
+    case PixelFormat_RGf32:   return D3DFMT_G32R32F;
+    case PixelFormat_Rf32:    return D3DFMT_R32F;
     }
     return D3DFMT_UNKNOWN;
 }
 
-IDirect3DSurface9* fcGraphicsDeviceD3D9::findOrCreateStagingTexture(int width, int height, fcPixelFormat format)
+IDirect3DSurface9* GraphicsDeviceD3D9::findOrCreateStagingTexture(int width, int height, PixelFormat format)
 {
     if (m_staging_textures.size() >= fcD3D9MaxStagingTextures) {
         clearStagingTextures();
@@ -136,7 +138,7 @@ inline void copy_with_BGRA_RGBA_conversion(RGBA<T> *dst, const RGBA<T> *src, int
     }
 }
 
-void fcGraphicsDeviceD3D9::sync()
+void GraphicsDeviceD3D9::sync()
 {
     m_query_event->Issue(D3DISSUE_END);
     auto hr = m_query_event->GetData(nullptr, 0, D3DGETDATA_FLUSH);
@@ -145,7 +147,7 @@ void fcGraphicsDeviceD3D9::sync()
     }
 }
 
-bool fcGraphicsDeviceD3D9::readTexture(void *o_buf, size_t bufsize, void *tex_, int width, int height, fcPixelFormat format)
+bool GraphicsDeviceD3D9::readTexture(void *o_buf, size_t bufsize, void *tex_, int width, int height, PixelFormat format)
 {
     HRESULT hr;
     IDirect3DTexture9 *tex = (IDirect3DTexture9*)tex_;
@@ -170,7 +172,7 @@ bool fcGraphicsDeviceD3D9::readTexture(void *o_buf, size_t bufsize, void *tex_, 
         if (SUCCEEDED(hr))
         {
             char *wpixels = (char*)o_buf;
-            int wpitch = width * fcGetPixelSize(format);
+            int wpitch = width * GetPixelSize(format);
             const char *rpixels = (const char*)locked.pBits;
             int rpitch = locked.Pitch;
 
@@ -192,7 +194,7 @@ bool fcGraphicsDeviceD3D9::readTexture(void *o_buf, size_t bufsize, void *tex_, 
             surf_dst->UnlockRect();
 
             // D3D9 の ARGB32 のピクセルの並びは BGRA になっているので並べ替える
-            if (format == fcPixelFormat_RGBAu8) {
+            if (format == PixelFormat_RGBAu8) {
                 BGRA_RGBA_conversion((RGBA<uint8_t>*)o_buf, int(bufsize / 4));
             }
             ret = true;
@@ -203,9 +205,9 @@ bool fcGraphicsDeviceD3D9::readTexture(void *o_buf, size_t bufsize, void *tex_, 
     return ret;
 }
 
-bool fcGraphicsDeviceD3D9::writeTexture(void *o_tex, int width, int height, fcPixelFormat format, const void *buf, size_t bufsize)
+bool GraphicsDeviceD3D9::writeTexture(void *o_tex, int width, int height, PixelFormat format, const void *buf, size_t bufsize)
 {
-    int psize = fcGetPixelSize(format);
+    int psize = GetPixelSize(format);
     int pitch = psize * width;
     const size_t num_pixels = bufsize / psize;
 
@@ -231,7 +233,7 @@ bool fcGraphicsDeviceD3D9::writeTexture(void *o_tex, int width, int height, fcPi
         int wpitch = locked.Pitch;
 
         // こちらも ARGB32 の場合 BGRA に並べ替える必要がある
-        if (format == fcPixelFormat_RGBAu8) {
+        if (format == PixelFormat_RGBAu8) {
             copy_with_BGRA_RGBA_conversion((RGBA<uint8_t>*)wpixels, (RGBA<uint8_t>*)rpixels, int(bufsize / 4));
         }
         else {
@@ -249,4 +251,5 @@ bool fcGraphicsDeviceD3D9::writeTexture(void *o_tex, int width, int height, fcPi
     return false;
 }
 
+} // namespace utj
 #endif // fcSupportD3D9

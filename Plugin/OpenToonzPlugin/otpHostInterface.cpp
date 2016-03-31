@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
+#include "Foundation.h"
+using namespace utj;
+
 #include "OpenToonzPlugin.h"
-#include "fcFoundation.h"
 #include "otpPlugin.h"
 
 #ifndef otpMaster
@@ -235,10 +237,10 @@ int tile_get_element_type(toonz_tile_handle_t handle, int *element)
     Trace("handle: %p", handle);
     auto obj = (ImageBase*)handle;
     switch (obj->getPixelType()) {
-    case fcPixelFormat_RGBAu8:  *element = TOONZ_TILE_TYPE_32P; break;
-    case fcPixelFormat_RGBAi16: *element = TOONZ_TILE_TYPE_64P; break;
-    case fcPixelFormat_RGu8:    *element = TOONZ_TILE_TYPE_GR8P; break;
-    case fcPixelFormat_RGi16:   *element = TOONZ_TILE_TYPE_GR16P; break;
+    case PixelFormat_RGBAu8:  *element = TOONZ_TILE_TYPE_32P; break;
+    case PixelFormat_RGBAi16: *element = TOONZ_TILE_TYPE_64P; break;
+    case PixelFormat_RGu8:    *element = TOONZ_TILE_TYPE_GR8P; break;
+    case PixelFormat_RGi16:   *element = TOONZ_TILE_TYPE_GR16P; break;
     default: printf(__FUNCTION__ ": !should not be here!\n"); break;
     }
     return TOONZ_OK;

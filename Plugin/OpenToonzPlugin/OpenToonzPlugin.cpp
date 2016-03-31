@@ -1,6 +1,8 @@
 #include "pch.h"
+#include "Foundation.h"
+using namespace utj;
+
 #include "OpenToonzPlugin.h"
-#include "fcFoundation.h"
 #include "otpPlugin.h"
 
 

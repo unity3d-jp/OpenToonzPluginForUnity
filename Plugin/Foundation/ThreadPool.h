@@ -10,6 +10,8 @@
 #include <condition_variable>
 #include <atomic>
 
+namespace utj {
+
 class fcWorkerThread;
 class fcThreadPool;
 class fcTaskGroup;
@@ -58,11 +60,14 @@ void fcTaskGroup::run(const F &f)
         --m_active_tasks;
     });
 }
+} // namespace utj
 
 #else // fcWithTBB
 
 #include <tbb/tbb.h>
-typedef tbb::task_group fcTaskGroup;
+namespace utj {
+    typedef tbb::task_group fcTaskGroup;
+} // namespace utj 
 
 #endif // fcWithTBB
 

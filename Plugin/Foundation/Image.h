@@ -1,8 +1,9 @@
-#ifndef Image_h
-#define Image_h
+#ifndef utj_Image_h
+#define utj_Image_h
 #include "Buffer.h"
 #include "PixelFormat.h"
 
+namespace utj {
 
 template<class T, int L> union TPixel;
 
@@ -48,15 +49,15 @@ union TPixel<T, 4>
 
 class half;
 template<class T> struct TGetPixelFormatType;
-template<> struct TGetPixelFormatType<half>    { static const fcPixelFormat value = fcPixelFormat_Type_f16; };
-template<> struct TGetPixelFormatType<float>   { static const fcPixelFormat value = fcPixelFormat_Type_f32; };
-template<> struct TGetPixelFormatType<uint8_t> { static const fcPixelFormat value = fcPixelFormat_Type_u8; };
-template<> struct TGetPixelFormatType<int16_t> { static const fcPixelFormat value = fcPixelFormat_Type_i16; };
-template<> struct TGetPixelFormatType<int32_t> { static const fcPixelFormat value = fcPixelFormat_Type_i32; };
+template<> struct TGetPixelFormatType<half>    { static const PixelFormat value = PixelFormat_Type_f16; };
+template<> struct TGetPixelFormatType<float>   { static const PixelFormat value = PixelFormat_Type_f32; };
+template<> struct TGetPixelFormatType<uint8_t> { static const PixelFormat value = PixelFormat_Type_u8; };
+template<> struct TGetPixelFormatType<int16_t> { static const PixelFormat value = PixelFormat_Type_i16; };
+template<> struct TGetPixelFormatType<int32_t> { static const PixelFormat value = PixelFormat_Type_i32; };
 
 template<class T> struct TGetPixelFormat
 {
-    static const fcPixelFormat value = fcPixelFormat(TGetPixelFormatType<typename T::element_type>::value | T::num_elements);
+    static const PixelFormat value = PixelFormat(TGetPixelFormatType<typename T::element_type>::value | T::num_elements);
 };
 
 
@@ -76,7 +77,7 @@ public:
     int                     getWidth() const { return m_width; }
     int                     getHeight() const { return m_height; }
     virtual int             getPixelSize() const = 0;
-    virtual fcPixelFormat   getPixelType() const = 0;
+    virtual PixelFormat   getPixelType() const = 0;
 
     virtual void*           getData() = 0;
     const void*             getData() const { return const_cast<ImageBase*>(this)->getData(); }
@@ -104,7 +105,7 @@ public:
     pixel_t*        getPixels()                     { return (pixel_t*)getData(); }
     const pixel_t*  getPixels() const               { return const_cast<TImageBase*>(this)->getPixels(); }
     int             getPixelSize() const override   { return sizeof(pixel_t); }
-    fcPixelFormat   getPixelType() const override   { return TGetPixelFormat<pixel_t>::value; }
+    PixelFormat   getPixelType() const override   { return TGetPixelFormat<pixel_t>::value; }
 
     pixel_t&        getPixel(int x, int y)          { return getPixels()[m_width*y + x]; }
     const pixel_t&  getPixel(int x, int y) const    { return getPixels()[m_width*y + x]; }
@@ -211,4 +212,5 @@ typedef TImage<RGBAf32>     ImageRGBAf32;
 typedef TImageIntrusive<RGBAu8>     ImageIntrusiveRGBAu8;
 typedef TImageIntrusive<RGBAf32>    ImageIntrusiveRGBAf32;
 
-#endif // Image_h
+} // namespace utj
+#endif // utj_Image_h

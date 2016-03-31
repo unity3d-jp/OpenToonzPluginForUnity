@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "fcFoundation.h"
+#include "Foundation.h"
 
 #ifdef fcWindows
     #include <windows.h>
@@ -7,6 +7,7 @@
     #include <dlfcn.h>
 #endif
 
+namespace utj {
 
 void DebugLogImpl(const char* fmt, ...)
 {
@@ -223,3 +224,5 @@ void Glob(const char *pattern, const std::function<void(const char*)>& f)
     }
 #endif
 }
+
+} // namespace utj

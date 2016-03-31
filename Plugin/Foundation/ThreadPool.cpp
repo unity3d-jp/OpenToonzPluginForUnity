@@ -1,7 +1,9 @@
 ﻿#include "pch.h"
-#include "fcThreadPool.h"
+#include "ThreadPool.h"
 
 #ifndef fcWithTBB
+
+namespace utj {
 
 class fcWorkerThread
 {
@@ -92,4 +94,5 @@ void fcTaskGroup::wait()
     }
 }
 
+} // namespace utj
 #endif // fcWithTBB

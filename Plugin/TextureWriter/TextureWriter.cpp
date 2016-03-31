@@ -1,8 +1,9 @@
 #include "pch.h"
-#include "fcFoundation.h"
-#include "fcGraphicsDevice.h"
+#include "Foundation.h"
+#include "GraphicsDevice.h"
+using namespace utj;
 
-typedef fcPixelFormat twPixelFormat;
+typedef PixelFormat twPixelFormat;
 #include "TextureWriter.h"
 
 twCLinkage twExport void* twMalloc(int size)
@@ -26,12 +27,12 @@ twCLinkage twExport bool twWriteTexture(
     // convert data if data format is not match
     std::vector<char> tmp_pixels;
     if (dst_fmt != src_fmt) {
-        tmp_pixels.resize(src_num * fcGetPixelSize(dst_fmt));
-        fcConvertPixelFormat(&tmp_pixels[0], dst_fmt, src, src_fmt, src_num);
+        tmp_pixels.resize(src_num * GetPixelSize(dst_fmt));
+        ConvertPixelFormat(&tmp_pixels[0], dst_fmt, src, src_fmt, src_num);
         src = &tmp_pixels[0];
     }
 
-    return dev->writeTexture(dst_tex, dst_width, dst_height, dst_fmt, src, src_num * fcGetPixelSize(dst_fmt));
+    return dev->writeTexture(dst_tex, dst_width, dst_height, dst_fmt, src, src_num * GetPixelSize(dst_fmt));
 }
 
 
@@ -46,17 +47,17 @@ twCLinkage twExport bool twReadTexture(
     void *orig_dst = dst;
     std::vector<char> tmp_pixels;
     if (dst_fmt != src_fmt) {
-        tmp_pixels.resize(dst_num * fcGetPixelSize(src_fmt));
+        tmp_pixels.resize(dst_num * GetPixelSize(src_fmt));
         dst = &tmp_pixels[0];
     }
 
-    if (!dev->readTexture(dst, dst_num * fcGetPixelSize(src_fmt), src_tex, src_width, src_height, src_fmt)) {
+    if (!dev->readTexture(dst, dst_num * GetPixelSize(src_fmt), src_tex, src_width, src_height, src_fmt)) {
         return false;
     }
 
     // convert data if data format is not match
     if (!tmp_pixels.empty()) {
-        fcConvertPixelFormat(orig_dst, dst_fmt, &tmp_pixels[0], src_fmt, (int)tmp_pixels.size());
+        ConvertPixelFormat(orig_dst, dst_fmt, &tmp_pixels[0], src_fmt, (int)tmp_pixels.size());
     }
 
     return true;

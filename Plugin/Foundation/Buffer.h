@@ -1,8 +1,10 @@
-#ifndef fcBuffer_h
-#define fcBuffer_h
+#ifndef utj_Buffer_h
+#define utj_Buffer_h
 
 #include <vector>
 #include <algorithm>
+
+namespace utj {
 
 void*       AlignedAlloc(size_t size, size_t align);
 void        AlignedFree(void *p);
@@ -401,5 +403,5 @@ private:
     CustomStreamData m_csd;
 };
 
-
-#endif // fcBuffer_h
+} // namespace utj
+#endif // utj_Buffer_h
