@@ -26,8 +26,9 @@ public:
     void*                   getUserData() const;
     void                    setUsertData(void *v);
 
-    void                    createDstImage(int width, int height);
-    otpImage*               applyFx(double frames);
+    void                    beginRender(int width, int height);
+    otpImage*               render(double frames);
+    void                    endRender();
 
     // Body: [](otpParam *param){} -> void
     template<class Body>
@@ -54,6 +55,8 @@ private:
     std::vector<otpParamPtr> m_params;
     void *m_userdata;
 
+    toonz_rendering_setting_t m_rs;
+    toonz_rect_t m_rect;
     double m_frame;
     std::vector<otpPortPtr> m_ports;
     std::unique_ptr<ImageRGBAu8> m_dst_image;

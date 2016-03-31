@@ -163,13 +163,18 @@ otpCLinkage otpExport void otpSetParamValue(otpParam *param, const void *src)
 }
 
 
-otpCLinkage otpExport void otpCreateDstImage(otpInstance *inst, int width, int height)
+otpCLinkage otpExport void otpBeginRender(otpInstance *inst, int width, int height)
 {
-    inst->createDstImage(width, height);
+    if (!inst) { return; }
+    inst->beginRender(width, height);
 }
-
-utjCLinkage utjExport otpImage* otpApplyFx(otpInstance *node, double frame)
+otpCLinkage otpExport otpImage* otpRender(otpInstance *inst, double frame)
 {
-    if (!node) { return nullptr; }
-    return node->applyFx(frame);
+    if (!inst) { return nullptr; }
+    return inst->render(frame);
+}
+otpCLinkage otpExport void otpEndRender(otpInstance *inst)
+{
+    if (!inst) { return; }
+    inst->endRender();
 }

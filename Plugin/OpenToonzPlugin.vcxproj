@@ -78,19 +78,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>Foundation;external;external\glew;external\OpenEXR;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>Foundation;external;external\glew;external\opencv;external\OpenToonzPluginAPI;$(ProjectDir);$(IncludePath)</IncludePath>
     <LibraryPath>external\libs\x86_64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)_out\$(SolutionName)_$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)_tmp\$(ProjectName)_$(Platform)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MasterDLL|x64'">
-    <IncludePath>Foundation;external;external\glew;external\OpenEXR;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>Foundation;external;external\glew;external\opencv;external\OpenToonzPluginAPI;$(ProjectDir);$(IncludePath)</IncludePath>
     <LibraryPath>external\libs\x86_64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)_out\$(SolutionName)_$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)_tmp\$(ProjectName)_$(Platform)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MasterLib|x64'">
-    <IncludePath>Foundation;external;external\glew;external\OpenEXR;$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>Foundation;external;external\glew;external\opencv;external\OpenToonzPluginAPI;$(ProjectDir);$(IncludePath)</IncludePath>
     <LibraryPath>external\libs\x86_64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)_out\$(SolutionName)_$(Platform)_$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)_tmp\$(ProjectName)_$(Platform)_$(Configuration)\</IntDir>

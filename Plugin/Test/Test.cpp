@@ -86,8 +86,10 @@ int main(int argc, char *argv[])
         otpSetInput(port, src);
     }
 
-    otpCreateDstImage(inst, 1024, 1024);
-    otpImage *dst = otpApplyFx(inst, 0.0);
+    otpBeginRender(inst, 1024, 1024);
+    otpImage *dst = otpRender(inst, 0.0);
+    otpEndRender(inst);
+
     {
         otpImageData dd;
         otpGetImageData(dst, &dd);

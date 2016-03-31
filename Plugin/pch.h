@@ -18,9 +18,12 @@
 #include <fstream>
 #include <sstream>
 #include <filesystem>
-#include "OpenToonzPluginAPI/toonz_plugin.h"
-#include "OpenToonzPluginAPI/toonz_params.h"
-#include "OpenToonzPluginAPI/toonz_hostif.h"
+
+//#include <opencv2/core/core.hpp>
+//#include <opencv2/imgproc/imgproc.hpp>
+#include <toonz_plugin.h>
+#include <toonz_params.h>
+#include <toonz_hostif.h>
 
 #define utjImpl
 
