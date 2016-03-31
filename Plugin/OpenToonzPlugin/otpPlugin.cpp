@@ -234,7 +234,7 @@ void otpInstance::createDstImage(int width, int height)
 otpImage* otpInstance::applyFx(double frame)
 {
     if (!m_dst_image) {
-        printf(__FUNCTION__ "dst image is null\n");
+        utjDebugLog("dst image is null");
         return nullptr;
     }
     auto dst = m_dst_image.get();

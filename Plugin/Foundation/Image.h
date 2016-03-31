@@ -71,18 +71,18 @@ public:
     ImageBase() : m_width(), m_height() {}
     virtual ~ImageBase() {}
 
-    virtual ImageBase*      create(int w, int h) const = 0;
-    virtual ImageBase*      clone() const = 0;
+    virtual ImageBase*  create(int w, int h) const = 0;
+    virtual ImageBase*  clone() const = 0;
 
-    int                     getWidth() const { return m_width; }
-    int                     getHeight() const { return m_height; }
-    virtual int             getPixelSize() const = 0;
-    virtual PixelFormat   getPixelType() const = 0;
+    int                 getWidth() const { return m_width; }
+    int                 getHeight() const { return m_height; }
+    virtual int         getPixelSize() const = 0;
+    virtual PixelFormat getPixelType() const = 0;
 
-    virtual void*           getData() = 0;
-    const void*             getData() const { return const_cast<ImageBase*>(this)->getData(); }
-    void*                   getData(int x, int y) { return (uint8_t*)getData() + (m_width*y + x) * getPixelSize(); }
-    const void*             getData(int x, int y) const { return const_cast<ImageBase*>(this)->getData(x, y); }
+    virtual void*       getData() = 0;
+    const void*         getData() const { return const_cast<ImageBase*>(this)->getData(); }
+    void*               getData(int x, int y) { return (uint8_t*)getData() + (m_width*y + x) * getPixelSize(); }
+    const void*         getData(int x, int y) const { return const_cast<ImageBase*>(this)->getData(x, y); }
 
 protected:
     int m_width;
@@ -105,7 +105,7 @@ public:
     pixel_t*        getPixels()                     { return (pixel_t*)getData(); }
     const pixel_t*  getPixels() const               { return const_cast<TImageBase*>(this)->getPixels(); }
     int             getPixelSize() const override   { return sizeof(pixel_t); }
-    PixelFormat   getPixelType() const override   { return TGetPixelFormat<pixel_t>::value; }
+    PixelFormat     getPixelType() const override   { return TGetPixelFormat<pixel_t>::value; }
 
     pixel_t&        getPixel(int x, int y)          { return getPixels()[m_width*y + x]; }
     const pixel_t&  getPixel(int x, int y) const    { return getPixels()[m_width*y + x]; }

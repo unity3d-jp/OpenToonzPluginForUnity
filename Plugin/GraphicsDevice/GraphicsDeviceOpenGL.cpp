@@ -1,15 +1,15 @@
 ﻿#include "pch.h"
 
-#ifdef fcSupportOpenGL
+#ifdef utjSupportOpenGL
 #include "Foundation.h"
 #include "GraphicsDevice.h"
 
-#ifndef fcDontForceStaticGLEW
-#define GLEW_STATIC
+#ifndef utjWindows
+    #define GLEW_STATIC
 #endif
 #include <GL/glew.h>
 
-#if defined(fcWindows) && !defined(fcNoAutoLink)
+#if defined(utjWindows)
 #pragma comment(lib, "opengl32.lib")
 //#pragma comment(lib, "glew32s.lib")
 #endif
@@ -28,7 +28,7 @@ public:
 };
 
 
-GraphicsDevice* fcCreateGraphicsDeviceOpenGL()
+GraphicsDevice* CreateGraphicsDeviceOpenGL()
 {
     return new GraphicsDeviceOpenGL();
 }
@@ -47,7 +47,7 @@ GraphicsDeviceOpenGL::~GraphicsDeviceOpenGL()
 }
 
 
-static void fcGetInternalFormatOpenGL(PixelFormat format, GLenum &o_fmt, GLenum &o_type)
+static void GetInternalFormatOpenGL(PixelFormat format, GLenum &o_fmt, GLenum &o_type)
 {
     switch (format)
     {
@@ -77,7 +77,7 @@ bool GraphicsDeviceOpenGL::readTexture(void *o_buf, size_t, void *tex, int, int,
 {
     GLenum internal_format = 0;
     GLenum internal_type = 0;
-    fcGetInternalFormatOpenGL(format, internal_format, internal_type);
+    GetInternalFormatOpenGL(format, internal_format, internal_type);
 
     //// glGetTextureImage() is available only OpenGL 4.5 or later...
     // glGetTextureImage((GLuint)(size_t)tex, 0, internal_format, internal_type, bufsize, o_buf);
@@ -93,7 +93,7 @@ bool GraphicsDeviceOpenGL::writeTexture(void *o_tex, int width, int height, Pixe
 {
     GLenum internal_format = 0;
     GLenum internal_type = 0;
-    fcGetInternalFormatOpenGL(format, internal_format, internal_type);
+    GetInternalFormatOpenGL(format, internal_format, internal_type);
 
     //// glTextureSubImage2D() is available only OpenGL 4.5 or later...
     // glTextureSubImage2D((GLuint)(size_t)o_tex, 0, 0, 0, width, height, internal_format, internal_type, buf);
@@ -105,4 +105,4 @@ bool GraphicsDeviceOpenGL::writeTexture(void *o_tex, int width, int height, Pixe
 }
 
 } // namespace utj
-#endif // fcSupportOpenGL
+#endif // utjSupportOpenGL

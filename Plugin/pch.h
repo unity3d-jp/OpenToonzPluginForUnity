@@ -22,86 +22,58 @@
 #include "OpenToonzPluginAPI/toonz_params.h"
 #include "OpenToonzPluginAPI/toonz_hostif.h"
 
-#define fcImpl
+#define utjImpl
 
 #if defined(_WIN32)
-    #define fcWindows
+    #define utjWindows
 #elif defined(__APPLE__)
     #ifdef TARGET_OS_IPHONE
-        #define fciOS
+        #define utjiOS
     #else
-        #define fcMac
+        #define utjMac
     #endif
 #elif defined(__ANDROID__)
-    #define fcAndroid
+    #define utjAndroid
 #elif defined(__linux__)
-    #define fcLinux
+    #define utjLinux
 #endif
 
-#define fcEnableLogging
 #ifdef _WIN32
-    #define fcSupportOpenGL
-    #define fcSupportD3D9
-    #define fcSupportD3D11
-
-    #define fcSupportPNG
-    #define fcSupportEXR
-    #define fcSupportGIF
-    #define fcSupportMP4
-
-    #define fcSupportHalfPixelFormat
-    #define fcSupportFAAC
-    #define fcSupportOpenH264
-    #define fcSupportNVH264
-    #define fcSupportAMDH264
+    #define utjSupportOpenGL
+    #define utjSupportD3D9
+    #define utjSupportD3D11
 #else
-    #define fcSupportOpenGL
-
-    #define fcSupportPNG
-    #define fcSupportEXR
-    #define fcSupportGIF
-    #define fcSupportMP4
-
-    #define fcSupportHalfPixelFormat
-    #define fcSupportFAAC
-    #define fcSupportOpenH264
-    #define fcSupportNVH264
+    #define utjSupportOpenGL
 #endif
-#ifndef fcStaticLink
-    //#define fcGIFSplitModule
-    #define fcPNGSplitModule
-    #define fcEXRSplitModule
-    #define fcMP4SplitModule
-#endif // fcStaticLink
 
-
-#ifdef fcEnableLogging
+#define utjEnableLogging
+#ifdef utjEnableLogging
     namespace utj { void DebugLogImpl(const char* fmt, ...); }
-    #define fcDebugLog(...) utj::DebugLogImpl(__VA_ARGS__)
+    #define utjDebugLog(...) utj::DebugLogImpl(__FUNCTION__ ": " __VA_ARGS__)
 #else
-    #define fcDebugLog(...)
+    #define utjDebugLog(...)
 #endif
 
-#define fcCLinkage extern "C"
+#define utjCLinkage extern "C"
 #ifdef _WIN32
-    #ifndef fcStaticLink
-        #ifdef fcImpl
-            #define fcExport __declspec(dllexport)
+    #ifndef utjStaticLink
+        #ifdef utjImpl
+            #define utjExport __declspec(dllexport)
         #else
-            #define fcExport __declspec(dllimport)
+            #define utjExport __declspec(dllimport)
         #endif
     #else
-        #define fcExport
+        #define utjExport
     #endif
 #else
-    #define fcExport
+    #define utjExport
 #endif
 
-#ifdef fcStaticLink
+#ifdef utjStaticLink
     #define otpStaticLink
     #define twStaticLink
 #endif 
-#ifdef fcImpl
+#ifdef utjImpl
     #define otpImpl
     #define twImpl
 #endif 

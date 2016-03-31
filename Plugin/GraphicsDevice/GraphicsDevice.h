@@ -24,7 +24,7 @@ public:
     virtual bool readTexture(void *o_buf, size_t bufsize, void *tex, int width, int height, PixelFormat format) = 0;
     virtual bool writeTexture(void *o_tex, int width, int height, PixelFormat format, const void *buf, size_t bufsize) = 0;
 };
-fcCLinkage fcExport GraphicsDevice* fcGetGraphicsDevice();
+utjCLinkage utjExport GraphicsDevice* GetGraphicsDevice();
 
 } // namespace utj
 #endif // utj_GraphicsDevice_h

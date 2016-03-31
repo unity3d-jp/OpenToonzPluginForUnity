@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Foundation.h"
 
-#ifdef fcWindows
+#ifdef utjWindows
     #include <windows.h>
 #else
     #include <dlfcn.h>
@@ -11,7 +11,7 @@ namespace utj {
 
 void DebugLogImpl(const char* fmt, ...)
 {
-#ifdef fcWindows
+#ifdef utjWindows
 
     char buf[2048];
     va_list vl;
@@ -20,7 +20,7 @@ void DebugLogImpl(const char* fmt, ...)
     ::OutputDebugStringA(buf);
     va_end(vl);
 
-#else // fcWindows
+#else // utjWindows
 
     char buf[2048];
     va_list vl;
@@ -28,12 +28,12 @@ void DebugLogImpl(const char* fmt, ...)
     vprintf(fmt, vl);
     va_end(vl);
 
-#endif // fcWindows
+#endif // utjWindows
 }
 
 
 
-#ifdef fcWindows
+#ifdef utjWindows
 
 module_t DLLLoad(const char *path) { return ::LoadLibraryA(path); }
 void DLLUnload(module_t mod) { ::FreeLibrary((HMODULE)mod); }
@@ -49,7 +49,7 @@ void* DLLGetSymbol(module_t mod, const char *name) { return ::dlsym(mod, name); 
 
 void DLLAddSearchPath(const char *path_to_add)
 {
-#ifdef fcWindows
+#ifdef utjWindows
     std::string path;
     path.resize(1024 * 64);
 
@@ -70,7 +70,7 @@ void DLLAddSearchPath(const char *path_to_add)
 const char* DLLGetDirectoryOfCurrentModule()
 {
     static std::string s_path;
-#ifdef fcWindows
+#ifdef utjWindows
     if (s_path.empty()) {
         char buf[MAX_PATH];
         HMODULE mod = 0;
@@ -94,9 +94,9 @@ const char* DLLGetDirectoryOfCurrentModule()
 
 void* AlignedAlloc(size_t size, size_t align)
 {
-#ifdef fcWindows
+#ifdef utjWindows
     return _aligned_malloc(size, align);
-#elif defined(fcMac)
+#elif defined(utjMac)
     return malloc(size);
 #else
     return memalign(align, size);
@@ -105,7 +105,7 @@ void* AlignedAlloc(size_t size, size_t align)
 
 void AlignedFree(void *p)
 {
-#ifdef fcWindows
+#ifdef utjWindows
     _aligned_free(p);
 #else
     free(p);
@@ -114,7 +114,7 @@ void AlignedFree(void *p)
 
 double GetCurrentTimeSec()
 {
-#ifdef fcWindows
+#ifdef utjWindows
     static LARGE_INTEGER g_freq = { 0, 0 };
     if ((u64&)g_freq == 0) {
         ::QueryPerformanceFrequency(&g_freq);
@@ -130,8 +130,8 @@ double GetCurrentTimeSec()
 #endif
 }
 
-#ifdef fcWindows
-void fcWinPrintLastError()
+#ifdef utjWindows
+void WinPrintLastError()
 {
     auto code = ::GetLastError();
     char buf[1024];
@@ -140,13 +140,13 @@ void fcWinPrintLastError()
         FORMAT_MESSAGE_FROM_SYSTEM,
         nullptr, ::GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         buf, sizeof(buf), nullptr);
-    fcDebugLog("fcWinPrintLastError(): %s", buf);
+    utjDebugLog("fcWinPrintLastError(): %s", buf);
 }
 #endif
 
 int Execute(const char *command_)
 {
-#ifdef fcWindows
+#ifdef utjWindows
     STARTUPINFOA si;
     PROCESS_INFORMATION pi;
     memset(&si, 0, sizeof(si));
@@ -163,7 +163,7 @@ int Execute(const char *command_)
         return exit_code;
     }
     else {
-        fcWinPrintLastError();
+        WinPrintLastError();
     }
     return 1;
 #else

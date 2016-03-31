@@ -1,12 +1,12 @@
 ﻿#include "pch.h"
 
-#ifdef fcSupportD3D9
+#ifdef utjSupportD3D9
 #include "Foundation.h"
 #include "GraphicsDevice.h"
 #include <d3d9.h>
 
 namespace utj {
-const int fcD3D9MaxStagingTextures = 32;
+const int D3D9MaxStagingTextures = 32;
 
 class GraphicsDeviceD3D9 : public GraphicsDevice
 {
@@ -30,7 +30,7 @@ private:
 };
 
 
-GraphicsDevice* fcCreateGraphicsDeviceD3D9(void *device)
+GraphicsDevice* CreateGraphicsDeviceD3D9(void *device)
 {
     return new GraphicsDeviceD3D9(device);
 }
@@ -66,7 +66,7 @@ void GraphicsDeviceD3D9::clearStagingTextures()
 
 
 
-static D3DFORMAT fcGetInternalFormatD3D9(PixelFormat fmt)
+static D3DFORMAT GetInternalFormatD3D9(PixelFormat fmt)
 {
     switch (fmt)
     {
@@ -85,11 +85,11 @@ static D3DFORMAT fcGetInternalFormatD3D9(PixelFormat fmt)
 
 IDirect3DSurface9* GraphicsDeviceD3D9::findOrCreateStagingTexture(int width, int height, PixelFormat format)
 {
-    if (m_staging_textures.size() >= fcD3D9MaxStagingTextures) {
+    if (m_staging_textures.size() >= D3D9MaxStagingTextures) {
         clearStagingTextures();
     }
 
-    D3DFORMAT internal_format = fcGetInternalFormatD3D9(format);
+    D3DFORMAT internal_format = GetInternalFormatD3D9(format);
     if (internal_format == D3DFMT_UNKNOWN) { return nullptr; }
 
     uint64_t hash = width + (height << 16) + ((uint64_t)internal_format << 32);
@@ -143,7 +143,7 @@ void GraphicsDeviceD3D9::sync()
     m_query_event->Issue(D3DISSUE_END);
     auto hr = m_query_event->GetData(nullptr, 0, D3DGETDATA_FLUSH);
     if (hr != S_OK) {
-        fcDebugLog("fcGraphicsDeviceD3D9::sync(): GetData() failed\n");
+        utjDebugLog("fcGraphicsDeviceD3D9::sync(): GetData() failed\n");
     }
 }
 
@@ -252,4 +252,4 @@ bool GraphicsDeviceD3D9::writeTexture(void *o_tex, int width, int height, PixelF
 }
 
 } // namespace utj
-#endif // fcSupportD3D9
+#endif // utjSupportD3D9

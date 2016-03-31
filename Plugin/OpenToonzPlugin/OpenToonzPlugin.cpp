@@ -33,7 +33,7 @@ otpCLinkage otpExport void otpGetImageData(otpImage *img, otpImageData *data)
 }
 
 
-fcCLinkage fcExport otpModule* otpLoadModule(const char *path)
+utjCLinkage utjExport otpModule* otpLoadModule(const char *path)
 {
     auto i = g_plugins.find(path);
     if (i != g_plugins.end()) {
@@ -54,13 +54,13 @@ fcCLinkage fcExport otpModule* otpLoadModule(const char *path)
     return inst;
 }
 
-fcCLinkage fcExport void otpUnloadModule(otpModule *inst)
+utjCLinkage utjExport void otpUnloadModule(otpModule *inst)
 {
     // do nothing
 }
 
 
-fcCLinkage fcExport int otpGetNumPlugins(otpModule *mod)
+utjCLinkage utjExport int otpGetNumPlugins(otpModule *mod)
 {
     if (!mod) { return 0; }
     return mod->getNumPlugins();
@@ -72,7 +72,7 @@ otpCLinkage otpExport void otpGetPluginInfo(otpModule *mod, int i, otpPluginInfo
     *dst = mod->getPluginInfo(i);
 }
 
-fcCLinkage fcExport otpInstance* otpCreateInstance(otpModule *mod, int i)
+utjCLinkage utjExport otpInstance* otpCreateInstance(otpModule *mod, int i)
 {
     if (!mod) { return nullptr; }
     return mod->createPluginInstance(i);
@@ -115,7 +115,7 @@ otpCLinkage otpExport void otpSetInput(otpPort *port, otpImage *src)
 }
 
 
-fcCLinkage fcExport int otpGetNumParams(otpInstance *inst)
+utjCLinkage utjExport int otpGetNumParams(otpInstance *inst)
 {
     if (!inst) { return 0; }
     return inst->getNumParams();
@@ -165,7 +165,7 @@ otpCLinkage otpExport void otpCreateDstImage(otpInstance *inst, int width, int h
     inst->createDstImage(width, height);
 }
 
-fcCLinkage fcExport otpImage* otpApplyFx(otpInstance *node, double frame)
+utjCLinkage utjExport otpImage* otpApplyFx(otpInstance *node, double frame)
 {
     if (!node) { return nullptr; }
     return node->applyFx(frame);

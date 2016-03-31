@@ -1,13 +1,13 @@
 ﻿#ifndef utj_Misc_h
 #define utj_Misc_h
 
-#ifdef fcWindows
-    #define fcDLLExt ".dll"
+#ifdef utjWindows
+    #define utjDLLExt ".dll"
 #else 
-    #ifdef fcMac
-        #define fcDLLExt ".dylib"
+    #ifdef utjMac
+        #define utjDLLExt ".dylib"
     #else
-        #define fcDLLExt ".so"
+        #define utjDLLExt ".so"
     #endif
 #endif
 

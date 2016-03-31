@@ -1,10 +1,10 @@
 ﻿#include "pch.h"
 
-#ifdef fcSupportD3D11
+#ifdef utjSupportD3D11
 #include "Foundation.h"
 #include "GraphicsDevice.h"
 #include <d3d11.h>
-const int fcD3D11MaxStagingTextures = 32;
+const int D3D11MaxStagingTextures = 32;
 
 namespace utj {
 class GraphicsDeviceD3D11 : public GraphicsDevice
@@ -30,7 +30,7 @@ private:
 };
 
 
-GraphicsDevice* fcCreateGraphicsDeviceD3D11(void *device)
+GraphicsDevice* CreateGraphicsDeviceD3D11(void *device)
 {
     return new GraphicsDeviceD3D11(device);
 }
@@ -66,7 +66,7 @@ void* GraphicsDeviceD3D11::getDevicePtr() { return m_device; }
 GfxDeviceType GraphicsDeviceD3D11::getDeviceType() { return GfxDeviceType_D3D11; }
 
 
-static DXGI_FORMAT fcGetInternalFormatD3D11(PixelFormat fmt)
+static DXGI_FORMAT GetInternalFormatD3D11(PixelFormat fmt)
 {
     switch (fmt)
     {
@@ -90,11 +90,11 @@ static DXGI_FORMAT fcGetInternalFormatD3D11(PixelFormat fmt)
 
 ID3D11Texture2D* GraphicsDeviceD3D11::findOrCreateStagingTexture(int width, int height, PixelFormat format)
 {
-    if (m_staging_textures.size() >= fcD3D11MaxStagingTextures) {
+    if (m_staging_textures.size() >= D3D11MaxStagingTextures) {
         clearStagingTextures();
     }
 
-    DXGI_FORMAT internal_format = fcGetInternalFormatD3D11(format);
+    DXGI_FORMAT internal_format = GetInternalFormatD3D11(format);
     uint64_t hash = width + (height << 16) + ((uint64_t)internal_format << 32);
     {
         auto it = m_staging_textures.find(hash);
@@ -199,4 +199,4 @@ bool GraphicsDeviceD3D11::writeTexture(void *o_tex, int width, int height, Pixel
 }
 
 } // namespace utj
-#endif // fcSupportD3D11
+#endif // utjSupportD3D11

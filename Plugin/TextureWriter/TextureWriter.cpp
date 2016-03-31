@@ -6,6 +6,8 @@ using namespace utj;
 typedef PixelFormat twPixelFormat;
 #include "TextureWriter.h"
 
+const char *utjModuleName = "TextureWriter" utjDLLExt;
+
 twCLinkage twExport void* twMalloc(int size)
 {
     return malloc(size);
@@ -21,7 +23,7 @@ twCLinkage twExport bool twWriteTexture(
     void *dst_tex, int dst_width, int dst_height, twPixelFormat dst_fmt,
     const void *src, int src_num, twPixelFormat src_fmt)
 {
-    auto *dev = fcGetGraphicsDevice();
+    auto *dev = GetGraphicsDevice();
     if (!dst_tex || !src || !dev) { return false; }
 
     // convert data if data format is not match
@@ -40,7 +42,7 @@ twCLinkage twExport bool twReadTexture(
     void *dst, int dst_num, twPixelFormat dst_fmt,
     void *src_tex, int src_width, int src_height, twPixelFormat src_fmt)
 {
-    auto *dev = fcGetGraphicsDevice();
+    auto *dev = GetGraphicsDevice();
     if (!dst || !src_tex || !dev) { return false; }
 
 
@@ -106,7 +108,7 @@ twCLinkage twExport int twAddDeferredCall(const fcDeferredCall& dc, int id)
         return id;
     }
     else {
-        fcDebugLog("fcAddDeferredCall(): should not be here");
+        utjDebugLog("fcAddDeferredCall(): should not be here");
         return 0;
     }
 }

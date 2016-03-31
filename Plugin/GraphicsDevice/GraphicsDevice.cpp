@@ -4,74 +4,75 @@
 
 
 namespace utj {
-
-GraphicsDevice* fcCreateGraphicsDeviceOpenGL();
-GraphicsDevice* fcCreateGraphicsDeviceD3D9(void *device);
-GraphicsDevice* fcCreateGraphicsDeviceD3D11(void *device);
-
-
+GraphicsDevice* CreateGraphicsDeviceOpenGL();
+GraphicsDevice* CreateGraphicsDeviceD3D9(void *device);
+GraphicsDevice* CreateGraphicsDeviceD3D11(void *device);
 static GraphicsDevice *g_gfx_device;
-fcCLinkage fcExport GraphicsDevice* fcGetGraphicsDevice() { return g_gfx_device; }
+} // namespace utj
+using namespace utj;
+
+utjCLinkage utjExport GraphicsDevice* GetGraphicsDevice()
+{
+    return g_gfx_device;
+}
 
 
-#ifdef fcSupportOpenGL
-fcCLinkage fcExport void fcGfxInitializeOpenGL()
+#ifdef utjSupportOpenGL
+utjCLinkage utjExport void GfxInitializeOpenGL()
 {
     if (g_gfx_device != nullptr) {
-        fcDebugLog("fcInitializeOpenGL(): already initialized");
+        utjDebugLog("already initialized");
         return;
     }
-    g_gfx_device = fcCreateGraphicsDeviceOpenGL();
+    g_gfx_device = CreateGraphicsDeviceOpenGL();
 }
 #endif
 
-#ifdef fcSupportD3D9
-fcCLinkage fcExport void fcGfxInitializeD3D9(void *device)
+#ifdef utjSupportD3D9
+utjCLinkage utjExport void GfxInitializeD3D9(void *device)
 {
     if (g_gfx_device != nullptr) {
-        fcDebugLog("fcInitializeD3D9(): already initialized");
+        utjDebugLog("already initialized");
         return;
     }
-    g_gfx_device = fcCreateGraphicsDeviceD3D9(device);
+    g_gfx_device = CreateGraphicsDeviceD3D9(device);
 }
 #endif
 
-#ifdef fcSupportD3D11
-fcCLinkage fcExport void fcGfxInitializeD3D11(void *device)
+#ifdef utjSupportD3D11
+utjCLinkage utjExport void GfxInitializeD3D11(void *device)
 {
     if (g_gfx_device != nullptr) {
-        fcDebugLog("fcInitializeD3D11(): already initialized");
+        utjDebugLog("already initialized");
         return;
     }
-    g_gfx_device = fcCreateGraphicsDeviceD3D11(device);
+    g_gfx_device = CreateGraphicsDeviceD3D11(device);
 }
 #endif
 
-fcCLinkage fcExport void fcGfxFinalize()
+utjCLinkage utjExport void GfxFinalize()
 {
     delete g_gfx_device;
     g_gfx_device = nullptr;
 }
 
-fcCLinkage fcExport void fcGfxSync()
+utjCLinkage utjExport void GfxSync()
 {
     if (g_gfx_device) {
         g_gfx_device->sync();
     }
 }
 
-} // namespace utj
 
 
-
-#ifndef fcStaticLink
+#ifndef utjStaticLink
 
 #include "PluginAPI/IUnityGraphics.h"
-#ifdef fcSupportD3D9
+#ifdef utjSupportD3D9
     #include <d3d9.h>
     #include "PluginAPI/IUnityGraphicsD3D9.h"
 #endif
-#ifdef fcSupportD3D11
+#ifdef utjSupportD3D11
     #include <d3d11.h>
     #include "PluginAPI/IUnityGraphicsD3D11.h"
 #endif
@@ -90,31 +91,32 @@ static void UNITY_INTERFACE_API UnityOnGraphicsDeviceEvent(UnityGfxDeviceEventTy
         auto unity_gfx = g_unity_interface->Get<IUnityGraphics>();
         auto api = unity_gfx->GetRenderer();
 
-#ifdef fcSupportD3D11
+#ifdef utjSupportD3D11
         if (api == kUnityGfxRendererD3D11) {
-            fcGfxInitializeD3D11(g_unity_interface->Get<IUnityGraphicsD3D11>()->GetDevice());
+            GfxInitializeD3D11(g_unity_interface->Get<IUnityGraphicsD3D11>()->GetDevice());
         }
 #endif
-#ifdef fcSupportD3D9
+#ifdef utjSupportD3D9
         if (api == kUnityGfxRendererD3D9) {
-            fcGfxInitializeD3D9(g_unity_interface->Get<IUnityGraphicsD3D9>()->GetDevice());
+            GfxInitializeD3D9(g_unity_interface->Get<IUnityGraphicsD3D9>()->GetDevice());
         }
 #endif
-#ifdef fcSupportOpenGL
+#ifdef utjSupportOpenGL
         if (api == kUnityGfxRendererOpenGL ||
             api == kUnityGfxRendererOpenGLCore ||
             api == kUnityGfxRendererOpenGLES20 ||
             api == kUnityGfxRendererOpenGLES30)
         {
-            fcGfxInitializeOpenGL();
+            GfxInitializeOpenGL();
         }
 #endif
     }
     else if (eventType == kUnityGfxDeviceEventShutdown) {
-        fcGfxFinalize();
+        GfxFinalize();
     }
 }
 } // namespace utj
+
 
 using namespace utj;
 
@@ -141,27 +143,28 @@ UnityPluginUnload()
     unity_gfx->UnregisterDeviceEventCallback(UnityOnGraphicsDeviceEvent);
 }
 
-fcCLinkage fcExport UnityRenderingEvent GetRenderEventFunc()
+utjCLinkage utjExport UnityRenderingEvent GetRenderEventFunc()
 {
     return UnityRenderEvent;
 }
 
-fcCLinkage fcExport IUnityInterfaces* fcGetUnityInterface()
+utjCLinkage utjExport IUnityInterfaces* GetUnityInterface()
 {
     return g_unity_interface;
 }
 
-#ifdef fcWindows
+#ifdef utjWindows
 #include <windows.h>
-typedef IUnityInterfaces* (*fcGetUnityInterfaceT)();
+typedef IUnityInterfaces* (*GetUnityInterfaceT)();
+extern const char *utjModuleName;
 
-void fcGfxForceInitialize()
+void GfxForceInitialize()
 {
     // PatchLibrary で突っ込まれたモジュールは UnityPluginLoad() が呼ばれないので、
     // 先にロードされているモジュールからインターフェースをもらって同等の処理を行う。
-    HMODULE m = ::GetModuleHandleA("FrameCapturer.dll");
+    HMODULE m = ::GetModuleHandleA(utjModuleName);
     if (m) {
-        auto proc = (fcGetUnityInterfaceT)::GetProcAddress(m, "fcGetUnityInterface");
+        auto proc = (GetUnityInterfaceT)::GetProcAddress(m, "GetUnityInterface");
         if (proc) {
             auto *iface = proc();
             if (iface) {
@@ -172,4 +175,4 @@ void fcGfxForceInitialize()
 }
 #endif
 
-#endif // fcStaticLink
+#endif // utjStaticLink
