@@ -76,7 +76,7 @@ utjCLinkage utjExport void GfxSync()
     #include <d3d11.h>
     #include "PluginAPI/IUnityGraphicsD3D11.h"
 #endif
-#ifdef fcSupportD3D12
+#ifdef utjSupportD3D12
     #include <d3d12.h>
     #include "PluginAPI/IUnityGraphicsD3D12.h"
 #endif

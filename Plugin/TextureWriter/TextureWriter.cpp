@@ -69,10 +69,10 @@ twCLinkage twExport bool twReadTexture(
 
 // deferred call impl
 
-typedef std::function<void()> fcDeferredCall;
+typedef std::function<void()> DeferredCall;
 namespace {
     std::mutex g_deferred_calls_mutex;
-    std::vector<fcDeferredCall> g_deferred_calls;
+    std::vector<DeferredCall> g_deferred_calls;
 }
 
 twCLinkage twExport void twGuardBegin()
@@ -85,7 +85,7 @@ twCLinkage twExport void twGuardEnd()
     g_deferred_calls_mutex.unlock();
 }
 
-twCLinkage twExport int twAddDeferredCall(const fcDeferredCall& dc, int id)
+twCLinkage twExport int twAddDeferredCall(const DeferredCall& dc, int id)
 {
     if (id <= 0) {
         // search empty object and return its position if found
@@ -97,7 +97,7 @@ twCLinkage twExport int twAddDeferredCall(const fcDeferredCall& dc, int id)
         }
 
         // 0th is "null" object
-        if (g_deferred_calls.empty()) { g_deferred_calls.emplace_back(fcDeferredCall()); }
+        if (g_deferred_calls.empty()) { g_deferred_calls.emplace_back(DeferredCall()); }
 
         // allocate new one
         g_deferred_calls.emplace_back(dc);
@@ -108,7 +108,7 @@ twCLinkage twExport int twAddDeferredCall(const fcDeferredCall& dc, int id)
         return id;
     }
     else {
-        utjDebugLog("fcAddDeferredCall(): should not be here");
+        utjDebugLog("should not be here");
         return 0;
     }
 }
@@ -117,7 +117,7 @@ twCLinkage twExport void twEraseDeferredCall(int id)
 {
     if (id <= 0 || id >= (int)g_deferred_calls.size()) { return; }
 
-    g_deferred_calls[id] = fcDeferredCall();
+    g_deferred_calls[id] = DeferredCall();
 }
 
 // **called from rendering thread**

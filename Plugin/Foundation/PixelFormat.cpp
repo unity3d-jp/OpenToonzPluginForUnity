@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Foundation.h"
 
-#define fcEnableISPCKernel
+#define utjEnableISPCKernel
 
 namespace utj {
 
@@ -52,7 +52,7 @@ void ImageFlipY(void *image_, int width, int height, PixelFormat fmt)
 }
 
 
-#ifdef fcEnableISPCKernel
+#ifdef utjEnableISPCKernel
 #include "ConvertKernel_ispc.h"
 
 void ScaleArray(uint8_t *data, size_t size, float scale)  { ispc::ScaleU8(data, (uint32_t)size, scale); }
@@ -61,7 +61,7 @@ void ScaleArray(int32_t *data, size_t size, float scale)  { ispc::ScaleI32(data,
 void ScaleArray(half *data, size_t size, float scale)     { ispc::ScaleF16((int16_t*)data, (uint32_t)size, scale); }
 void ScaleArray(float *data, size_t size, float scale)    { ispc::ScaleF32(data, (uint32_t)size, scale); }
 
-const void* fcConvertPixelFormat_ISPC(void *dst, PixelFormat dstfmt, const void *src, PixelFormat srcfmt, size_t size_)
+const void* ConvertPixelFormat_ISPC(void *dst, PixelFormat dstfmt, const void *src, PixelFormat srcfmt, size_t size_)
 {
     uint32_t size = (uint32_t)size_;
     switch (srcfmt) {
@@ -297,8 +297,8 @@ const void* fcConvertPixelFormat_ISPC(void *dst, PixelFormat dstfmt, const void 
 
 const void* ConvertPixelFormat(void *dst, PixelFormat dstfmt, const void *src, PixelFormat srcfmt, size_t size)
 {
-    return fcConvertPixelFormat_ISPC(dst, dstfmt, src, srcfmt, size);
+    return ConvertPixelFormat_ISPC(dst, dstfmt, src, srcfmt, size);
 }
-#endif // fcEnableISPCKernel
+#endif // utjEnableISPCKernel
 
 } // namespace utj

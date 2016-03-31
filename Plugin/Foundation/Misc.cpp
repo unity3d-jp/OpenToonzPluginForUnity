@@ -140,7 +140,7 @@ void WinPrintLastError()
         FORMAT_MESSAGE_FROM_SYSTEM,
         nullptr, ::GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         buf, sizeof(buf), nullptr);
-    utjDebugLog("fcWinPrintLastError(): %s", buf);
+    utjDebugLog("%s", buf);
 }
 #endif
 

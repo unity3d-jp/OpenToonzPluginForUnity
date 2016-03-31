@@ -77,7 +77,7 @@
     #define otpImpl
     #define twImpl
 #endif 
-#ifdef fcMaster
+#ifdef utjMaster
     #define otpMaster
     #define twMaster
 #endif 

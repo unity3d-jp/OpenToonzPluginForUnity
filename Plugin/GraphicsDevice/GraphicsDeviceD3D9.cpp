@@ -143,7 +143,7 @@ void GraphicsDeviceD3D9::sync()
     m_query_event->Issue(D3DISSUE_END);
     auto hr = m_query_event->GetData(nullptr, 0, D3DGETDATA_FLUSH);
     if (hr != S_OK) {
-        utjDebugLog("fcGraphicsDeviceD3D9::sync(): GetData() failed\n");
+        utjDebugLog("GetData() failed\n");
     }
 }
 
