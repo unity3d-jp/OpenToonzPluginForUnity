@@ -5,7 +5,7 @@ OpenToonz 用のプラグインを Unity の PostEffect として使えるよう
 
 
 ## History
-- 2016/03/xx
+- 2016/04/xx
   - first release
 
 ## Thanks

@@ -3,7 +3,7 @@
 #include "fcFoundation.h"
 #include "otpPlugin.h"
 
-#ifndef otMaster
+#ifndef otpMaster
     #define Trace(Fmt, ...) printf(__FUNCTION__ " " Fmt "\n", __VA_ARGS__)
 #else
     #define Trace(Fmt, ...)
@@ -91,7 +91,7 @@ int node_get_input_port(toonz_node_handle_t handle, const char *name, toonz_port
     if (!handle || !port) { return TOONZ_ERROR_NULL; }
 
     auto obj = (otpInstance*)handle;
-    *port = obj;
+    *port = obj->getPortByName(name);
     return TOONZ_OK;
 }
 
@@ -154,9 +154,9 @@ static toonz_node_interface_t g_toonz_node_interface = {
 int fxnode_get_bbox(toonz_fxnode_handle_t handle, const toonz_rendering_setting_t *rs, double frame, toonz_rect_t *rect, int *get_bbox)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpInstance*)handle;
+    auto obj = (otpPort*)handle;
 
-    auto img = obj->getSrcImage();
+    auto img = obj->getImage();
     rect->x0 = 0.0;
     rect->y0 = 0.0;
     rect->x1 = (double)img->getWidth();
@@ -169,7 +169,7 @@ int fxnode_get_bbox(toonz_fxnode_handle_t handle, const toonz_rendering_setting_
 int fxnode_can_handle(toonz_fxnode_handle_t handle, const toonz_rendering_setting_t *, double frame, int *can_handle)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpInstance*)handle;
+    auto obj = (otpPort*)handle;
     *can_handle = 1;
     return TOONZ_OK;
 }
@@ -177,7 +177,7 @@ int fxnode_can_handle(toonz_fxnode_handle_t handle, const toonz_rendering_settin
 int fxnode_get_input_port_count(toonz_fxnode_handle_t handle, int *count)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpInstance*)handle;
+    auto obj = (otpPort*)handle;
     *count = 1;
     return TOONZ_OK;
 }
@@ -185,7 +185,7 @@ int fxnode_get_input_port_count(toonz_fxnode_handle_t handle, int *count)
 int fxnode_get_input_port(toonz_fxnode_handle_t handle, int index, toonz_port_handle_t *port)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpInstance*)handle;
+    auto obj = (otpPort*)handle;
     *port = obj;
     return TOONZ_OK;
 }
@@ -193,11 +193,11 @@ int fxnode_get_input_port(toonz_fxnode_handle_t handle, int index, toonz_port_ha
 int fxnode_compute_to_tile(toonz_fxnode_handle_t handle, const toonz_rendering_setting_t *rs, double frame, const toonz_rect_t *rect, toonz_tile_handle_t intile, toonz_tile_handle_t outtile)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpInstance*)handle;
+    auto obj = (otpPort*)handle;
 
     if (outtile) {
         auto dst = (ImageRGBAu8*)outtile;
-        *dst = *obj->getSrcImage();
+        *dst = *obj->getImage();
     }
 
     return TOONZ_OK;
@@ -339,6 +339,7 @@ int setup_add_input_port(toonz_node_handle_t handle, const char *name, int type)
 {
     Trace("handle: %p, name: %s, type: %d", handle, name, type);
     auto obj = (otpInstance*)handle;
+    obj->addPort(name);
     return TOONZ_OK;
 }
 
@@ -354,7 +355,7 @@ static toonz_setup_interface_t g_toonz_setup_interface = {
 int port_is_connected(toonz_port_handle_t handle, int *is_connected)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpInstance*)handle;
+    auto obj = (otpPort*)handle;
     *is_connected = 1;
     return TOONZ_OK;
 }
@@ -362,7 +363,7 @@ int port_is_connected(toonz_port_handle_t handle, int *is_connected)
 int port_get_fx(toonz_port_handle_t handle, toonz_fxnode_handle_t *fxnode)
 {
     Trace("handle: %p", handle);
-    auto obj = (otpInstance*)handle;
+    auto obj = (otpPort*)handle;
     *fxnode = obj;
     return TOONZ_OK;
 }

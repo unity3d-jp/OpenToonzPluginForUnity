@@ -30,33 +30,50 @@ int main(int argc, char *argv[])
     }
 
     {
+        printf("plugin info:\n");
         otpPluginInfo info;
         otpGetPluginInfo(module, plugin_index, &info);
-        printf("inst name: %s\n", info.name);
-        printf("inst vendor: %s\n", info.vendor);
-        printf("inst note: %s\n", info.note);
-        printf("inst version: %d.%d\n", info.version_major, info.version_minor);
+        printf("  name: %s\n", info.name);
+        printf("  vendor: %s\n", info.vendor);
+        printf("  note: %s\n", info.note);
+        printf("  version: %d.%d\n", info.version_major, info.version_minor);
         printf("\n");
     }
 
     {
+        printf("port info:\n");
+        int n = otpGetNumPorts(inst);
+        otpPortInfo info;
+        for (int i = 0; i < n; ++i) {
+            otpPort *port = otpGetPort(inst, i);
+            otpGetPortInfo(port, &info);
+            printf("  port %d: %s\n", i, info.name);
+        }
+        printf("\n");
+    }
+
+    {
+        printf("param info:\n");
         int n = otpGetNumParams(inst);
         otpParamInfo pinfo;
         for (int i = 0; i < n; ++i) {
             otpParam *param = otpGetParam(inst, i);
             otpGetParamInfo(param, &pinfo);
-            printf("inst param %d: %s\n", i, pinfo.name);
+            printf("  param %d: %s\n", i, pinfo.name);
         }
+        printf("\n");
     }
 
-    otpImage *src = otpCreateImage(128, 128);
+
+    otpImage *src = otpCreateImage(1024, 1024);
     {
         otpImageData sd;
         otpGetImageData(src, &sd);
         printf("src image: %p\n", sd.data);
 
+        // create image
         int n = sd.width * sd.height;
-        const int block = 8;
+        const int block = 4;
         uint32_t *pixels = (uint32_t*)sd.data;
         for (int i = 0; i < n / block; ++i) {
             if (i % 2 == 0) {
@@ -64,9 +81,13 @@ int main(int argc, char *argv[])
                 memset(dst, 0xff, block *4);
             }
         }
+
+        otpPort *port = otpGetPort(inst, 0);
+        otpSetInput(port, src);
     }
 
-    otpImage *dst = otpApplyFx(inst, src, 0.0);
+    otpCreateDstImage(inst, 1024, 1024);
+    otpImage *dst = otpApplyFx(inst, 0.0);
     {
         otpImageData dd;
         otpGetImageData(dst, &dd);

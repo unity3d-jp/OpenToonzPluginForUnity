@@ -75,6 +75,18 @@ otpParamInfo& otpParam::getRawInfo() { return m_info; }
 
 
 
+otpPort::otpPort(otpInstance *parent, const char *name)
+    : m_parent(parent)
+    , m_name(name)
+    , m_image()
+{
+}
+
+otpInstance* otpPort::getInstance() const { return m_parent; }
+const char* otpPort::getName() const { return m_name.c_str(); }
+void otpPort::setImage(otpImage *img) { m_image = (ImageRGBAu8*)img; }
+ImageRGBAu8* otpPort::getImage() const { return m_image; }
+
 
 static otpPluginInfo otpProbeToInfo(toonz_plugin_probe_t *probe)
 {
@@ -93,7 +105,6 @@ otpInstance::otpInstance(otpModule *module, toonz_plugin_probe_t *probe)
     , m_info(otpProbeToInfo(probe))
     , m_userdata()
     , m_frame()
-    , m_src_image()
     , m_dst_image()
     , m_canceled()
 {
@@ -159,14 +170,25 @@ void otpInstance::setParamInfo(toonz_param_page_t *pages, int num_pages)
     }
 }
 
+void otpInstance::addPort(const char *name)
+{
+    m_ports.emplace_back(otpPortPtr(new otpPort(this, name)));
+}
+
 const otpPluginInfo& otpInstance::getPluginInfo() const
 {
     return m_info;
 }
 
 
-int otpInstance::getNumParams() const { return (int)m_params.size(); }
-otpParam* otpInstance::getParam(int i) { return m_params[i].get(); }
+int otpInstance::getNumParams() const
+{
+    return (int)m_params.size();
+}
+otpParam* otpInstance::getParam(int i)
+{
+    return i < m_params.size() ? m_params[i].get() : nullptr;
+}
 otpParam* otpInstance::getParamByName(const char *name)
 {
     for (auto& p : m_params) {
@@ -177,17 +199,41 @@ otpParam* otpInstance::getParamByName(const char *name)
     return nullptr;
 }
 
+int otpInstance::getNumPorts() const
+{
+    return (int)m_ports.size();
+}
+otpPort* otpInstance::getPort(int i)
+{
+    return i < m_ports.size() ? m_ports[i].get() : nullptr;
+}
+otpPort* otpInstance::getPortByName(const char *name)
+{
+    for (auto& p : m_ports) {
+        if (strcmp(p->getName(), name) == 0) {
+            return p.get();
+        }
+    }
+    return nullptr;
+}
+
 void* otpInstance::getUserData() const { return m_userdata; }
 void otpInstance::setUsertData(void *v) { m_userdata = v; }
-ImageRGBAu8* otpInstance::getSrcImage() { return m_src_image; }
 ImageRGBAu8* otpInstance::getDstImage() { return m_dst_image.get(); }
 double otpInstance::getFrame() const { return m_frame; }
 
-otpImage* otpInstance::applyFx(otpImage *src, double frame)
+void otpInstance::createDstImage(int width, int height)
 {
-    m_src_image = (ImageRGBAu8*)src;
-    if (!m_dst_image || (src->getWidth() != m_dst_image->getWidth() || src->getHeight() != m_dst_image->getHeight())) {
-        m_dst_image.reset(new ImageRGBAu8(src->getWidth(), src->getHeight()));
+    if (!m_dst_image || (width != m_dst_image->getWidth() || height != m_dst_image->getHeight())) {
+        m_dst_image.reset(new ImageRGBAu8(width, height));
+    }
+}
+
+otpImage* otpInstance::applyFx(double frame)
+{
+    if (!m_dst_image) {
+        printf(__FUNCTION__ "dst image is null\n");
+        return nullptr;
     }
     auto dst = m_dst_image.get();
 

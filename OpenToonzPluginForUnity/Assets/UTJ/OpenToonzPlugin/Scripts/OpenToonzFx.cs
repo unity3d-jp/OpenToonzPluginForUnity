@@ -15,7 +15,46 @@ namespace UTJ
     //[ExecuteInEditMode]
     class OpenToonzFx : MonoBehaviour
     {
-        public string m_pluginPath;
+        [Serializable]
+        public class PluginPath
+        {
+            public enum Root
+            {
+                StreamingAssetsPath,
+                Absolute,
+            }
+
+            public Root m_root;
+            public string m_leaf;
+
+            public PluginPath() { }
+            public PluginPath(Root root, string leaf)
+            {
+                m_root = root;
+                m_leaf = leaf;
+            }
+
+            public string GetPath()
+            {
+                string ret = "";
+                switch (m_root)
+                {
+                    case Root.StreamingAssetsPath:
+                        ret += Application.streamingAssetsPath;
+                        break;
+                    case Root.Absolute:
+                        break;
+                }
+                if (m_leaf.Length > 0)
+                {
+                    if(ret.Length > 0) { ret += "/"; }
+                    ret += m_leaf;
+                }
+                return ret;
+            }
+        }
+
+        public PluginPath m_pluginPath;
         public int m_pluginIndex;
 
         otpAPI.otpInstance m_inst;
@@ -25,7 +64,7 @@ namespace UTJ
 
         void OnEnable()
         {
-            var mod = otpAPI.otpLoadModule(m_pluginPath);
+            var mod = otpAPI.otpLoadModule(m_pluginPath.GetPath());
             m_inst = otpAPI.otpCreateInstance(mod, m_pluginIndex);
         }
 
@@ -66,8 +105,17 @@ namespace UTJ
             otpAPI.otpGetImageData(m_img_src, ref src_data);
             TextureWriter.Read(src_data.data, src_data.width * src_data.height, TextureWriter.twPixelFormat.RGBAu8, rt_src);
 
+            // set inputs
+            {
+                var port = otpAPI.otpGetPort(m_inst, 0);
+                if(port)
+                {
+                    otpAPI.otpSetInput(port, m_img_src);
+                }
+            }
+
             // apply toonz fx
-            var img_dst = otpAPI.otpApplyFx(m_inst, m_img_src, Time.time);
+            var img_dst = otpAPI.otpApplyFx(m_inst, Time.time);
             if(!img_dst)
             {
                 Graphics.Blit(rt_src, rt_dst);

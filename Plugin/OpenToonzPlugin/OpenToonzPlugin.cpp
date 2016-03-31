@@ -82,6 +82,37 @@ otpCLinkage otpExport void otpDestroyInstance(otpInstance *inst)
 }
 
 
+otpCLinkage otpExport int otpGetNumPorts(otpInstance *inst)
+{
+    if (!inst) { return 0; }
+    return inst->getNumPorts();
+}
+
+otpCLinkage otpExport otpPort* otpGetPort(otpInstance *inst, int i)
+{
+    if (!inst) { return nullptr; }
+    return inst->getPort(i);
+}
+
+otpCLinkage otpExport otpPort* otpGetPortByName(otpInstance *inst, const char *name)
+{
+    if (!inst) { return nullptr; }
+    return inst->getPortByName(name);
+}
+
+otpCLinkage otpExport void otpGetPortInfo(otpPort *port, otpPortInfo *info)
+{
+    if (!port) { return; }
+    info->name = port->getName();
+}
+
+otpCLinkage otpExport void otpSetInput(otpPort *port, otpImage *src)
+{
+    if (!port) { return; }
+    port->setImage(src);
+}
+
+
 fcCLinkage fcExport int otpGetNumParams(otpInstance *inst)
 {
     if (!inst) { return 0; }
@@ -127,9 +158,13 @@ otpCLinkage otpExport void otpSetParamValue(otpParam *param, const void *src)
 }
 
 
+otpCLinkage otpExport void otpCreateDstImage(otpInstance *inst, int width, int height)
+{
+    inst->createDstImage(width, height);
+}
 
-fcCLinkage fcExport otpImage* otpApplyFx(otpInstance *node, otpImage *src, double frame)
+fcCLinkage fcExport otpImage* otpApplyFx(otpInstance *node, double frame)
 {
     if (!node) { return nullptr; }
-    return node->applyFx(src, frame);
+    return node->applyFx(frame);
 }

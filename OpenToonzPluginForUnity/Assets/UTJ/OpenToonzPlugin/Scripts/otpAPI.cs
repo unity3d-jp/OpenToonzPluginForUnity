@@ -46,6 +46,11 @@ namespace UTJ
             public IntPtr ptr;
             public static implicit operator bool(otpParam v) { return v.ptr != IntPtr.Zero; }
         }
+        public struct otpPort
+        {
+            public IntPtr ptr;
+            public static implicit operator bool(otpPort v) { return v.ptr != IntPtr.Zero; }
+        }
 
         public struct otpImageData
         {
@@ -60,14 +65,19 @@ namespace UTJ
             public IntPtr vendor;
             public IntPtr note;
             public int version_major, version_minor;
-        };
+        }
 
         public struct otpParamInfo
         {
             public IntPtr name;
             public IntPtr note;
             public otParamType type;
-        };
+        }
+
+        public struct otpPortInfo
+        {
+            public IntPtr name;
+        }
 
 
         public struct otpIntValue
@@ -129,17 +139,23 @@ namespace UTJ
         [DllImport("OpenToonzPlugin")] public static extern otpInstance otpCreateInstance(otpModule mod, int i);
         [DllImport("OpenToonzPlugin")] public static extern void        otpDestroyInstance(otpInstance inst);
 
+        [DllImport("OpenToonzPlugin")] public static extern int         otpGetNumPorts(otpInstance inst);
+        [DllImport("OpenToonzPlugin")] public static extern otpPort     otpGetPort(otpInstance inst, int i);
+        [DllImport("OpenToonzPlugin")] public static extern otpPort     otpGetPortByName(otpInstance inst, string name);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetPortInfo(otpPort port, ref otpPortInfo info);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetInput(otpPort port, otpImage src);
+
         [DllImport("OpenToonzPlugin")] public static extern int         otpGetNumParams(otpInstance inst);
         [DllImport("OpenToonzPlugin")] public static extern otpParam    otpGetParam(otpInstance inst, int i);
         [DllImport("OpenToonzPlugin")] public static extern otpParam    otpGetParamByName(otpInstance inst, string name);
-
         [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamInfo(otpParam param, ref otpParamInfo pinfo);
         // return count of elements if param type is string or tonecurve. otherwise 1
         [DllImport("OpenToonzPlugin")] public static extern int         otpGetParamLength(otpParam param);
         [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, IntPtr dst);
         [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, IntPtr src);
 
+        [DllImport("OpenToonzPlugin")] public static extern void        otpCreateDstImage(otpInstance inst, int width, int height);
         // return result image. user should otImageDestroy() returned image
-        [DllImport("OpenToonzPlugin")] public static extern otpImage    otpApplyFx(otpInstance inst, otpImage src, double frame);
+        [DllImport("OpenToonzPlugin")] public static extern otpImage    otpApplyFx(otpInstance inst, double frame);
     }
 }

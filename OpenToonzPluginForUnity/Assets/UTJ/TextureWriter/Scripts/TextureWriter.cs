@@ -123,7 +123,7 @@ namespace UTJ
         [DllImport ("TextureWriter")] public static extern void     twEraseDeferredCall(int id);
 
         [DllImport("TextureWriter")]
-        private static extern bool twWriteTexture(
+        private static extern Bool twWriteTexture(
             IntPtr dst_tex, int dst_width, int dst_height, twPixelFormat dst_fmt,
             IntPtr src, int src_num, twPixelFormat src_fmt);
 
@@ -143,7 +143,7 @@ namespace UTJ
 
 
         [DllImport("TextureWriter")]
-        private static extern bool twReadTexture(
+        private static extern Bool twReadTexture(
             IntPtr dst, int dst_num, twPixelFormat dst_fmt,
             IntPtr src_tex, int src_width, int src_height, twPixelFormat src_fmt);
 

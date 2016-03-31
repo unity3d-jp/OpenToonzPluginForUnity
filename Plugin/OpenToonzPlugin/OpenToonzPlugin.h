@@ -22,6 +22,7 @@
 class otpModule;
 class otpInstance;
 class otpParam;
+class otpPort;
 
 struct otpImageData
 {
@@ -64,6 +65,11 @@ struct otpParamInfo
         otpParamType type_ = otParamType_Unknown)
         : name(name_), note(note_), type(type_)
     {}
+};
+
+struct otpPortInfo
+{
+    const char *name;
 };
 
 
@@ -121,17 +127,23 @@ otpCLinkage otpExport void          otpGetPluginInfo(otpModule *inst, int i, otp
 otpCLinkage otpExport otpInstance*  otpCreateInstance(otpModule *mod, int i);
 otpCLinkage otpExport void          otpDestroyInstance(otpInstance *inst);
 
+otpCLinkage otpExport int           otpGetNumPorts(otpInstance *inst);
+otpCLinkage otpExport otpPort*      otpGetPort(otpInstance *inst, int i);
+otpCLinkage otpExport otpPort*      otpGetPortByName(otpInstance *inst, const char *name);
+otpCLinkage otpExport void          otpGetPortInfo(otpPort *port, otpPortInfo *info);
+otpCLinkage otpExport void          otpSetInput(otpPort *port, otpImage *src);
+
 otpCLinkage otpExport int           otpGetNumParams(otpInstance *inst);
 otpCLinkage otpExport otpParam*     otpGetParam(otpInstance *inst, int i);
 otpCLinkage otpExport otpParam*     otpGetParamByName(otpInstance *inst, const char *name);
-
 otpCLinkage otpExport void          otpGetParamInfo(otpParam *param, otpParamInfo *pinfo);
 // return count of elements if param type is string or tonecurve. otherwise 1
 otpCLinkage otpExport int           otpGetParamLength(otpParam *param);
 otpCLinkage otpExport void          otpGetParamValue(otpParam *param, void *dst);
 otpCLinkage otpExport void          otpSetParamValue(otpParam *param, const void *src);
 
+otpCLinkage otpExport void          otpCreateDstImage(otpInstance *inst, int width, int height);
 // return result image. user *should not* otpImageDestroy() returned image
-otpCLinkage otpExport otpImage*     otpApplyFx(otpInstance *inst, otpImage *src, double frame);
+otpCLinkage otpExport otpImage*     otpApplyFx(otpInstance *inst, double frame);
 
 #endif // OpenToonzPluginForUnity_h
