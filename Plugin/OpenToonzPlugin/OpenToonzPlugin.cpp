@@ -3,7 +3,10 @@
 using namespace utj;
 
 #include "OpenToonzPlugin.h"
-#include "otpPlugin.h"
+#include "otpModule.h"
+#include "otpInstance.h"
+#include "otpPort.h"
+#include "otpParam.h"
 
 
 std::map<std::string, otpModule*> g_plugins;

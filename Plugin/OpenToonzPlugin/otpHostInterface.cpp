@@ -3,7 +3,9 @@
 using namespace utj;
 
 #include "OpenToonzPlugin.h"
-#include "otpPlugin.h"
+#include "otpInstance.h"
+#include "otpPort.h"
+#include "otpParam.h"
 
 #ifndef otpMaster
     #define Trace(Fmt, ...) printf(__FUNCTION__ " " Fmt "\n", __VA_ARGS__)

@@ -14,7 +14,16 @@
     <ClCompile Include="OpenToonzPlugin\otpHostInterface.cpp">
       <Filter>OpenToonzPlugin</Filter>
     </ClCompile>
-    <ClCompile Include="OpenToonzPlugin\otpPlugin.cpp">
+    <ClCompile Include="OpenToonzPlugin\otpModule.cpp">
+      <Filter>OpenToonzPlugin</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenToonzPlugin\otpParam.cpp">
+      <Filter>OpenToonzPlugin</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenToonzPlugin\otpPort.cpp">
+      <Filter>OpenToonzPlugin</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenToonzPlugin\otpInstance.cpp">
       <Filter>OpenToonzPlugin</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,11 +44,20 @@
     <ClInclude Include="OpenToonzPlugin\OpenToonzPlugin.h">
       <Filter>OpenToonzPlugin</Filter>
     </ClInclude>
-    <ClInclude Include="OpenToonzPlugin\otpPlugin.h">
-      <Filter>OpenToonzPlugin</Filter>
-    </ClInclude>
     <ClInclude Include="Foundation\Foundation.h">
       <Filter>Foundaion</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenToonzPlugin\otpInstance.h">
+      <Filter>OpenToonzPlugin</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenToonzPlugin\otpModule.h">
+      <Filter>OpenToonzPlugin</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenToonzPlugin\otpParam.h">
+      <Filter>OpenToonzPlugin</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenToonzPlugin\otpPort.h">
+      <Filter>OpenToonzPlugin</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

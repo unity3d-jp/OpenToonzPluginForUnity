@@ -19,7 +19,10 @@
     <ClCompile Include="Foundation\PixelFormat.cpp" />
     <ClCompile Include="OpenToonzPlugin\OpenToonzPlugin.cpp" />
     <ClCompile Include="OpenToonzPlugin\otpHostInterface.cpp" />
-    <ClCompile Include="OpenToonzPlugin\otpPlugin.cpp" />
+    <ClCompile Include="OpenToonzPlugin\otpInstance.cpp" />
+    <ClCompile Include="OpenToonzPlugin\otpModule.cpp" />
+    <ClCompile Include="OpenToonzPlugin\otpParam.cpp" />
+    <ClCompile Include="OpenToonzPlugin\otpPort.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MasterDLL|x64'">Create</PrecompiledHeader>
@@ -33,7 +36,10 @@
     <ClInclude Include="Foundation\Misc.h" />
     <ClInclude Include="Foundation\PixelFormat.h" />
     <ClInclude Include="OpenToonzPlugin\OpenToonzPlugin.h" />
-    <ClInclude Include="OpenToonzPlugin\otpPlugin.h" />
+    <ClInclude Include="OpenToonzPlugin\otpInstance.h" />
+    <ClInclude Include="OpenToonzPlugin\otpModule.h" />
+    <ClInclude Include="OpenToonzPlugin\otpParam.h" />
+    <ClInclude Include="OpenToonzPlugin\otpPort.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
