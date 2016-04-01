@@ -25,6 +25,7 @@ namespace UTJ
         public override void OnInspectorGUI()
         {
             //DrawDefaultInspector();
+            //return;
 
             m_obj.Update();
             EditorGUILayout.PropertyField(m_pluginPath, new GUIContent("Plugin Path"), true);
@@ -34,9 +35,10 @@ namespace UTJ
             EditorGUILayout.Space();
 
             var t = target as OpenToonzFx;
-            if (t.m_params != null)
+            var cparams = t.GetCurrentParams();
+            if (cparams != null)
             {
-                foreach (var p in t.m_params)
+                foreach (var p in cparams)
                 {
                     float width = 100.0f;
                     var type = p.GetType();

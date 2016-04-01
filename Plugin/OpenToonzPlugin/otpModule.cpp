@@ -73,7 +73,7 @@ void otpModule::unload()
 
 int otpModule::getNumPlugins() const
 {
-    return int(((size_t)m_probes->end - (size_t)m_probes->begin) / sizeof(void*));
+    return (int)std::distance(m_probes->begin, m_probes->end);
 }
 
 otpPluginInfo otpModule::getPluginInfo(int i)

@@ -13,7 +13,7 @@ namespace UTJ
     [AddComponentMenu("UTJ/OpenToonzFx")]
     [RequireComponent(typeof(Camera))]
     //[ExecuteInEditMode]
-    public class OpenToonzFx : MonoBehaviour
+    public class OpenToonzFx : MonoBehaviour, ISerializationCallbackReceiver
     {
         [Serializable]
         public class PluginPath
@@ -55,14 +55,10 @@ namespace UTJ
             }
         }
 
+
         public PluginPath m_pluginPath;
         public int m_pluginIndex;
-        public ToonzParam[] m_params;
-
-#if UNITY_EDITOR
-        PluginPath m_pluginPath_prev;
-        int m_pluginIndex_prev;
-#endif
+        public ToonzParam[][] m_params;
 
         otpAPI.otpInstance m_inst;
         otpAPI.otpImage m_img_src;
@@ -70,42 +66,78 @@ namespace UTJ
         bool m_began;
 
 
+        public ToonzParam[] GetCurrentParams()
+        {
+            if(m_params == null) { return null; }
+            if(m_pluginIndex >= m_params.Length) { return null; }
+            return m_params[m_pluginIndex];
+        }
 
         void UpdateParams()
         {
-            if(m_params != null && m_params.Length > 0)
-            {
-                return;
-            }
-
             var mod = otpAPI.otpLoadModule(m_pluginPath.GetPath());
             if (!mod) { return; }
 
-            m_inst = otpAPI.otpCreateInstance(mod, m_pluginIndex);
-            if(!m_inst) { return; }
-
-            int nparams = otpAPI.otpGetNumParams(m_inst);
-            m_params = new ToonzParam[nparams];
-            for (int i=0; i<nparams; ++i)
+            int nplugins = otpAPI.otpGetNumPlugins(mod);
+            if(m_params == null || m_params.Length != nplugins)
             {
-                m_params[i] = otpAPI.CreateToonzParam(otpAPI.otpGetParam(m_inst, i));
+                Debug.Log("updated param list array");
+                m_params = new ToonzParam[nplugins][];
+            }
+
+            for (int pi = 0; pi < nplugins; ++pi)
+            {
+                var inst = otpAPI.otpCreateInstance(mod, pi);
+                int nparams = otpAPI.otpGetNumParams(inst);
+                var ps = m_params[pi];
+                if(ps == null || ps.Length != nparams)
+                {
+                    Debug.Log("updated param list");
+                    ps = m_params[pi] = new ToonzParam[nparams];
+                }
+
+                var pinfo = default(otpAPI.otpParamInfo);
+                for (int i = 0; i < nparams; ++i)
+                {
+                    var paramptr = otpAPI.otpGetParam(inst, i);
+                    otpAPI.otpGetParamInfo(paramptr, ref pinfo);
+                    if(ps[i] == null || ps[i].name != pinfo.name || ps[i].type != pinfo.type)
+                    {
+                        Debug.Log("new param");
+                        ps[i] = otpAPI.CreateToonzParam(paramptr);
+                    }
+                }
+
+                otpAPI.otpDestroyInstance(inst);
             }
         }
 
 #if UNITY_EDITOR
         void OnValidate()
         {
-            if( m_pluginPath_prev == null ||
-                m_pluginPath.GetPath() != m_pluginPath_prev.GetPath() ||
-                m_pluginIndex != m_pluginIndex_prev)
-            {
-                m_pluginPath_prev = m_pluginPath;
-                m_pluginIndex_prev = m_pluginIndex;
-                m_params = null;
-                UpdateParams();
-            }
+            UpdateParams();
         }
 #endif
+
+        public void OnBeforeSerialize()
+        {
+            if(m_params == null) { return; }
+            foreach (var pa in m_params)
+            {
+                foreach (var p in pa)
+                    p.SerializeValue();
+            }
+        }
+
+        public void OnAfterDeserialize()
+        {
+            if (m_params == null) { return; }
+            foreach (var pa in m_params)
+            {
+                foreach (var p in pa)
+                    p.DeserializeValue();
+            }
+        }
 
         void OnEnable()
         {
@@ -116,6 +148,7 @@ namespace UTJ
                 return;
             }
             m_inst = otpAPI.otpCreateInstance(mod, m_pluginIndex);
+            UpdateParams();
         }
 
         void OnDisable()
