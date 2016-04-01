@@ -57,7 +57,6 @@ namespace UTJ
 
         public PluginPath m_pluginPath;
         public int m_pluginIndex;
-
         public ToonzParam[] m_params;
 
 #if UNITY_EDITOR
@@ -96,7 +95,8 @@ namespace UTJ
 #if UNITY_EDITOR
         void OnValidate()
         {
-            if( m_pluginPath.GetPath() != m_pluginPath_prev.GetPath() ||
+            if( m_pluginPath_prev == null ||
+                m_pluginPath.GetPath() != m_pluginPath_prev.GetPath() ||
                 m_pluginIndex != m_pluginIndex_prev)
             {
                 m_pluginPath_prev = m_pluginPath;
