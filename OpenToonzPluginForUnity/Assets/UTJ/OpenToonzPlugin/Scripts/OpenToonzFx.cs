@@ -59,28 +59,40 @@ namespace UTJ
 
         otpAPI.otpInstance m_inst;
         otpAPI.otpImage m_img_src;
-        RenderTexture m_rt_tmp;
+        public RenderTexture m_rt_tmp;
+        bool m_began;
 
 
         void OnEnable()
         {
             var mod = otpAPI.otpLoadModule(m_pluginPath.GetPath());
+            if(!mod)
+            {
+                Debug.LogWarning("OpenToonzFx: failed to load module " + m_pluginPath.GetPath());
+                return;
+            }
             m_inst = otpAPI.otpCreateInstance(mod, m_pluginIndex);
         }
 
         void OnDisable()
         {
-            otpAPI.otpDestroyInstance(m_inst);
-            m_inst.ptr = IntPtr.Zero;
-
-            otpAPI.otpDestroyImage(m_img_src);
-            m_inst.ptr = IntPtr.Zero;
-
             if(m_rt_tmp != null)
             {
                 m_rt_tmp.Release();
                 m_rt_tmp = null;
             }
+
+            if (m_began)
+            {
+                otpAPI.otpEndRender(m_inst);
+                m_began = false;
+            }
+
+            otpAPI.otpDestroyInstance(m_inst);
+            m_inst.ptr = IntPtr.Zero;
+
+            otpAPI.otpDestroyImage(m_img_src);
+            m_inst.ptr = IntPtr.Zero;
         }
 
         [ImageEffectOpaque]
@@ -94,6 +106,11 @@ namespace UTJ
             if (!m_inst) {
                 Graphics.Blit(rt_src, rt_dst);
                 return;
+            }
+
+            if(!m_began)
+            {
+                otpAPI.otpBeginRender(m_inst, rt_src.width, rt_src.height);
             }
 
             // copy rt_src content to memory
@@ -115,7 +132,7 @@ namespace UTJ
             }
 
             // apply toonz fx
-            var img_dst = otpAPI.otpApplyFx(m_inst, Time.time);
+            var img_dst = otpAPI.otpRender(m_inst, Time.time);
             if(!img_dst)
             {
                 Graphics.Blit(rt_src, rt_dst);

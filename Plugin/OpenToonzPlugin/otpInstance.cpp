@@ -140,22 +140,24 @@ void otpInstance::beginRender(int width, int height)
         m_dst_image.reset(new ImageRGBAu8(width, height));
     }
 
+    double hw = double(width / 2);
+    double hh = double(height / 2);
     m_rs = {
         { 1, 0 },
         this,
-        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+        { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0 },
         1.0,
-        1.0, 1.0,
-        1.0,
+        60.0, 60.0,
+        0.0,
         32,
-        1024,
-        100,
+        INT_MAX,
+        3,
         0,
         0,
         0,
         0,
         0,
-        { 0.0, 0.0, 0.0, 0.0 },
+        { -hw, -hh, hw, hh },
         &m_canceled
     };
     m_probe->handler->start_render(this);

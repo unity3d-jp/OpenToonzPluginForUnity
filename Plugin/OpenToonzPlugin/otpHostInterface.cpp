@@ -161,10 +161,12 @@ int fxnode_get_bbox(toonz_fxnode_handle_t handle, const toonz_rendering_setting_
     auto obj = (otpPort*)handle;
 
     auto img = obj->getImage();
-    rect->x0 = 0.0;
-    rect->y0 = 0.0;
-    rect->x1 = (double)img->getWidth();
-    rect->y1 = (double)img->getHeight();
+    double hw = double(img->getWidth() / 2);
+    double hh = double(img->getHeight() / 2);
+    rect->x0 = -hw;
+    rect->y0 = -hh;
+    rect->x1 = hw;
+    rect->y1 = hh;
 
     if(get_bbox) { *get_bbox = 1; }
     return TOONZ_OK;
@@ -202,6 +204,9 @@ int fxnode_compute_to_tile(toonz_fxnode_handle_t handle, const toonz_rendering_s
     if (outtile) {
         auto dst = (ImageRGBAu8*)outtile;
         *dst = *obj->getImage();
+        dst->resize(
+            (int)(rect->x1 - rect->x0),
+            (int)(rect->y1 - rect->y0));
     }
 
     return TOONZ_OK;

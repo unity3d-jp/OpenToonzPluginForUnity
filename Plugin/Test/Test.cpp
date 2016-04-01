@@ -65,36 +65,36 @@ int main(int argc, char *argv[])
     }
 
 
-    otpImage *src = otpCreateImage(1024, 1024);
+    otpImage *src = otpCreateImage(1024, 512);
+    otpImageData src_data;
     {
-        otpImageData sd;
-        otpGetImageData(src, &sd);
-        printf("src image: %p\n", sd.data);
+        otpGetImageData(src, &src_data);
+        printf("src image: %p\n", src_data.data);
 
         // create image
-        int n = sd.width * sd.height;
+        int n = src_data.width * src_data.height;
         const int block = 4;
-        uint32_t *pixels = (uint32_t*)sd.data;
+        uint32_t *pixels = (uint32_t*)src_data.data;
         for (int i = 0; i < n / block; ++i) {
-            if (i % 2 == 0) {
-                uint32_t *dst = pixels + (block * i);
-                memset(dst, 0xff, block *4);
-            }
+            uint32_t *dst = pixels + (block * i);
+            memset(dst, i % 2 == 0 ? 0xff : 0x00, block * 4);
         }
 
         otpPort *port = otpGetPort(inst, 0);
         otpSetInput(port, src);
     }
 
-    otpBeginRender(inst, 1024, 1024);
+    otpBeginRender(inst, 1024, 512);
+
     otpImage *dst = otpRender(inst, 0.0);
+    otpImageData dst_data;
+    {
+        otpGetImageData(dst, &dst_data);
+        printf("dst image: %p\n", dst_data.data);
+    }
+
     otpEndRender(inst);
 
-    {
-        otpImageData dd;
-        otpGetImageData(dst, &dd);
-        printf("dst image: %p\n", dd.data);
-    }
 
     otpDestroyImage(src);
 
