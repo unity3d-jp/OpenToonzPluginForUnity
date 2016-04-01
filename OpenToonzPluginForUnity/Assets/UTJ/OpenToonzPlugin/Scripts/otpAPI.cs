@@ -10,9 +10,72 @@ using UnityEditor;
 
 namespace UTJ
 {
+    [Serializable]
+    public class ToonzParam 
+    {
+        public string name;
+        public string note;
+    }
+
+    [Serializable]
+    public class ToonzDoubleParam : ToonzParam
+    {
+        public otpAPI.otpDoubleValue value;
+
+        public ToonzDoubleParam(otpAPI.otpParam p)
+        {
+            otpAPI.otpGetParamValue(p, ref value);
+        }
+    }
+
+    [Serializable]
+    public class ToonzIntParam : ToonzParam
+    {
+        public otpAPI.otpIntValue value;
+
+        public ToonzIntParam(otpAPI.otpParam p)
+        {
+            otpAPI.otpGetParamValue(p, ref value);
+        }
+    }
+
+    [Serializable]
+    public class ToonzBoolParam : ToonzParam
+    {
+        public otpAPI.otpBoolValue value;
+
+        public ToonzBoolParam(otpAPI.otpParam p)
+        {
+            otpAPI.otpGetParamValue(p, ref value);
+        }
+    }
+
+    [Serializable]
+    public class ToonzEnumParam : ToonzParam
+    {
+        public otpAPI.otpEnumValue value;
+
+        public ToonzEnumParam(otpAPI.otpParam p)
+        {
+            otpAPI.otpGetParamValue(p, ref value);
+        }
+    }
+
+    [Serializable]
+    public class ToonzRangeParam : ToonzParam
+    {
+        public otpAPI.otpRangeValue value;
+
+        public ToonzRangeParam(otpAPI.otpParam p)
+        {
+            otpAPI.otpGetParamValue(p, ref value);
+        }
+    }
+
+
     public static class otpAPI
     {
-        public enum otParamType
+        public enum otpParamType
         {
             Double,
             Range,
@@ -61,62 +124,80 @@ namespace UTJ
 
         public struct otpPluginInfo
         {
-            public IntPtr name;
-            public IntPtr vendor;
-            public IntPtr note;
+            IntPtr name_;
+            IntPtr vendor_;
+            IntPtr note_;
             public int version_major, version_minor;
+
+            public string name { get { return Marshal.PtrToStringAnsi(name_); } }
+            public string vendor { get { return Marshal.PtrToStringAnsi(vendor_); } }
+            public string note { get { return Marshal.PtrToStringAnsi(note_); } }
         }
 
         public struct otpParamInfo
         {
-            public IntPtr name;
-            public IntPtr note;
-            public otParamType type;
+            IntPtr name_;
+            IntPtr note_;
+            public otpParamType type;
+
+            public string name { get { return Marshal.PtrToStringAnsi(name_); } }
+            public string note { get { return Marshal.PtrToStringAnsi(note_); } }
         }
 
         public struct otpPortInfo
         {
-            public IntPtr name;
+            IntPtr name_;
+
+            public string name { get { return Marshal.PtrToStringAnsi(name_); } }
         }
 
-
+        [Serializable]
         public struct otpIntValue
         {
             public int value;
         };
+        [Serializable]
         public struct otpBoolValue
         {
             public int value;
         };
+        [Serializable]
         public struct otpEnumValue
         {
             public int value;
         };
+        [Serializable]
         public struct otpDoubleValue
         {
             public double value;
         };
+        [Serializable]
         public struct otpStringValue
         {
             public IntPtr value;
         };
+        [Serializable]
         public struct otpRangeValue
         {
             public double min, max;
         };
+        [Serializable]
         public struct otpPixelValue
         {
             public int c0, c1, c2, m;
         };
+        [Serializable]
         public struct otpPointValue
         {
             public double x, y;
         };
+        [Serializable]
         public struct otpSpectrumValue
         {
             public double w;
             public double c0, c1, c2, m;
         };
+        [Serializable]
         public struct otpToneCurveValue
         {
             public double x, y;
@@ -159,5 +240,64 @@ namespace UTJ
         [DllImport("OpenToonzPlugin")] public static extern otpImage    otpRender(otpInstance inst, double frame);
         [DllImport("OpenToonzPlugin")] public static extern void        otpEndRender(otpInstance inst);
 
+        
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpDoubleValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpIntValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpBoolValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpEnumValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpRangeValue v);
+
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpDoubleValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpIntValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpBoolValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpEnumValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpRangeValue v);
+
+        public static ToonzParam CreateToonzParam(otpParam param)
+        {
+            var info = default(otpParamInfo);
+            otpGetParamInfo(param, ref info);
+
+            ToonzParam ret = null;
+            switch (info.type)
+            {
+                case otpParamType.Double: ret = new ToonzDoubleParam(param); break;
+                case otpParamType.Int: ret = new ToonzIntParam(param); break;
+                case otpParamType.Bool: ret = new ToonzBoolParam(param); break;
+                case otpParamType.Enum: ret = new ToonzEnumParam(param); break;
+                case otpParamType.Range: ret = new ToonzRangeParam(param); break;
+            }
+            if (ret != null)
+            {
+                ret.name = info.name;
+                ret.note = info.note;
+            }
+            return ret;
+        }
+
+        public static void SetParamValue(otpParam param, ToonzParam v)
+        {
+            var t = v.GetType();
+            if (t == typeof(ToonzDoubleParam))
+            {
+                otpSetParamValue(param, ref ((ToonzDoubleParam)v).value);
+            }
+            else if (t == typeof(ToonzIntParam))
+            {
+                otpSetParamValue(param, ref ((ToonzIntParam)v).value);
+            }
+            else if (t == typeof(ToonzBoolParam))
+            {
+                otpSetParamValue(param, ref ((ToonzBoolParam)v).value);
+            }
+            else if (t == typeof(ToonzEnumParam))
+            {
+                otpSetParamValue(param, ref ((ToonzEnumParam)v).value);
+            }
+            else if (t == typeof(ToonzRangeParam))
+            {
+                otpSetParamValue(param, ref ((ToonzRangeParam)v).value);
+            }
+        }
     }
 }

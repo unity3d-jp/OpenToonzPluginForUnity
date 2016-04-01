@@ -13,7 +13,7 @@ namespace UTJ
     [AddComponentMenu("UTJ/OpenToonzFx")]
     [RequireComponent(typeof(Camera))]
     //[ExecuteInEditMode]
-    class OpenToonzFx : MonoBehaviour
+    public class OpenToonzFx : MonoBehaviour
     {
         [Serializable]
         public class PluginPath
@@ -36,6 +36,7 @@ namespace UTJ
 
             public string GetPath()
             {
+                if(m_leaf == null) { return ""; }
                 string ret = "";
                 switch (m_root)
                 {
@@ -57,11 +58,54 @@ namespace UTJ
         public PluginPath m_pluginPath;
         public int m_pluginIndex;
 
+        public ToonzParam[] m_params;
+
+#if UNITY_EDITOR
+        PluginPath m_pluginPath_prev;
+        int m_pluginIndex_prev;
+#endif
+
         otpAPI.otpInstance m_inst;
         otpAPI.otpImage m_img_src;
-        public RenderTexture m_rt_tmp;
+        RenderTexture m_rt_tmp;
         bool m_began;
 
+
+
+        void UpdateParams()
+        {
+            if(m_params != null && m_params.Length > 0)
+            {
+                return;
+            }
+
+            var mod = otpAPI.otpLoadModule(m_pluginPath.GetPath());
+            if (!mod) { return; }
+
+            m_inst = otpAPI.otpCreateInstance(mod, m_pluginIndex);
+            if(!m_inst) { return; }
+
+            int nparams = otpAPI.otpGetNumParams(m_inst);
+            m_params = new ToonzParam[nparams];
+            for (int i=0; i<nparams; ++i)
+            {
+                m_params[i] = otpAPI.CreateToonzParam(otpAPI.otpGetParam(m_inst, i));
+            }
+        }
+
+#if UNITY_EDITOR
+        void OnValidate()
+        {
+            if( m_pluginPath.GetPath() != m_pluginPath_prev.GetPath() ||
+                m_pluginIndex != m_pluginIndex_prev)
+            {
+                m_pluginPath_prev = m_pluginPath;
+                m_pluginIndex_prev = m_pluginIndex;
+                m_params = null;
+                UpdateParams();
+            }
+        }
+#endif
 
         void OnEnable()
         {
