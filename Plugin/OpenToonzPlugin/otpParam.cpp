@@ -38,7 +38,7 @@ void otpParam::getValue(void *dst) const
     switch (getType()) {
     case otParamType_Double:    *(otpDoubleValue*)dst = m_value.double_v; break;
     case otParamType_Range:     *(otpRangeValue*)dst = m_value.range_v; break;
-    case otParamType_Pixel:     *(otpPixelValue*)dst = m_value.pixel_v; break;
+    case otParamType_Color:     *(otpColorValue*)dst = m_value.color_v; break;
     case otParamType_Point:     *(otpPointValue*)dst = m_value.point_v; break;
     case otParamType_Enum:      *(otpEnumValue*)dst = m_value.enum_v; break;
     case otParamType_Int:       *(otpIntValue*)dst = m_value.int_v; break;
@@ -56,7 +56,7 @@ void otpParam::setValue(const void *src, int len)
     switch (getType()) {
     case otParamType_Double:    m_value.double_v = *(otpDoubleValue*)src; break;
     case otParamType_Range:     m_value.range_v = *(otpRangeValue*)src; break;
-    case otParamType_Pixel:     m_value.pixel_v = *(otpPixelValue*)src; break;
+    case otParamType_Color:     m_value.color_v = *(otpColorValue*)src; break;
     case otParamType_Point:     m_value.point_v = *(otpPointValue*)src; break;
     case otParamType_Enum:      m_value.enum_v = *(otpEnumValue*)src; break;
     case otParamType_Int:       m_value.int_v = *(otpIntValue*)src; break;

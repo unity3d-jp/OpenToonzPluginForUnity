@@ -34,7 +34,7 @@ struct otpImageData
 enum otpParamType {
     otParamType_Double,
     otParamType_Range,
-    otParamType_Pixel,
+    otParamType_Color,
     otParamType_Point,
     otParamType_Enum,
     otParamType_Int,
@@ -91,7 +91,7 @@ struct otpRangeValue
 {
     double min, max;
 };
-struct otpPixelValue
+struct otpColorValue
 {
     int c0, c1, c2, m;
 };

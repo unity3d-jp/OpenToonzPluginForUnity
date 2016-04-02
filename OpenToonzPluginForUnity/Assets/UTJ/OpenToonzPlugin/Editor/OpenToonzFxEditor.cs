@@ -60,13 +60,24 @@ namespace UTJ
             //return;
 
             var t = target as OpenToonzFx;
-            const float width = 100.0f;
+            const float width = 10.0f;
             bool repaint = false;
 
             // "Select Plugin" button
             if (GUILayout.Button("Select Plugin", GUILayout.MinWidth(width)))
             {
                 repaint = SelectPlugin();
+            }
+
+            // preview check
+            {
+                EditorGUI.BeginChangeCheck();
+                t.m_preview = EditorGUILayout.Toggle(
+                                "Preview", t.m_preview, GUILayout.MinWidth(width));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    repaint = true;
+                }
             }
 
             var plugin_list = t.pluginList;
@@ -104,19 +115,6 @@ namespace UTJ
 
             EditorGUILayout.Space();
 
-            // preview check
-            {
-                EditorGUI.BeginChangeCheck();
-                t.m_preview = EditorGUILayout.Toggle(
-                                "Preview", t.m_preview, GUILayout.MinWidth(width));
-                if (EditorGUI.EndChangeCheck())
-                {
-                    repaint = true;
-                }
-            }
-
-            EditorGUILayout.Space();
-
             // params
             GUILayout.Label("Params:");
             var cparams = t.pluginParams;
@@ -124,12 +122,81 @@ namespace UTJ
             {
                 foreach (var p in cparams)
                 {
+                    if(p == null) { continue; }
                     var type = p.GetType();
                     if (type == typeof(ToonzDoubleParam))
                     {
                         var vp = p as ToonzDoubleParam;
                         EditorGUI.BeginChangeCheck();
                         var v = EditorGUILayout.DoubleField(
+                            new GUIContent(p.name, p.note), vp.value.value, GUILayout.MinWidth(width));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObject(target, "Changed Param Value");
+                            vp.value.value = v;
+                            repaint = true;
+                        }
+                    }
+                    else if (type == typeof(ToonzRangeParam))
+                    {
+                        var vp = p as ToonzRangeParam;
+                        EditorGUI.BeginChangeCheck();
+                        EditorGUILayout.LabelField(p.name, p.note);
+                        EditorGUILayout.BeginHorizontal();
+                        var vmin = EditorGUILayout.DoubleField("", vp.value.min, GUILayout.MinWidth(width));
+                        var vmax = EditorGUILayout.DoubleField("", vp.value.max, GUILayout.MinWidth(width));
+                        EditorGUILayout.EndHorizontal();
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObject(target, "Changed Param Value");
+                            vp.value.min = vmin;
+                            vp.value.max = vmax;
+                            repaint = true;
+                        }
+                    }
+                    else if (type == typeof(ToonzColorParam))
+                    {
+                        var vp = p as ToonzColorParam;
+                        EditorGUI.BeginChangeCheck();
+                        EditorGUILayout.LabelField(p.name, p.note);
+                        EditorGUILayout.BeginHorizontal();
+                        var c0 = EditorGUILayout.IntField("", vp.value.c0, GUILayout.MinWidth(width));
+                        var c1 = EditorGUILayout.IntField("", vp.value.c1, GUILayout.MinWidth(width));
+                        var c2 = EditorGUILayout.IntField("", vp.value.c2, GUILayout.MinWidth(width));
+                        var m = EditorGUILayout.IntField("", vp.value.m, GUILayout.MinWidth(width));
+                        EditorGUILayout.EndHorizontal();
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObject(target, "Changed Param Value");
+                            vp.value.c0 = c0;
+                            vp.value.c1 = c1;
+                            vp.value.c2 = c2;
+                            vp.value.m = m;
+                            repaint = true;
+                        }
+                    }
+                    else if (type == typeof(ToonzPointParam))
+                    {
+                        var vp = p as ToonzPointParam;
+                        EditorGUI.BeginChangeCheck();
+                        EditorGUILayout.LabelField(p.name, p.note);
+                        EditorGUILayout.BeginHorizontal();
+                        var x = EditorGUILayout.DoubleField("", vp.value.x, GUILayout.MinWidth(width));
+                        var y = EditorGUILayout.DoubleField("", vp.value.y, GUILayout.MinWidth(width));
+                        EditorGUILayout.EndHorizontal();
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObject(target, "Changed Param Value");
+                            vp.value.x = x;
+                            vp.value.y = y;
+                            repaint = true;
+                        }
+                    }
+                    else if (type == typeof(ToonzEnumParam))
+                    {
+                        var vp = p as ToonzEnumParam;
+                        EditorGUI.BeginChangeCheck();
+                        var v = EditorGUILayout.IntField(
                             new GUIContent(p.name, p.note), vp.value.value, GUILayout.MinWidth(width));
                         if (EditorGUI.EndChangeCheck())
                         {
@@ -155,41 +222,25 @@ namespace UTJ
                     {
                         var vp = p as ToonzBoolParam;
                         EditorGUI.BeginChangeCheck();
-                        var v = EditorGUILayout.IntField(
-                            new GUIContent(p.name, p.note), vp.value.value, GUILayout.MinWidth(width));
+                        var v = EditorGUILayout.Toggle(
+                            new GUIContent(p.name, p.note), vp.value.value != 0, GUILayout.MinWidth(width));
                         if (EditorGUI.EndChangeCheck())
                         {
                             Undo.RecordObject(target, "Changed Param Value");
-                            vp.value.value = v;
+                            vp.value.value = v ? 1 : 0;
                             repaint = true;
                         }
                     }
-                    else if (type == typeof(ToonzEnumParam))
+                    else if (type == typeof(ToonzStringParam))
                     {
-                        var vp = p as ToonzEnumParam;
-                        var v = EditorGUILayout.IntField(
-                            new GUIContent(p.name, p.note), vp.value.value, GUILayout.MinWidth(width));
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            Undo.RecordObject(target, "Changed Param Value");
-                            vp.value.value = v;
-                            repaint = true;
-                        }
-                    }
-                    else if (type == typeof(ToonzRangeParam))
-                    {
-                        var vp = p as ToonzRangeParam;
+                        var vp = p as ToonzStringParam;
                         EditorGUI.BeginChangeCheck();
-                        EditorGUILayout.LabelField(p.name, p.note);
-                        EditorGUILayout.BeginHorizontal();
-                        var vmin = EditorGUILayout.DoubleField("", vp.value.min, GUILayout.MinWidth(width));
-                        var vmax = EditorGUILayout.DoubleField("", vp.value.max, GUILayout.MinWidth(width));
-                        EditorGUILayout.EndHorizontal();
+                        var v = EditorGUILayout.TextField(
+                            new GUIContent(p.name, p.note), vp.value, GUILayout.MinWidth(width));
                         if (EditorGUI.EndChangeCheck())
                         {
                             Undo.RecordObject(target, "Changed Param Value");
-                            vp.value.min = vmin;
-                            vp.value.max = vmax;
+                            vp.value = v;
                             repaint = true;
                         }
                     }

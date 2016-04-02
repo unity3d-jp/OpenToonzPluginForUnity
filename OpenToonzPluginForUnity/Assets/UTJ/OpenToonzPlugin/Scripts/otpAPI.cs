@@ -50,6 +50,54 @@ namespace UTJ
     }
 
     [Serializable]
+    public class ToonzRangeParam : ToonzParam
+    {
+        public otpAPI.otpRangeValue value;
+
+        public ToonzRangeParam(otpAPI.otpParam p)
+            : base(p)
+        {
+            otpAPI.otpGetParamValue(p, ref value);
+        }
+    }
+
+    [Serializable]
+    public class ToonzColorParam : ToonzParam
+    {
+        public otpAPI.otpColorValue value;
+
+        public ToonzColorParam(otpAPI.otpParam p)
+            : base(p)
+        {
+            otpAPI.otpGetParamValue(p, ref value);
+        }
+    }
+
+    [Serializable]
+    public class ToonzPointParam : ToonzParam
+    {
+        public otpAPI.otpPointValue value;
+
+        public ToonzPointParam(otpAPI.otpParam p)
+            : base(p)
+        {
+            otpAPI.otpGetParamValue(p, ref value);
+        }
+    }
+
+    [Serializable]
+    public class ToonzEnumParam : ToonzParam
+    {
+        public otpAPI.otpEnumValue value;
+
+        public ToonzEnumParam(otpAPI.otpParam p)
+            : base(p)
+        {
+            otpAPI.otpGetParamValue(p, ref value);
+        }
+    }
+
+    [Serializable]
     public class ToonzIntParam : ToonzParam
     {
         public otpAPI.otpIntValue value;
@@ -74,26 +122,20 @@ namespace UTJ
     }
 
     [Serializable]
-    public class ToonzEnumParam : ToonzParam
+    public class ToonzStringParam : ToonzParam
     {
-        public otpAPI.otpEnumValue value;
+        public string value;
 
-        public ToonzEnumParam(otpAPI.otpParam p)
+        public ToonzStringParam(otpAPI.otpParam p)
             : base(p)
         {
-            otpAPI.otpGetParamValue(p, ref value);
-        }
-    }
-
-    [Serializable]
-    public class ToonzRangeParam : ToonzParam
-    {
-        public otpAPI.otpRangeValue value;
-
-        public ToonzRangeParam(otpAPI.otpParam p)
-            : base(p)
-        {
-            otpAPI.otpGetParamValue(p, ref value);
+            int nlen = otpAPI.otpGetParamLength(p);
+            if(nlen > 0)
+            {
+                byte[] tmp = new byte[nlen];
+                otpAPI.otpGetParamValue(p, ref tmp[0]);
+                value = System.Text.Encoding.ASCII.GetString(tmp);
+            }
         }
     }
 
@@ -104,7 +146,7 @@ namespace UTJ
         {
             Double,
             Range,
-            Pixel,
+            Color,
             Point,
             Enum,
             Int,
@@ -202,17 +244,12 @@ namespace UTJ
             public double value;
         };
         [Serializable]
-        public struct otpStringValue
-        {
-            public IntPtr value;
-        };
-        [Serializable]
         public struct otpRangeValue
         {
             public double min, max;
         };
         [Serializable]
-        public struct otpPixelValue
+        public struct otpColorValue
         {
             public int c0, c1, c2, m;
         };
@@ -271,18 +308,24 @@ namespace UTJ
         [DllImport("OpenToonzPlugin")] public static extern otpImage    otpRender(otpInstance inst, double frame);
         [DllImport("OpenToonzPlugin")] public static extern void        otpEndRender(otpInstance inst);
 
-        
+
         [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpDoubleValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpRangeValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpColorValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpPointValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpEnumValue v);
         [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpIntValue v);
         [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpBoolValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpEnumValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpRangeValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref byte v);
 
         [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpDoubleValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpRangeValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpColorValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpPointValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpEnumValue v);
         [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpIntValue v);
         [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpBoolValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpEnumValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpRangeValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, string v);
 
         public static ToonzParam CreateToonzParam(otpParam param)
         {
@@ -293,10 +336,13 @@ namespace UTJ
             switch (info.type)
             {
                 case otpParamType.Double: ret = new ToonzDoubleParam(param); break;
+                case otpParamType.Range: ret = new ToonzRangeParam(param); break;
+                case otpParamType.Color: ret = new ToonzColorParam(param); break;
+                case otpParamType.Point: ret = new ToonzPointParam(param); break;
+                case otpParamType.Enum: ret = new ToonzEnumParam(param); break;
                 case otpParamType.Int: ret = new ToonzIntParam(param); break;
                 case otpParamType.Bool: ret = new ToonzBoolParam(param); break;
-                case otpParamType.Enum: ret = new ToonzEnumParam(param); break;
-                case otpParamType.Range: ret = new ToonzRangeParam(param); break;
+                case otpParamType.String: ret = new ToonzStringParam(param); break;
             }
             return ret;
         }
@@ -308,6 +354,22 @@ namespace UTJ
             {
                 otpSetParamValue(param, ref ((ToonzDoubleParam)v).value);
             }
+            else if (t == typeof(ToonzRangeParam))
+            {
+                otpSetParamValue(param, ref ((ToonzRangeParam)v).value);
+            }
+            else if (t == typeof(ToonzColorParam))
+            {
+                otpSetParamValue(param, ref ((ToonzColorParam)v).value);
+            }
+            else if (t == typeof(ToonzPointParam))
+            {
+                otpSetParamValue(param, ref ((ToonzPointParam)v).value);
+            }
+            else if (t == typeof(ToonzEnumParam))
+            {
+                otpSetParamValue(param, ref ((ToonzEnumParam)v).value);
+            }
             else if (t == typeof(ToonzIntParam))
             {
                 otpSetParamValue(param, ref ((ToonzIntParam)v).value);
@@ -316,13 +378,9 @@ namespace UTJ
             {
                 otpSetParamValue(param, ref ((ToonzBoolParam)v).value);
             }
-            else if (t == typeof(ToonzEnumParam))
+            else if (t == typeof(ToonzStringParam))
             {
-                otpSetParamValue(param, ref ((ToonzEnumParam)v).value);
-            }
-            else if (t == typeof(ToonzRangeParam))
-            {
-                otpSetParamValue(param, ref ((ToonzRangeParam)v).value);
+                otpSetParamValue(param, ((ToonzStringParam)v).value);
             }
         }
 

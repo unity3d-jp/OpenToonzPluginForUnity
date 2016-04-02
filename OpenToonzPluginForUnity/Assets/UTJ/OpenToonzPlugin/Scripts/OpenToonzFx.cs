@@ -126,6 +126,7 @@ namespace UTJ
             int pi = m_pluginIndex;
             var inst = otpAPI.otpCreateInstance(mod, pi);
 
+            // update port list
             {
                 int nports = otpAPI.otpGetNumPorts(inst);
                 if(m_ports == null || m_ports.Length != nports)
@@ -147,6 +148,7 @@ namespace UTJ
                 }
             }
 
+            // update param list
             {
                 int nparams = otpAPI.otpGetNumParams(inst);
                 if(m_params == null || m_params.Length != nparams)
@@ -164,9 +166,9 @@ namespace UTJ
                         m_params[i] = otpAPI.CreateToonzParam(paramptr);
                     }
                 }
-
-                otpAPI.otpDestroyInstance(inst);
             }
+
+            otpAPI.otpDestroyInstance(inst);
         }
 
         void ApplyParams()

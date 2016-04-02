@@ -30,7 +30,7 @@ private:
         otpBoolValue      bool_v;
         otpEnumValue      enum_v;
         otpRangeValue     range_v;
-        otpPixelValue     pixel_v;
+        otpColorValue     color_v;
         otpPointValue     point_v;
         otpSpectrumValue  spectrum_v;
     } m_value;
