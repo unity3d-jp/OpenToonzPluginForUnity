@@ -25,6 +25,10 @@ twCLinkage twExport bool twWriteTexture(
 {
     auto *dev = GetGraphicsDevice();
     if (!dst_tex || !src || !dev) { return false; }
+    if (!dev) { utjDebugLog("device is null\n"); return false; }
+    if (!src) { utjDebugLog("src buffer is null\n"); return false; }
+    if (!dst_tex) { utjDebugLog("dst texture is null\n"); return false; }
+    if (dst_fmt == PixelFormat_Unknown) { utjDebugLog("dst texture format is unknown\n"); return false; }
 
     // convert data if data format is not match
     std::vector<char> tmp_pixels;
@@ -43,7 +47,10 @@ twCLinkage twExport bool twReadTexture(
     void *src_tex, int src_width, int src_height, twPixelFormat src_fmt)
 {
     auto *dev = GetGraphicsDevice();
-    if (!dst || !src_tex || !dev) { return false; }
+    if (!dev) { utjDebugLog("device is null\n"); return false; }
+    if (!dst) { utjDebugLog("dst buffer is null\n"); return false; }
+    if (!src_tex) { utjDebugLog("src texture is null\n"); return false; }
+    if (src_fmt == PixelFormat_Unknown) { utjDebugLog("src texture format is unknown\n"); return false; }
 
 
     void *orig_dst = dst;

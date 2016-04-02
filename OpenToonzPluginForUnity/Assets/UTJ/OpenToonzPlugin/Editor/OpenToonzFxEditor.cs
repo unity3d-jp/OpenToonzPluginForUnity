@@ -60,35 +60,65 @@ namespace UTJ
                     if (type == typeof(ToonzDoubleParam))
                     {
                         var vp = p as ToonzDoubleParam;
-                        vp.value.value = EditorGUILayout.DoubleField(
+                        EditorGUI.BeginChangeCheck();
+                        var v = EditorGUILayout.DoubleField(
                             new GUIContent(p.name, p.note), vp.value.value, GUILayout.MinWidth(width));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObject(target, "Changed Param Value");
+                            vp.value.value = v;
+                        }
                     }
                     else if (type == typeof(ToonzIntParam))
                     {
                         var vp = p as ToonzIntParam;
-                        vp.value.value = EditorGUILayout.IntField(
+                        EditorGUI.BeginChangeCheck();
+                        var v = EditorGUILayout.IntField(
                             new GUIContent(p.name, p.note), vp.value.value, GUILayout.MinWidth(width));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObject(target, "Changed Param Value");
+                            vp.value.value = v;
+                        }
                     }
                     else if (type == typeof(ToonzBoolParam))
                     {
                         var vp = p as ToonzBoolParam;
-                        vp.value.value = EditorGUILayout.IntField(
+                        EditorGUI.BeginChangeCheck();
+                        var v = EditorGUILayout.IntField(
                             new GUIContent(p.name, p.note), vp.value.value, GUILayout.MinWidth(width));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObject(target, "Changed Param Value");
+                            vp.value.value = v;
+                        }
                     }
                     else if (type == typeof(ToonzEnumParam))
                     {
                         var vp = p as ToonzEnumParam;
-                        vp.value.value = EditorGUILayout.IntField(
+                        var v = EditorGUILayout.IntField(
                             new GUIContent(p.name, p.note), vp.value.value, GUILayout.MinWidth(width));
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObject(target, "Changed Param Value");
+                            vp.value.value = v;
+                        }
                     }
                     else if (type == typeof(ToonzRangeParam))
                     {
                         var vp = p as ToonzRangeParam;
+                        EditorGUI.BeginChangeCheck();
                         EditorGUILayout.LabelField(p.name, p.note);
                         EditorGUILayout.BeginHorizontal();
-                        vp.value.min = EditorGUILayout.DoubleField("", vp.value.min, GUILayout.MinWidth(width));
-                        vp.value.max = EditorGUILayout.DoubleField("", vp.value.max, GUILayout.MinWidth(width));
+                        var vmin = EditorGUILayout.DoubleField("", vp.value.min, GUILayout.MinWidth(width));
+                        var vmax = EditorGUILayout.DoubleField("", vp.value.max, GUILayout.MinWidth(width));
                         EditorGUILayout.EndHorizontal();
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            Undo.RecordObject(target, "Changed Param Value");
+                            vp.value.min = vmin;
+                            vp.value.max = vmax;
+                        }
                     }
                 }
             }
@@ -97,16 +127,23 @@ namespace UTJ
             EditorGUILayout.Space();
 
             GUILayout.Label("Inputs:");
-            GUILayout.Label("  (none is treated as frame buffer)");
+            GUILayout.Label("  (None is treated as frame buffer)");
             var ports = t.pluginPorts;
             if(ports != null)
             {
                 foreach (var port in ports)
                 {
-                    port.input = EditorGUILayout.ObjectField(
+                    EditorGUI.BeginChangeCheck();
+                    var newinput = EditorGUILayout.ObjectField(
                         port.name, port.input, typeof(Texture), true, GUILayout.MinWidth(width)) as Texture;
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        Undo.RecordObject(target, "Changed Input Texture");
+                        port.input = newinput;
+                    }
                 }
             }
+
         }
     }
 }

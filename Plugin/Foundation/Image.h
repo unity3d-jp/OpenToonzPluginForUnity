@@ -84,6 +84,8 @@ public:
     void*               getData(int x, int y) { return (uint8_t*)getData() + (m_width*y + x) * getPixelSize(); }
     const void*         getData(int x, int y) const { return const_cast<ImageBase*>(this)->getData(x, y); }
 
+    virtual void        resize(int w, int h) {}
+
 protected:
     int m_width;
     int m_height;
@@ -133,7 +135,7 @@ public:
         m_data.clear();
     }
 
-    void resize(int w, int h)
+    void resize(int w, int h) override
     {
         m_width = w;
         m_height = h;

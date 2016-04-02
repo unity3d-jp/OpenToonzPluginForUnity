@@ -116,6 +116,7 @@ struct otpToneCurveValue
 otpCLinkage otpExport otpImage*     otpCreateImage(int width, int height);
 otpCLinkage otpExport otpImage*     otpCreateIntrusiveImage(void *data, int width, int height);
 otpCLinkage otpExport void          otpDestroyImage(otpImage *img);
+otpCLinkage otpExport void          otpGetImageResize(otpImage *img, int width, int height);
 otpCLinkage otpExport void          otpGetImageData(otpImage *img, otpImageData *data);
 
 

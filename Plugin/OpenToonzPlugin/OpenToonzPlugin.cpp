@@ -27,6 +27,11 @@ otpCLinkage otpExport void otpDestroyImage(otpImage *img)
     delete img;
 }
 
+otpCLinkage otpExport void otpGetImageResize(otpImage *img, int width, int height)
+{
+    return img->resize(width, height);
+}
+
 otpCLinkage otpExport void otpGetImageData(otpImage *img, otpImageData *data)
 {
     if (!img || !data) { return; }
