@@ -66,7 +66,7 @@ twCLinkage twExport bool twReadTexture(
 
     // convert data if data format is not match
     if (!tmp_pixels.empty()) {
-        ConvertPixelFormat(orig_dst, dst_fmt, &tmp_pixels[0], src_fmt, (int)tmp_pixels.size());
+        ConvertPixelFormat(orig_dst, dst_fmt, &tmp_pixels[0], src_fmt, (int)dst_num);
     }
 
     return true;

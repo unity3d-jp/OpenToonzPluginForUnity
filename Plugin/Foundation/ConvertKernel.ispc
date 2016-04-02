@@ -5,13 +5,13 @@ typedef int16           f16;
 typedef float           f32;
 
 uniform u8 to_u8(uniform u8 v) { return v; }
-uniform u8 to_u8(uniform i16 v) { return v & 0xff; }
-uniform u8 to_u8(uniform f16 v) { return (int)(half_to_float(v) * 255.0f) & 0xff; }
-uniform u8 to_u8(uniform float v) { return (int)(v * 255.0f) & 0xff; }
+uniform u8 to_u8(uniform i16 v) { return clamp(v, (i16)0, (i16)255) & 0xff; }
+uniform u8 to_u8(uniform f16 v) { return (int)(clamp(half_to_float(v), 0.0, 1.0) * 255.0f) & 0xff; }
+uniform u8 to_u8(uniform float v) { return (int)(clamp(v, 0.0, 1.0) * 255.0f) & 0xff; }
 u8 to_u8(u8 v) { return v; }
-u8 to_u8(i16 v) { return v & 0xff; }
-u8 to_u8(f16 v) { return (int)(half_to_float(v) * 255.0f) & 0xff; }
-u8 to_u8(float v) { return (int)(v * 255.0f) & 0xff; }
+u8 to_u8(i16 v) { return clamp(v, (i16)0, (i16)255) & 0xff; }
+u8 to_u8(f16 v) { return (int)(clamp(half_to_float(v), 0.0, 1.0) * 255.0f) & 0xff; }
+u8 to_u8(float v) { return (int)(clamp(v, 0.0, 1.0) * 255.0f) & 0xff; }
 
 uniform i16 to_i16(uniform u8 v) { return v; }
 uniform i16 to_i16(uniform i16 v) { return v; }
