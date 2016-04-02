@@ -161,8 +161,8 @@ int fxnode_get_bbox(toonz_fxnode_handle_t handle, const toonz_rendering_setting_
     auto obj = (otpPort*)handle;
 
     auto img = obj->getImage();
-    double hw = double(img->getWidth() / 2);
-    double hh = double(img->getHeight() / 2);
+    double hw = double(img->getWidth()) / 2.0;
+    double hh = double(img->getHeight()) / 2.0;
     rect->x0 = -hw;
     rect->y0 = -hh;
     rect->x1 = hw;
@@ -299,10 +299,13 @@ int tile_get_rectangle(toonz_tile_handle_t handle, toonz_rect_t *rect)
 {
     Trace("handle: %p", handle);
     auto obj = (ImageBase*)handle;
-    rect->x0 = 0.0f;
-    rect->x1 = (double)obj->getWidth();
-    rect->y0 = 0.0f;
-    rect->y1 = (double)obj->getHeight();
+
+    double hw = (double)obj->getWidth() / 2.0;
+    double hh = (double)obj->getHeight() / 2.0;
+    rect->x0 = -hw;
+    rect->y0 = -hh;
+    rect->x1 = hw;
+    rect->y1 = hh;
     return TOONZ_OK;
 }
 

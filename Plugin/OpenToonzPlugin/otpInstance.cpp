@@ -16,8 +16,9 @@ otpInstance::otpInstance(otpModule *module, toonz_plugin_probe_t *probe)
     , m_probe(probe)
     , m_info(otpProbeToInfo(probe))
     , m_userdata()
+    , m_base_width()
+    , m_base_height()
     , m_frame()
-    , m_dst_image()
     , m_canceled()
 {
     if (m_probe->handler) {
@@ -136,12 +137,15 @@ double otpInstance::getFrame() const { return m_frame; }
 
 void otpInstance::beginRender(int width, int height)
 {
-    if (!m_dst_image || (width != m_dst_image->getWidth() || height != m_dst_image->getHeight())) {
-        m_dst_image.reset(new ImageRGBAu8(width, height));
+    m_base_width = width;
+    m_base_height = height;
+    if (!m_dst_image) {
+        m_dst_image.reset(new ImageRGBAu8());
     }
+    m_dst_image->resize(m_base_width, m_base_height);
 
-    double hw = double(width / 2);
-    double hh = double(height / 2);
+    double hw = double(width) / 2.0;
+    double hh = double(height) / 2.0;
     m_rs = {
         { 1, 0 },
         this,
@@ -169,6 +173,7 @@ otpImage* otpInstance::render(double frame)
         utjDebugLog("dst image is null");
         return nullptr;
     }
+    m_dst_image->resize(m_base_width, m_base_height);
     auto dst = m_dst_image.get();
 
     m_frame = frame;

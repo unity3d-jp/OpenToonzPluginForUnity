@@ -137,9 +137,11 @@ public:
 
     void resize(int w, int h) override
     {
-        m_width = w;
-        m_height = h;
-        m_data.resize(w * h);
+        if (m_width != w || m_height != h) {
+            m_width = w;
+            m_height = h;
+            m_data.resize(w * h);
+        }
     }
 
     void* getData() override { return m_data.empty() ? nullptr : &m_data[0]; }

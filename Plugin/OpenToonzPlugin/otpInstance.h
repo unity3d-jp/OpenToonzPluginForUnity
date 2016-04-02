@@ -45,22 +45,26 @@ public:
     ImageRGBAu8*    getDstImage();
 
 private:
-    typedef std::unique_ptr<otpParam> otpParamPtr;
-    typedef std::unique_ptr<otpPort> otpPortPtr;
+    typedef std::unique_ptr<otpParam>       otpParamPtr;
+    typedef std::unique_ptr<otpPort>        otpPortPtr;
+    typedef std::unique_ptr<ImageRGBAu8>    ImagePtr;
 
-    otpModule *m_module;
-    toonz_plugin_probe_t *m_probe;
-    otpPluginInfo m_info;
+    otpModule                   *m_module;
+    toonz_plugin_probe_t        *m_probe;
+    otpPluginInfo               m_info;
 
-    std::vector<otpParamPtr> m_params;
-    void *m_userdata;
+    std::vector<otpPortPtr>     m_ports;
+    std::vector<otpParamPtr>    m_params;
+    ImagePtr                    m_dst_image;
 
-    toonz_rendering_setting_t m_rs;
-    toonz_rect_t m_rect;
-    double m_frame;
-    std::vector<otpPortPtr> m_ports;
-    std::unique_ptr<ImageRGBAu8> m_dst_image;
-    int m_canceled;
+    toonz_rendering_setting_t   m_rs;
+    toonz_rect_t                m_rect;
+
+    void                        *m_userdata;
+    int                         m_base_width;
+    int                         m_base_height;
+    double                      m_frame;
+    int                         m_canceled;
 };
 
 #endif // otPlugin_h

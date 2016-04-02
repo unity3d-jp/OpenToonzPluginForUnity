@@ -24,7 +24,6 @@ namespace UTJ
     {
         public string name;
         public string note;
-        public byte[] serialized;
         public otpAPI.otpParamType type;
 
         public ToonzParam(otpAPI.otpParam p)
