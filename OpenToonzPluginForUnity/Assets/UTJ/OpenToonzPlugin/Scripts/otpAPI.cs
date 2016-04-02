@@ -12,6 +12,13 @@ using UnityEditor;
 namespace UTJ
 {
     [Serializable]
+    public class ToonzPort
+    {
+        public string name;
+        public Texture input;
+    }
+
+    [Serializable]
     public abstract class ToonzParam 
     {
         public string name;

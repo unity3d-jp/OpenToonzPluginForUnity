@@ -60,6 +60,7 @@ namespace UTJ
 
         [SerializeField] PluginPath m_pluginPath;
         [SerializeField] int m_pluginIndex;
+        [SerializeField] ToonzPort[] m_inputs;
         ToonzParam[] m_params;
 
         [SerializeField] byte[] m_serialized;
@@ -73,6 +74,8 @@ namespace UTJ
 
         public PluginPath pluginPath { get { return m_pluginPath; } }
         public int pluginIndex { get { return m_pluginIndex; } }
+
+        public ToonzPort[] pluginInputs { get { return m_inputs; } }
         public ToonzParam[] pluginParams { get { return m_params; } }
 
         public string pluginName { get { return m_plugin_info.name; } }
@@ -90,12 +93,31 @@ namespace UTJ
             otpAPI.otpGetPluginInfo(mod, m_pluginIndex, ref m_plugin_info);
 
             int pi = m_pluginIndex;
+            var inst = otpAPI.otpCreateInstance(mod, pi);
+
             {
-                var inst = otpAPI.otpCreateInstance(mod, pi);
+                int nports = otpAPI.otpGetNumPorts(inst);
+                if(m_inputs == null || m_inputs.Length != nports)
+                {
+                    m_inputs = new ToonzPort[nports];
+                }
+
+                var pinfo = default(otpAPI.otpPortInfo);
+                for (int i = 0; i < nports; ++i)
+                {
+                    var portptr = otpAPI.otpGetPort(inst, i);
+                    otpAPI.otpGetPortInfo(portptr, ref pinfo);
+                    if (m_inputs[i] == null || m_params[i].name != pinfo.name)
+                    {
+                        m_inputs[i] = new ToonzPort { name = pinfo.name };
+                    }
+                }
+            }
+
+            {
                 int nparams = otpAPI.otpGetNumParams(inst);
                 if(m_params == null || m_params.Length != nparams)
                 {
-                    Debug.Log("updated param list");
                     m_params = new ToonzParam[nparams];
                 }
 
@@ -106,7 +128,6 @@ namespace UTJ
                     otpAPI.otpGetParamInfo(paramptr, ref pinfo);
                     if(m_params[i] == null || m_params[i].name != pinfo.name || m_params[i].type != pinfo.type)
                     {
-                        Debug.Log("new param");
                         m_params[i] = otpAPI.CreateToonzParam(paramptr);
                     }
                 }

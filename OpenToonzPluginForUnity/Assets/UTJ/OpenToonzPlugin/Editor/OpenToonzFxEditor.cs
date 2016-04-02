@@ -28,6 +28,7 @@ namespace UTJ
             //return;
 
             var t = target as OpenToonzFx;
+            const float width = 100.0f;
 
             m_obj.Update();
             EditorGUILayout.PropertyField(m_pluginPath, new GUIContent("Plugin Path"), true);
@@ -48,12 +49,13 @@ namespace UTJ
 
             EditorGUILayout.Space();
 
+            GUILayout.Label("Params:");
+
             var cparams = t.pluginParams;
             if (cparams != null)
             {
                 foreach (var p in cparams)
                 {
-                    float width = 100.0f;
                     var type = p.GetType();
                     if (type == typeof(ToonzDoubleParam))
                     {
@@ -89,7 +91,21 @@ namespace UTJ
                         EditorGUILayout.EndHorizontal();
                     }
                 }
+            }
 
+
+            EditorGUILayout.Space();
+
+            GUILayout.Label("Inputs:");
+            GUILayout.Label("  (none is treated as frame buffer)");
+            var inputs = t.pluginInputs;
+            if(inputs != null)
+            {
+                foreach (var p in inputs)
+                {
+                    p.input = EditorGUILayout.ObjectField(
+                        p.name, p.input, typeof(Texture), true, GUILayout.MinWidth(width)) as Texture;
+                }
             }
         }
     }
