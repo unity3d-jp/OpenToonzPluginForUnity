@@ -71,7 +71,6 @@ namespace UTJ
         otpAPI.otpImage m_img_src;
         RenderTexture m_rt_tmp;
         bool m_began;
-        int m_pluginIndex_prev;
 #if UNITY_EDITOR
         public bool m_preview = false;
 #endif
@@ -80,12 +79,18 @@ namespace UTJ
         public PluginPath pluginPath
         {
             get { return m_pluginPath; }
-            set { m_pluginPath = value; UpdateParamList(); }
+            set { m_pluginPath = value;
+                ReleaseInstance();
+                UpdateParamList();
+            }
         }
         public int pluginIndex
         {
             get { return m_pluginIndex; }
-            set { m_pluginIndex = value; UpdateParamList(); }
+            set { m_pluginIndex = value;
+                ReleaseInstance();
+                UpdateParamList();
+            }
         }
 
         public ToonzPort[] pluginPorts { get { return m_ports; } }
@@ -105,6 +110,7 @@ namespace UTJ
 
         void UpdateParamList()
         {
+            if(m_pluginPath == null) { return; }
             var mod = otpAPI.otpLoadModule(m_pluginPath.GetPath());
             if (!mod)
             {
@@ -221,11 +227,18 @@ namespace UTJ
 
         void ReleaseInputImages()
         {
+            if(m_ports == null) { return; }
             foreach(var port in m_ports)
             {
                 otpAPI.otpDestroyImage(port.image);
                 port.image = default(otpAPI.otpImage);
             }
+        }
+
+        void ReleaseInstance()
+        {
+            otpAPI.otpDestroyInstance(m_inst);
+            m_inst.ptr = IntPtr.Zero;
         }
 
         otpAPI.otpImage GetInputImage(int i)
@@ -284,8 +297,7 @@ namespace UTJ
                 m_began = false;
             }
 
-            otpAPI.otpDestroyInstance(m_inst);
-            m_inst.ptr = IntPtr.Zero;
+            ReleaseInstance();
 
             otpAPI.otpDestroyImage(m_img_src);
             m_inst.ptr = IntPtr.Zero;
@@ -302,11 +314,8 @@ namespace UTJ
                 return;
             }
 
-            if (!m_inst || m_pluginIndex != m_pluginIndex_prev)
+            if (!m_inst && m_pluginPath != null)
             {
-                m_pluginIndex_prev = m_pluginIndex;
-                otpAPI.otpDestroyInstance(m_inst);
-                m_inst.ptr = IntPtr.Zero;
                 m_inst = otpAPI.otpCreateInstance(
                     otpAPI.otpLoadModule(m_pluginPath.GetPath()), m_pluginIndex);
             }

@@ -20,10 +20,14 @@ namespace UTJ
             return pathToAssets.MakeRelativeUri(new Uri(path)).ToString();
         }
 
-        void SelectPlugin()
+        bool SelectPlugin()
         {
             var t = target as OpenToonzFx;
             var path = EditorUtility.OpenFilePanel("Select OpenToonz plugin", Application.streamingAssetsPath, "plugin");
+            if(path == Application.streamingAssetsPath)
+            {
+                return false;
+            }
 
             OpenToonzFx.PluginPath ppath;
             if (path.IndexOf(Application.streamingAssetsPath) == -1)
@@ -47,6 +51,7 @@ namespace UTJ
 
             t.pluginPath = ppath;
             t.pluginIndex = 0;
+            return true;
         }
 
         public override void OnInspectorGUI()
@@ -56,10 +61,12 @@ namespace UTJ
 
             var t = target as OpenToonzFx;
             const float width = 100.0f;
+            bool repaint = false;
 
-            if(GUILayout.Button("Select Plugin", GUILayout.MinWidth(width)))
+            // "Select Plugin" button
+            if (GUILayout.Button("Select Plugin", GUILayout.MinWidth(width)))
             {
-                SelectPlugin();
+                repaint = SelectPlugin();
             }
 
             var plugin_list = t.pluginList;
@@ -68,6 +75,7 @@ namespace UTJ
                 return;
             }
 
+            // plugin dropdown
             {
                 GUILayout.Label(t.pluginPath.GetFileName());
 
@@ -77,11 +85,13 @@ namespace UTJ
                 {
                     Undo.RecordObject(target, "Changed Plugin Index");
                     t.pluginIndex = v;
+                    repaint = true;
                 }
             }
 
             EditorGUILayout.Space();
 
+            // plugin name, vendor, note
             {
                 GUILayout.Label(t.pluginName + " by " + t.pluginVendor);
 
@@ -94,20 +104,21 @@ namespace UTJ
 
             EditorGUILayout.Space();
 
+            // preview check
             {
                 EditorGUI.BeginChangeCheck();
                 t.m_preview = EditorGUILayout.Toggle(
                                 "Preview", t.m_preview, GUILayout.MinWidth(width));
                 if (EditorGUI.EndChangeCheck())
                 {
-                    UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+                    repaint = true;
                 }
             }
 
             EditorGUILayout.Space();
 
+            // params
             GUILayout.Label("Params:");
-
             var cparams = t.pluginParams;
             if (cparams != null)
             {
@@ -124,6 +135,7 @@ namespace UTJ
                         {
                             Undo.RecordObject(target, "Changed Param Value");
                             vp.value.value = v;
+                            repaint = true;
                         }
                     }
                     else if (type == typeof(ToonzIntParam))
@@ -136,6 +148,7 @@ namespace UTJ
                         {
                             Undo.RecordObject(target, "Changed Param Value");
                             vp.value.value = v;
+                            repaint = true;
                         }
                     }
                     else if (type == typeof(ToonzBoolParam))
@@ -148,6 +161,7 @@ namespace UTJ
                         {
                             Undo.RecordObject(target, "Changed Param Value");
                             vp.value.value = v;
+                            repaint = true;
                         }
                     }
                     else if (type == typeof(ToonzEnumParam))
@@ -159,6 +173,7 @@ namespace UTJ
                         {
                             Undo.RecordObject(target, "Changed Param Value");
                             vp.value.value = v;
+                            repaint = true;
                         }
                     }
                     else if (type == typeof(ToonzRangeParam))
@@ -175,14 +190,15 @@ namespace UTJ
                             Undo.RecordObject(target, "Changed Param Value");
                             vp.value.min = vmin;
                             vp.value.max = vmax;
+                            repaint = true;
                         }
                     }
                 }
             }
 
-
             EditorGUILayout.Space();
 
+            // inputs
             GUILayout.Label("Inputs:");
             var ports = t.pluginPorts;
             if(ports != null)
@@ -196,11 +212,17 @@ namespace UTJ
                     {
                         Undo.RecordObject(target, "Changed Input Texture");
                         port.input = newinput;
+                        repaint = true;
                     }
                 }
                 GUILayout.Label("  (None is treated as frame buffer)");
             }
 
+
+            if(repaint && !Application.isPlaying)
+            {
+                UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+            }
         }
     }
 }
