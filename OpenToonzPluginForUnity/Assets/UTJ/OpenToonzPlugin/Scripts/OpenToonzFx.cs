@@ -1,10 +1,6 @@
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -14,7 +10,7 @@ namespace UTJ
 {
     [AddComponentMenu("UTJ/OpenToonzFx")]
     [RequireComponent(typeof(Camera))]
-    //[ExecuteInEditMode]
+    [ExecuteInEditMode]
     public class OpenToonzFx : MonoBehaviour, ISerializationCallbackReceiver
     {
         [Serializable]
@@ -55,6 +51,11 @@ namespace UTJ
                 }
                 return ret;
             }
+
+            public string GetFileName()
+            {
+                return Path.GetFileName(m_leaf);
+            }
         }
 
 
@@ -70,10 +71,22 @@ namespace UTJ
         otpAPI.otpImage m_img_src;
         RenderTexture m_rt_tmp;
         bool m_began;
+        int m_pluginIndex_prev;
+#if UNITY_EDITOR
+        public bool m_preview = false;
+#endif
 
 
-        public PluginPath pluginPath { get { return m_pluginPath; } }
-        public int pluginIndex { get { return m_pluginIndex; } }
+        public PluginPath pluginPath
+        {
+            get { return m_pluginPath; }
+            set { m_pluginPath = value; UpdateParamList(); }
+        }
+        public int pluginIndex
+        {
+            get { return m_pluginIndex; }
+            set { m_pluginIndex = value; UpdateParamList(); }
+        }
 
         public ToonzPort[] pluginPorts { get { return m_ports; } }
         public ToonzParam[] pluginParams { get { return m_params; } }
@@ -82,11 +95,23 @@ namespace UTJ
         public string pluginNote { get { return m_plugin_info.note; } }
         public string pluginVendor { get { return m_plugin_info.vendor; } }
 
+        public string[] pluginList
+        {
+            get
+            {
+                return otpAPI.GetPluginList(otpAPI.otpLoadModule(m_pluginPath.GetPath()));
+            }
+        }
 
         void UpdateParamList()
         {
             var mod = otpAPI.otpLoadModule(m_pluginPath.GetPath());
-            if (!mod) { return; }
+            if (!mod)
+            {
+                m_ports = null;
+                m_params = null;
+                return;
+            }
 
             int nplugins = otpAPI.otpGetNumPlugins(mod);
             m_pluginIndex = m_pluginIndex < nplugins ? m_pluginIndex : nplugins - 1;
@@ -213,7 +238,6 @@ namespace UTJ
         void OnValidate()
         {
             m_pluginIndex = m_pluginIndex < 0 ? 0 : m_pluginIndex;
-            UpdateParamList();
         }
 #endif
 
@@ -243,13 +267,6 @@ namespace UTJ
 
         void OnEnable()
         {
-            var mod = otpAPI.otpLoadModule(m_pluginPath.GetPath());
-            if(!mod)
-            {
-                Debug.LogWarning("OpenToonzFx: failed to load module " + m_pluginPath.GetPath());
-                return;
-            }
-            m_inst = otpAPI.otpCreateInstance(mod, m_pluginIndex);
             UpdateParamList();
         }
 
@@ -284,7 +301,22 @@ namespace UTJ
                 Debug.Log("OpenToonzFx: dst is null");
                 return;
             }
-            if (!m_inst) {
+
+            if (!m_inst || m_pluginIndex != m_pluginIndex_prev)
+            {
+                m_pluginIndex_prev = m_pluginIndex;
+                otpAPI.otpDestroyInstance(m_inst);
+                m_inst.ptr = IntPtr.Zero;
+                m_inst = otpAPI.otpCreateInstance(
+                    otpAPI.otpLoadModule(m_pluginPath.GetPath()), m_pluginIndex);
+            }
+
+            if (!m_inst
+#if UNITY_EDITOR
+                || (!Application.isPlaying && !m_preview)
+#endif
+                )
+            {
                 Graphics.Blit(rt_src, rt_dst);
                 return;
             }

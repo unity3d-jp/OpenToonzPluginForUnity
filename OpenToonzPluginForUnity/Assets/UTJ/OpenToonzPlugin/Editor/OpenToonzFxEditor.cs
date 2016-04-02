@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
+using System.IO;
 using UnityEngine;
 using UnityEditor;
 
@@ -11,15 +8,45 @@ namespace UTJ
     [CustomEditor(typeof(OpenToonzFx))]
     public class OpenToonzFxEditor : Editor
     {
-        SerializedObject m_obj;
-        SerializedProperty m_pluginPath;
-        SerializedProperty m_pluginIndex;
 
         void OnEnable()
         {
-            m_obj = new SerializedObject(target);
-            m_pluginPath = m_obj.FindProperty("m_pluginPath");
-            m_pluginIndex = m_obj.FindProperty("m_pluginIndex");
+        }
+
+
+        static string MakePathRelative(string path)
+        {
+            Uri pathToAssets = new Uri(Application.streamingAssetsPath + "/");
+            return pathToAssets.MakeRelativeUri(new Uri(path)).ToString();
+        }
+
+        void SelectPlugin()
+        {
+            var t = target as OpenToonzFx;
+            var path = EditorUtility.OpenFilePanel("Select OpenToonz plugin", Application.streamingAssetsPath, "plugin");
+
+            OpenToonzFx.PluginPath ppath;
+            if (path.IndexOf(Application.streamingAssetsPath) == -1)
+            {
+                ppath = new OpenToonzFx.PluginPath
+                {
+                    m_root = OpenToonzFx.PluginPath.Root.Absolute,
+                    m_leaf = path,
+                };
+            }
+            else
+            {
+                ppath = new OpenToonzFx.PluginPath
+                {
+                    m_root = OpenToonzFx.PluginPath.Root.StreamingAssetsPath,
+                    m_leaf = MakePathRelative(path),
+                };
+            }
+
+            Undo.RecordObject(target, "Changed Plugin");
+
+            t.pluginPath = ppath;
+            t.pluginIndex = 0;
         }
 
         public override void OnInspectorGUI()
@@ -30,10 +57,28 @@ namespace UTJ
             var t = target as OpenToonzFx;
             const float width = 100.0f;
 
-            m_obj.Update();
-            EditorGUILayout.PropertyField(m_pluginPath, new GUIContent("Plugin Path"), true);
-            EditorGUILayout.PropertyField(m_pluginIndex, new GUIContent("Plugin Index"));
-            m_obj.ApplyModifiedProperties();
+            if(GUILayout.Button("Select Plugin", GUILayout.MinWidth(width)))
+            {
+                SelectPlugin();
+            }
+
+            var plugin_list = t.pluginList;
+            if(plugin_list.Length == 0)
+            {
+                return;
+            }
+
+            {
+                GUILayout.Label(t.pluginPath.GetFileName());
+
+                EditorGUI.BeginChangeCheck();
+                int v = EditorGUILayout.Popup(t.pluginIndex, plugin_list);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(target, "Changed Plugin Index");
+                    t.pluginIndex = v;
+                }
+            }
 
             EditorGUILayout.Space();
 
@@ -44,6 +89,18 @@ namespace UTJ
                 if (note.Length > 0)
                 {
                     GUILayout.Label(t.pluginNote);
+                }
+            }
+
+            EditorGUILayout.Space();
+
+            {
+                EditorGUI.BeginChangeCheck();
+                t.m_preview = EditorGUILayout.Toggle(
+                                "Preview", t.m_preview, GUILayout.MinWidth(width));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
                 }
             }
 
@@ -127,7 +184,6 @@ namespace UTJ
             EditorGUILayout.Space();
 
             GUILayout.Label("Inputs:");
-            GUILayout.Label("  (None is treated as frame buffer)");
             var ports = t.pluginPorts;
             if(ports != null)
             {
@@ -142,6 +198,7 @@ namespace UTJ
                         port.input = newinput;
                     }
                 }
+                GUILayout.Label("  (None is treated as frame buffer)");
             }
 
         }

@@ -325,5 +325,19 @@ namespace UTJ
                 otpSetParamValue(param, ref ((ToonzRangeParam)v).value);
             }
         }
+
+        public static string[] GetPluginList(otpModule mod)
+        {
+            int nplugins = otpGetNumPlugins(mod);
+            var ret = new string[nplugins];
+
+            otpPluginInfo info = default(otpPluginInfo);
+            for (int i = 0; i < nplugins; ++i)
+            {
+                otpGetPluginInfo(mod, i, ref info);
+                ret[i] = info.name;
+            }
+            return ret;
+        }
     }
 }
