@@ -60,7 +60,7 @@ namespace UTJ
 
         [SerializeField] PluginPath m_pluginPath;
         [SerializeField] int m_pluginIndex;
-        [SerializeField] ToonzPort[] m_inputs;
+        [SerializeField] ToonzPort[] m_ports;
         ToonzParam[] m_params;
 
         [SerializeField] byte[] m_serialized;
@@ -75,7 +75,7 @@ namespace UTJ
         public PluginPath pluginPath { get { return m_pluginPath; } }
         public int pluginIndex { get { return m_pluginIndex; } }
 
-        public ToonzPort[] pluginInputs { get { return m_inputs; } }
+        public ToonzPort[] pluginPorts { get { return m_ports; } }
         public ToonzParam[] pluginParams { get { return m_params; } }
 
         public string pluginName { get { return m_plugin_info.name; } }
@@ -97,9 +97,9 @@ namespace UTJ
 
             {
                 int nports = otpAPI.otpGetNumPorts(inst);
-                if(m_inputs == null || m_inputs.Length != nports)
+                if(m_ports == null || m_ports.Length != nports)
                 {
-                    m_inputs = new ToonzPort[nports];
+                    m_ports = new ToonzPort[nports];
                 }
 
                 var pinfo = default(otpAPI.otpPortInfo);
@@ -107,9 +107,11 @@ namespace UTJ
                 {
                     var portptr = otpAPI.otpGetPort(inst, i);
                     otpAPI.otpGetPortInfo(portptr, ref pinfo);
-                    if (m_inputs[i] == null || m_params[i].name != pinfo.name)
+                    if (m_ports[i] == null || m_ports[i].name != pinfo.name)
                     {
-                        m_inputs[i] = new ToonzPort { name = pinfo.name };
+                        m_ports[i] = new ToonzPort {
+                            name = pinfo.name,
+                        };
                     }
                 }
             }
@@ -138,14 +140,73 @@ namespace UTJ
 
         void ApplyParams()
         {
-            if(m_params==null || !m_inst) { return; }
+            if(!m_inst) { return; }
 
-            int nparams = m_params.Length;
-            for (int i = 0; i < nparams; ++i)
+            // set inputs
+            if(m_ports != null)
             {
-                var paramptr = otpAPI.otpGetParam(m_inst, i);
-                otpAPI.SetParamValue(paramptr, m_params[i]);
+                int nports = m_ports.Length;
+                for (int i = 0; i < nports; ++i)
+                {
+                    otpAPI.otpSetInput(otpAPI.otpGetPort(m_inst, i), GetInputImage(i));
+                }
             }
+
+            // set params
+            if (m_params != null)
+            {
+                int nparams = m_params.Length;
+                for (int i = 0; i < nparams; ++i)
+                {
+                    otpAPI.SetParamValue(otpAPI.otpGetParam(m_inst, i), m_params[i]);
+                }
+            }
+        }
+
+        void UpdateInputImages(Texture rt_src)
+        {
+            if(rt_src != null)
+            {
+                // copy rt_src content to memory
+                if (!m_img_src)
+                {
+                    m_img_src = otpAPI.otpCreateImage(rt_src.width, rt_src.height);
+                }
+                var src_data = default(otpAPI.otpImageData);
+                otpAPI.otpGetImageData(m_img_src, ref src_data);
+                TextureWriter.Read(src_data.data, src_data.width * src_data.height, TextureWriter.twPixelFormat.RGBAu8, rt_src);
+            }
+
+
+            foreach (var port in m_ports)
+            {
+                if(port.input != null)
+                {
+                    if(!port.image)
+                    {
+                        port.image = otpAPI.otpCreateImage(port.input.width, port.input.height);
+                    }
+
+                    var idata = default(otpAPI.otpImageData);
+                    otpAPI.otpGetImageData(port.image, ref idata);
+                    TextureWriter.Read(idata.data, idata.width * idata.height, TextureWriter.twPixelFormat.RGBAu8, port.input);
+                }
+            }
+        }
+
+        void ReleaseInputImages()
+        {
+            foreach(var port in m_ports)
+            {
+                otpAPI.otpDestroyImage(port.image);
+                port.image = default(otpAPI.otpImage);
+            }
+        }
+
+        otpAPI.otpImage GetInputImage(int i)
+        {
+            var inp = m_ports[i];
+            return !inp.input ? m_img_src : inp.image;
         }
 
 #if UNITY_EDITOR
@@ -211,6 +272,8 @@ namespace UTJ
 
             otpAPI.otpDestroyImage(m_img_src);
             m_inst.ptr = IntPtr.Zero;
+
+            ReleaseInputImages();
         }
 
         [ImageEffectOpaque]
@@ -231,25 +294,7 @@ namespace UTJ
                 otpAPI.otpBeginRender(m_inst, rt_src.width, rt_src.height);
             }
 
-            // copy rt_src content to memory
-            if (!m_img_src)
-            {
-                m_img_src = otpAPI.otpCreateImage(rt_src.width, rt_src.height);
-            }
-            var src_data = default(otpAPI.otpImageData);
-            otpAPI.otpGetImageData(m_img_src, ref src_data);
-            TextureWriter.Read(src_data.data, src_data.width * src_data.height, TextureWriter.twPixelFormat.RGBAu8, rt_src);
-
-            // set inputs
-            {
-                var port = otpAPI.otpGetPort(m_inst, 0);
-                if(port)
-                {
-                    otpAPI.otpSetInput(port, m_img_src);
-                }
-            }
-
-            // apply toonz fx
+            UpdateInputImages(rt_src);
             ApplyParams();
             var img_dst = otpAPI.otpRender(m_inst, Time.time);
             if(!img_dst)

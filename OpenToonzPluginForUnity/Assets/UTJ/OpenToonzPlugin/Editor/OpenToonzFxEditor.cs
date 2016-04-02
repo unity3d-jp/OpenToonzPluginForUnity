@@ -98,13 +98,13 @@ namespace UTJ
 
             GUILayout.Label("Inputs:");
             GUILayout.Label("  (none is treated as frame buffer)");
-            var inputs = t.pluginInputs;
-            if(inputs != null)
+            var ports = t.pluginPorts;
+            if(ports != null)
             {
-                foreach (var p in inputs)
+                foreach (var port in ports)
                 {
-                    p.input = EditorGUILayout.ObjectField(
-                        p.name, p.input, typeof(Texture), true, GUILayout.MinWidth(width)) as Texture;
+                    port.input = EditorGUILayout.ObjectField(
+                        port.name, port.input, typeof(Texture), true, GUILayout.MinWidth(width)) as Texture;
                 }
             }
         }

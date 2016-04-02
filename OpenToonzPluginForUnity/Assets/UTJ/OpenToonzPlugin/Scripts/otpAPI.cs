@@ -16,15 +16,26 @@ namespace UTJ
     {
         public string name;
         public Texture input;
+        [NonSerialized] public otpAPI.otpImage image;
     }
 
     [Serializable]
-    public abstract class ToonzParam 
+    public abstract class ToonzParam
     {
         public string name;
         public string note;
-        public otpAPI.otpParamType  type;
         public byte[] serialized;
+        public otpAPI.otpParamType type;
+
+        public ToonzParam(otpAPI.otpParam p)
+        {
+            var info = default(otpAPI.otpParamInfo);
+            otpAPI.otpGetParamInfo(p, ref info);
+
+            name = info.name;
+            note = info.note;
+            type = info.type;
+        }
     }
 
     [Serializable]
@@ -33,6 +44,7 @@ namespace UTJ
         public otpAPI.otpDoubleValue value;
 
         public ToonzDoubleParam(otpAPI.otpParam p)
+            : base(p)
         {
             otpAPI.otpGetParamValue(p, ref value);
         }
@@ -44,6 +56,7 @@ namespace UTJ
         public otpAPI.otpIntValue value;
 
         public ToonzIntParam(otpAPI.otpParam p)
+            : base(p)
         {
             otpAPI.otpGetParamValue(p, ref value);
         }
@@ -55,6 +68,7 @@ namespace UTJ
         public otpAPI.otpBoolValue value;
 
         public ToonzBoolParam(otpAPI.otpParam p)
+            : base(p)
         {
             otpAPI.otpGetParamValue(p, ref value);
         }
@@ -66,6 +80,7 @@ namespace UTJ
         public otpAPI.otpEnumValue value;
 
         public ToonzEnumParam(otpAPI.otpParam p)
+            : base(p)
         {
             otpAPI.otpGetParamValue(p, ref value);
         }
@@ -77,6 +92,7 @@ namespace UTJ
         public otpAPI.otpRangeValue value;
 
         public ToonzRangeParam(otpAPI.otpParam p)
+            : base(p)
         {
             otpAPI.otpGetParamValue(p, ref value);
         }
@@ -224,6 +240,7 @@ namespace UTJ
         [DllImport("OpenToonzPlugin")] public static extern otpImage    otpCreateImage(int width, int height);
         [DllImport("OpenToonzPlugin")] public static extern otpImage    otpCreateIntrusiveImage(IntPtr data, int width, int height);
         [DllImport("OpenToonzPlugin")] public static extern void        otpDestroyImage(otpImage img);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetImageResize(otpImage img, int width, int height);
         [DllImport("OpenToonzPlugin")] public static extern void        otpGetImageData(otpImage img, ref otpImageData data);
 
 
@@ -281,12 +298,6 @@ namespace UTJ
                 case otpParamType.Bool: ret = new ToonzBoolParam(param); break;
                 case otpParamType.Enum: ret = new ToonzEnumParam(param); break;
                 case otpParamType.Range: ret = new ToonzRangeParam(param); break;
-            }
-            if (ret != null)
-            {
-                ret.name = info.name;
-                ret.note = info.note;
-                ret.type = info.type;
             }
             return ret;
         }
