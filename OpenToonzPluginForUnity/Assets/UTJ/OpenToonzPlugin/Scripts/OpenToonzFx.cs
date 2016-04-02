@@ -194,6 +194,7 @@ namespace UTJ
             }
         }
 
+
         void UpdateInputImages(Texture rt_src)
         {
             if(rt_src != null)
@@ -201,8 +202,10 @@ namespace UTJ
                 // copy rt_src content to memory
                 if (!m_img_src)
                 {
-                    m_img_src = otpAPI.otpCreateImage(rt_src.width, rt_src.height);
+                    m_img_src = otpAPI.otpCreateImage();
                 }
+                otpAPI.otpResizeImage(m_img_src, rt_src.width, rt_src.height);
+
                 var src_data = default(otpAPI.otpImageData);
                 otpAPI.otpGetImageData(m_img_src, ref src_data);
                 TextureWriter.Read(src_data.data, src_data.width * src_data.height, TextureWriter.twPixelFormat.RGBAu8, rt_src);
@@ -215,8 +218,9 @@ namespace UTJ
                 {
                     if(!port.image)
                     {
-                        port.image = otpAPI.otpCreateImage(port.input.width, port.input.height);
+                        port.image = otpAPI.otpCreateImage();
                     }
+                    otpAPI.otpResizeImage(port.image, port.input.width, port.input.height);
 
                     var idata = default(otpAPI.otpImageData);
                     otpAPI.otpGetImageData(port.image, ref idata);

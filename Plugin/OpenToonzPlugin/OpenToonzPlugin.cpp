@@ -12,9 +12,9 @@ using namespace utj;
 std::map<std::string, otpModule*> g_plugins;
 
 
-otpCLinkage otpExport otpImage* otpCreateImage(int width, int height)
+otpCLinkage otpExport otpImage* otpCreateImage()
 {
-    return new ImageRGBAu8(width, height);
+    return new ImageRGBAu8();
 }
 
 otpCLinkage otpExport otpImage* otpCreateIntrusiveImage(void *data, int width, int height)
@@ -27,7 +27,7 @@ otpCLinkage otpExport void otpDestroyImage(otpImage *img)
     delete img;
 }
 
-otpCLinkage otpExport void otpGetImageResize(otpImage *img, int width, int height)
+otpCLinkage otpExport void otpResizeImage(otpImage *img, int width, int height)
 {
     return img->resize(width, height);
 }

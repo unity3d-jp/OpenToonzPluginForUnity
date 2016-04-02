@@ -38,7 +38,10 @@ twCLinkage twExport bool twWriteTexture(
         src = &tmp_pixels[0];
     }
 
-    return dev->writeTexture(dst_tex, dst_width, dst_height, dst_fmt, src, src_num * GetPixelSize(dst_fmt));
+    size_t write_size = std::min<size_t>(
+        src_num * GetPixelSize(dst_fmt),
+        dst_width * dst_height * GetPixelSize(dst_fmt));
+    return dev->writeTexture(dst_tex, dst_width, dst_height, dst_fmt, src, write_size);
 }
 
 
@@ -60,7 +63,10 @@ twCLinkage twExport bool twReadTexture(
         dst = &tmp_pixels[0];
     }
 
-    if (!dev->readTexture(dst, dst_num * GetPixelSize(src_fmt), src_tex, src_width, src_height, src_fmt)) {
+    size_t read_size = std::min<size_t>(
+        dst_num * GetPixelSize(src_fmt),
+        src_width * src_height * GetPixelSize(src_fmt) );
+    if (!dev->readTexture(dst, read_size, src_tex, src_width, src_height, src_fmt)) {
         return false;
     }
 

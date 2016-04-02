@@ -236,10 +236,10 @@ namespace UTJ
         };
 
 
-        [DllImport("OpenToonzPlugin")] public static extern otpImage    otpCreateImage(int width, int height);
+        [DllImport("OpenToonzPlugin")] public static extern otpImage    otpCreateImage();
         [DllImport("OpenToonzPlugin")] public static extern otpImage    otpCreateIntrusiveImage(IntPtr data, int width, int height);
         [DllImport("OpenToonzPlugin")] public static extern void        otpDestroyImage(otpImage img);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpGetImageResize(otpImage img, int width, int height);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpResizeImage(otpImage img, int width, int height);
         [DllImport("OpenToonzPlugin")] public static extern void        otpGetImageData(otpImage img, ref otpImageData data);
 
 

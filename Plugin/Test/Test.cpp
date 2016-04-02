@@ -65,7 +65,9 @@ int main(int argc, char *argv[])
     }
 
 
-    otpImage *src = otpCreateImage(1024, 512);
+    otpImage *src = otpCreateImage();
+    otpResizeImage(src, 1024, 512);
+
     otpImageData src_data;
     {
         otpGetImageData(src, &src_data);
