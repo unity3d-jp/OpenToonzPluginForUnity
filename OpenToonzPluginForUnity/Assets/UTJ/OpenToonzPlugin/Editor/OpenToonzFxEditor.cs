@@ -27,6 +27,8 @@ namespace UTJ
             //DrawDefaultInspector();
             //return;
 
+            var t = target as OpenToonzFx;
+
             m_obj.Update();
             EditorGUILayout.PropertyField(m_pluginPath, new GUIContent("Plugin Path"), true);
             EditorGUILayout.PropertyField(m_pluginIndex, new GUIContent("Plugin Index"));
@@ -34,8 +36,19 @@ namespace UTJ
 
             EditorGUILayout.Space();
 
-            var t = target as OpenToonzFx;
-            var cparams = t.GetCurrentParams();
+            {
+                GUILayout.Label(t.pluginName + " by " + t.pluginVendor);
+
+                var note = t.pluginNote;
+                if (note.Length > 0)
+                {
+                    GUILayout.Label(t.pluginNote);
+                }
+            }
+
+            EditorGUILayout.Space();
+
+            var cparams = t.pluginParams;
             if (cparams != null)
             {
                 foreach (var p in cparams)

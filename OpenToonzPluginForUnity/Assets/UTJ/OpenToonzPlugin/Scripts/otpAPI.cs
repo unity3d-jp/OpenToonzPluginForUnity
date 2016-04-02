@@ -18,27 +18,6 @@ namespace UTJ
         public string note;
         public otpAPI.otpParamType  type;
         public byte[] serialized;
-
-        public abstract void SerializeValue();
-        public abstract void DeserializeValue();
-
-        protected void SerializeValue(Action<BinaryWriter> act)
-        {
-            var stream = new MemoryStream();
-            var writer = new BinaryWriter(stream);
-            act(writer);
-            stream.Flush();
-            serialized = stream.GetBuffer();
-        }
-
-        protected void DeserializeValue(Action<BinaryReader> act)
-        {
-            var stream = new MemoryStream(serialized);
-            var reader = new BinaryReader(stream);
-            act(reader);
-            stream.Flush();
-            serialized = null;
-        }
     }
 
     [Serializable]
@@ -49,21 +28,6 @@ namespace UTJ
         public ToonzDoubleParam(otpAPI.otpParam p)
         {
             otpAPI.otpGetParamValue(p, ref value);
-        }
-
-        public override void SerializeValue()
-        {
-            SerializeValue((BinaryWriter writer) =>
-            {
-                writer.Write(value.value);
-            });
-        }
-        public override void DeserializeValue()
-        {
-            DeserializeValue((BinaryReader reader) =>
-            {
-                value.value = reader.ReadDouble();
-            });
         }
     }
 
@@ -76,21 +40,6 @@ namespace UTJ
         {
             otpAPI.otpGetParamValue(p, ref value);
         }
-
-        public override void SerializeValue()
-        {
-            SerializeValue((BinaryWriter writer) =>
-            {
-                writer.Write(value.value);
-            });
-        }
-        public override void DeserializeValue()
-        {
-            DeserializeValue((BinaryReader reader) =>
-            {
-                value.value = reader.ReadInt32();
-            });
-        }
     }
 
     [Serializable]
@@ -101,21 +50,6 @@ namespace UTJ
         public ToonzBoolParam(otpAPI.otpParam p)
         {
             otpAPI.otpGetParamValue(p, ref value);
-        }
-
-        public override void SerializeValue()
-        {
-            SerializeValue((BinaryWriter writer) =>
-            {
-                writer.Write(value.value);
-            });
-        }
-        public override void DeserializeValue()
-        {
-            DeserializeValue((BinaryReader reader) =>
-            {
-                value.value = reader.ReadInt32();
-            });
         }
     }
 
@@ -128,21 +62,6 @@ namespace UTJ
         {
             otpAPI.otpGetParamValue(p, ref value);
         }
-
-        public override void SerializeValue()
-        {
-            SerializeValue((BinaryWriter writer) =>
-            {
-                writer.Write(value.value);
-            });
-        }
-        public override void DeserializeValue()
-        {
-            DeserializeValue((BinaryReader reader) =>
-            {
-                value.value = reader.ReadInt32();
-            });
-        }
     }
 
     [Serializable]
@@ -153,23 +72,6 @@ namespace UTJ
         public ToonzRangeParam(otpAPI.otpParam p)
         {
             otpAPI.otpGetParamValue(p, ref value);
-        }
-
-        public override void SerializeValue()
-        {
-            SerializeValue((BinaryWriter writer) =>
-            {
-                writer.Write(value.min);
-                writer.Write(value.max);
-            });
-        }
-        public override void DeserializeValue()
-        {
-            DeserializeValue((BinaryReader reader) =>
-            {
-                value.min = reader.ReadDouble();
-                value.max = reader.ReadDouble();
-            });
         }
     }
 
@@ -189,6 +91,11 @@ namespace UTJ
             String,
             ToneCurve,
         };
+
+        public static string ToS(IntPtr ptr)
+        {
+            return ptr == IntPtr.Zero ? "" : Marshal.PtrToStringAnsi(ptr);
+        }
 
         public struct otpImage
         {
@@ -230,9 +137,9 @@ namespace UTJ
             public IntPtr note_;
             public int version_major, version_minor;
 
-            public string name { get { return Marshal.PtrToStringAnsi(name_); } }
-            public string vendor { get { return Marshal.PtrToStringAnsi(vendor_); } }
-            public string note { get { return Marshal.PtrToStringAnsi(note_); } }
+            public string name { get { return ToS(name_); } }
+            public string vendor { get { return ToS(vendor_); } }
+            public string note { get { return ToS(note_); } }
         }
 
         public struct otpParamInfo
@@ -241,54 +148,64 @@ namespace UTJ
             public IntPtr note_;
             public otpParamType type;
 
-            public string name { get { return Marshal.PtrToStringAnsi(name_); } }
-            public string note { get { return Marshal.PtrToStringAnsi(note_); } }
+            public string name { get { return ToS(name_); } }
+            public string note { get { return ToS(note_); } }
         }
 
         public struct otpPortInfo
         {
             public IntPtr name_;
 
-            public string name { get { return Marshal.PtrToStringAnsi(name_); } }
+            public string name { get { return ToS(name_); } }
         }
 
+        [Serializable]
         public struct otpIntValue
         {
             public int value;
         };
+        [Serializable]
         public struct otpBoolValue
         {
             public int value;
         };
+        [Serializable]
         public struct otpEnumValue
         {
             public int value;
         };
+        [Serializable]
         public struct otpDoubleValue
         {
             public double value;
         };
+        [Serializable]
         public struct otpStringValue
         {
             public IntPtr value;
         };
+        [Serializable]
         public struct otpRangeValue
         {
             public double min, max;
         };
+        [Serializable]
         public struct otpPixelValue
         {
             public int c0, c1, c2, m;
         };
+        [Serializable]
         public struct otpPointValue
         {
             public double x, y;
         };
+        [Serializable]
         public struct otpSpectrumValue
         {
             public double w;
             public double c0, c1, c2, m;
         };
+        [Serializable]
         public struct otpToneCurveValue
         {
             public double x, y;

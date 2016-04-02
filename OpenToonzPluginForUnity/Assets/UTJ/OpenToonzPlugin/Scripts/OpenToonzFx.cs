@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -56,44 +58,45 @@ namespace UTJ
         }
 
 
-        public PluginPath m_pluginPath;
-        public int m_pluginIndex;
-        public ToonzParam[][] m_params;
+        [SerializeField] PluginPath m_pluginPath;
+        [SerializeField] int m_pluginIndex;
+        ToonzParam[] m_params;
 
+        [SerializeField] byte[] m_serialized;
+
+        otpAPI.otpPluginInfo m_plugin_info = default(otpAPI.otpPluginInfo);
         otpAPI.otpInstance m_inst;
         otpAPI.otpImage m_img_src;
         RenderTexture m_rt_tmp;
         bool m_began;
 
 
-        public ToonzParam[] GetCurrentParams()
-        {
-            if(m_params == null) { return null; }
-            if(m_pluginIndex >= m_params.Length) { return null; }
-            return m_params[m_pluginIndex];
-        }
+        public PluginPath pluginPath { get { return m_pluginPath; } }
+        public int pluginIndex { get { return m_pluginIndex; } }
+        public ToonzParam[] pluginParams { get { return m_params; } }
 
-        void UpdateParams()
+        public string pluginName { get { return m_plugin_info.name; } }
+        public string pluginNote { get { return m_plugin_info.note; } }
+        public string pluginVendor { get { return m_plugin_info.vendor; } }
+
+
+        void UpdateParamList()
         {
             var mod = otpAPI.otpLoadModule(m_pluginPath.GetPath());
             if (!mod) { return; }
 
             int nplugins = otpAPI.otpGetNumPlugins(mod);
-            if(m_params == null || m_params.Length != nplugins)
-            {
-                Debug.Log("updated param list array");
-                m_params = new ToonzParam[nplugins][];
-            }
+            m_pluginIndex = m_pluginIndex < nplugins ? m_pluginIndex : nplugins - 1;
+            otpAPI.otpGetPluginInfo(mod, m_pluginIndex, ref m_plugin_info);
 
-            for (int pi = 0; pi < nplugins; ++pi)
+            int pi = m_pluginIndex;
             {
                 var inst = otpAPI.otpCreateInstance(mod, pi);
                 int nparams = otpAPI.otpGetNumParams(inst);
-                var ps = m_params[pi];
-                if(ps == null || ps.Length != nparams)
+                if(m_params == null || m_params.Length != nparams)
                 {
                     Debug.Log("updated param list");
-                    ps = m_params[pi] = new ToonzParam[nparams];
+                    m_params = new ToonzParam[nparams];
                 }
 
                 var pinfo = default(otpAPI.otpParamInfo);
@@ -101,10 +104,10 @@ namespace UTJ
                 {
                     var paramptr = otpAPI.otpGetParam(inst, i);
                     otpAPI.otpGetParamInfo(paramptr, ref pinfo);
-                    if(ps[i] == null || ps[i].name != pinfo.name || ps[i].type != pinfo.type)
+                    if(m_params[i] == null || m_params[i].name != pinfo.name || m_params[i].type != pinfo.type)
                     {
                         Debug.Log("new param");
-                        ps[i] = otpAPI.CreateToonzParam(paramptr);
+                        m_params[i] = otpAPI.CreateToonzParam(paramptr);
                     }
                 }
 
@@ -112,32 +115,49 @@ namespace UTJ
             }
         }
 
+        void ApplyParams()
+        {
+            if(m_params==null || !m_inst) { return; }
+
+            int nparams = m_params.Length;
+            for (int i = 0; i < nparams; ++i)
+            {
+                var paramptr = otpAPI.otpGetParam(m_inst, i);
+                otpAPI.SetParamValue(paramptr, m_params[i]);
+            }
+        }
+
 #if UNITY_EDITOR
         void OnValidate()
         {
-            UpdateParams();
+            m_pluginIndex = m_pluginIndex < 0 ? 0 : m_pluginIndex;
+            UpdateParamList();
         }
 #endif
 
         public void OnBeforeSerialize()
         {
-            if(m_params == null) { return; }
-            foreach (var pa in m_params)
+            if (m_params != null)
             {
-                foreach (var p in pa)
-                    p.SerializeValue();
+                var stream = new MemoryStream();
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(stream, m_params);
+                stream.Flush();
+                m_serialized = stream.GetBuffer();
             }
         }
 
         public void OnAfterDeserialize()
         {
-            if (m_params == null) { return; }
-            foreach (var pa in m_params)
+            if(m_serialized != null && m_serialized.Length > 0)
             {
-                foreach (var p in pa)
-                    p.DeserializeValue();
+                var stream = new MemoryStream(m_serialized);
+                var formatter = new BinaryFormatter();
+                m_params = (ToonzParam[])formatter.Deserialize(stream);
+                m_serialized = null;
             }
         }
+
 
         void OnEnable()
         {
@@ -148,7 +168,7 @@ namespace UTJ
                 return;
             }
             m_inst = otpAPI.otpCreateInstance(mod, m_pluginIndex);
-            UpdateParams();
+            UpdateParamList();
         }
 
         void OnDisable()
@@ -185,13 +205,13 @@ namespace UTJ
                 return;
             }
 
-            if(!m_began)
+            if (!m_began)
             {
                 otpAPI.otpBeginRender(m_inst, rt_src.width, rt_src.height);
             }
 
             // copy rt_src content to memory
-            if(!m_img_src)
+            if (!m_img_src)
             {
                 m_img_src = otpAPI.otpCreateImage(rt_src.width, rt_src.height);
             }
@@ -209,6 +229,7 @@ namespace UTJ
             }
 
             // apply toonz fx
+            ApplyParams();
             var img_dst = otpAPI.otpRender(m_inst, Time.time);
             if(!img_dst)
             {
