@@ -227,11 +227,16 @@ namespace UTJ
 
         void ReleaseInputImages()
         {
-            if(m_ports == null) { return; }
-            foreach(var port in m_ports)
+            otpAPI.otpDestroyImage(m_img_src);
+            m_img_src = default(otpAPI.otpImage);
+
+            if (m_ports != null)
             {
-                otpAPI.otpDestroyImage(port.image);
-                port.image = default(otpAPI.otpImage);
+                foreach (var port in m_ports)
+                {
+                    otpAPI.otpDestroyImage(port.image);
+                    port.image = default(otpAPI.otpImage);
+                }
             }
         }
 
@@ -298,10 +303,6 @@ namespace UTJ
             }
 
             ReleaseInstance();
-
-            otpAPI.otpDestroyImage(m_img_src);
-            m_inst.ptr = IntPtr.Zero;
-
             ReleaseInputImages();
         }
 
