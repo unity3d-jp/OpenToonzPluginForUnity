@@ -76,9 +76,6 @@ namespace UTJ
         int m_tw_write;
         int m_otp_render;
 
-#if UNITY_EDITOR
-        public bool m_preview = false;
-#endif
 
 
         public PluginPath pluginPath
@@ -351,12 +348,7 @@ namespace UTJ
                 m_inst = otpAPI.otpCreateInstance(
                     otpAPI.otpLoadModule(m_pluginPath.GetPath()), m_pluginIndex);
             }
-
-            if (!m_inst
-#if UNITY_EDITOR
-                || (!Application.isPlaying && !m_preview)
-#endif
-                )
+            if (!m_inst )
             {
                 Graphics.Blit(rt_src, rt_dst);
                 return;
@@ -384,6 +376,11 @@ namespace UTJ
             else
             {
                 // blit & resize if size of img_dst != size of rt_dst
+                if( m_rt_tmp != null && (m_rt_tmp.width != dst_data.width || m_rt_tmp.height != dst_data.height) )
+                {
+                    m_rt_tmp.Release();
+                    m_rt_tmp = null;
+                }
                 if (m_rt_tmp == null)
                 {
                     m_rt_tmp = new RenderTexture(dst_data.width, dst_data.height, 0, RenderTextureFormat.ARGB32);

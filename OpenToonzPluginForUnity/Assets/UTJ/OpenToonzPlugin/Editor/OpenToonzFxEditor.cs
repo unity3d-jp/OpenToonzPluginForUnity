@@ -23,7 +23,7 @@ namespace UTJ
         bool SelectPlugin()
         {
             var t = target as OpenToonzFx;
-            var path = EditorUtility.OpenFilePanel("Select OpenToonz plugin", Application.streamingAssetsPath, "plugin");
+            var path = EditorUtility.OpenFilePanel("Select OpenToonz plugin", Application.streamingAssetsPath + "OpenToonzPlugin", "plugin");
             if(path == Application.streamingAssetsPath)
             {
                 return false;
@@ -69,17 +69,6 @@ namespace UTJ
             if (GUILayout.Button("Select Plugin", GUILayout.MinWidth(width)))
             {
                 repaint = SelectPlugin();
-            }
-
-            // preview check
-            {
-                EditorGUI.BeginChangeCheck();
-                t.m_preview = EditorGUILayout.Toggle(
-                                "Preview", t.m_preview, GUILayout.MinWidth(width));
-                if (EditorGUI.EndChangeCheck())
-                {
-                    repaint = true;
-                }
             }
 
             var plugin_list = t.pluginList;
