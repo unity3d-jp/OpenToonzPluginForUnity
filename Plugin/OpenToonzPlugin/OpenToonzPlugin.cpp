@@ -191,7 +191,7 @@ otpCLinkage otpExport void otpEndRender(otpInstance *inst)
 
 
 
-
+#ifndef otpStaticLink
 // deferred call APIs
 
 #include "PluginAPI/IUnityGraphics.h"
@@ -279,3 +279,4 @@ otpCLinkage otpExport UnityRenderingEvent GetRenderEventFunc()
 {
     return UnityRenderEvent;
 }
+#endif // otpStaticLink

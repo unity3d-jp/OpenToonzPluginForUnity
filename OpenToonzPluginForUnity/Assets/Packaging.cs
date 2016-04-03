@@ -8,7 +8,7 @@ using UnityEditor;
 
 public class Packaging
 {
-    [MenuItem("Assets/UTJ/make package - OpenToonzPlugin")]
+    [MenuItem("Assets/UTJ/OpenToonzPlugin/MakePackage")]
     public static void MakePackages()
     {
         string[] files = new string[]
@@ -16,7 +16,7 @@ public class Packaging
 "Assets/UTJ",
 "Assets/StreamingAssets/OpenToonzPlugin/License.txt",
         };
-        AssetDatabase.ExportPackage(files, "OpenToonzPlugin.unitypackage", ExportPackageOptions.Recurse);
+        AssetDatabase.ExportPackage(files, "OpenToonzPluginForUnity.unitypackage", ExportPackageOptions.Recurse);
     }
 
 }

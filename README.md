@@ -4,16 +4,17 @@
 ![Screenshot](Screenshots/Screenshot.jpg)
 
 OpenToonz 用のプラグインを Unity の PostEffect として使えるようにするプラグインです。  
-どちらかというと映像制作を想定したもので、デルタタイムを固定して事前に指定しておいた範囲のフレームを書き出す、といった使い方を想定しています。
+映像制作用途を想定したもので、デルタタイムを固定して事前に指定しておいた範囲のフレームを書き出す、といった使い方を想定しています。
 フレームの書き出しには [FrameCapturer](https://github.com/unity3d-jp/FrameCapturer) などが使えるでしょう。  
 OpenToonz のプラグインがリアルタイム向けではないため、残念ながらゲームへの使用は厳しいかと思われます。  
 
 ## How To Use
 <img align="right" src="Screenshots/OpenToonzFx.png">
-1. OpenToonz 用のプラグインを Assets/StreamingAssets/OpenToonzPlugin に配置  
-2. エフェクトを適用したいカメラに OpenToonzFx コンポーネントを追加 (AddComponent -> UTJ/OpenToonzFx)  
-3. "Select Plugin" でプラグインを選択  
-4. プラグイン用のパラメータが表示されるので設定  
+1. こちらのパッケージをインポート [OpenToonzPluginForUnity.unitypackage](https://github.com/unity3d-jp/OpenToonzPluginForUnity/blob/master/OpenToonzPluginForUnity.unitypackage?raw=true)
+2. OpenToonz 用のプラグインを Assets/StreamingAssets/OpenToonzPlugin に配置  
+3. エフェクトを適用したいカメラに OpenToonzFx コンポーネントを追加 (AddComponent -> UTJ/OpenToonzFx)  
+4. "Select Plugin" でプラグインを選択  
+5. プラグイン用のパラメータが表示されるので設定  
 
 右のスクリーンショットは DWANGO_PencilHatching.plugin を選択した例です。
 "Select Plugin" ボタンから下の内容は選択したプラグインによって変わります。
@@ -27,7 +28,7 @@ OpenToonz のプラグインは一つの .plugin ファイルに複数のコン�
 エフェクト適用は RenderTexture の内容を CPU 側にコピー -> エフェクト適用 -> GPU 側に書き戻す という手順で行われています。つまり、遅いです。
 
 ## History
-- 2016/04/xx
+- 2016/04/03
   - first release
 
 ## Thanks

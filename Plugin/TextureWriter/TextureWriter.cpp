@@ -80,6 +80,7 @@ twCLinkage twExport bool twReadTexture(
 
 
 
+#ifndef twStaticLink
 // deferred call APIs
 
 twCLinkage twExport void twGuardBegin();
@@ -180,3 +181,4 @@ twCLinkage twExport int twReadTextureDeferred(
         twReadTexture(dst, dst_num, dst_fmt, src_tex, src_width, src_height, src_fmt);
     }, id);
 }
+#endif // twStaticLink
