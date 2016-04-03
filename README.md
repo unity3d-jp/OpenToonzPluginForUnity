@@ -10,11 +10,10 @@ OpenToonz のプラグインがリアルタイム向けではないため、残�
 
 ## How To Use
 <img align="right" src="Screenshots/OpenToonzFx.png">
-1. OpenToonz 用のプラグインを Assets/StreamingAssets/OpenToonzPlugin に配置
-2. エフェクトを適用したいカメラに OpenToonzFx コンポーネントを追加  
-(AddComponent -> UTJ/OpenToonzFx)
-3. "Select Plugin" でプラグインを選択
-4. プラグイン用のパラメータが表示されるので設定
+1. OpenToonz 用のプラグインを Assets/StreamingAssets/OpenToonzPlugin に配置  
+2. エフェクトを適用したいカメラに OpenToonzFx コンポーネントを追加 (AddComponent -> UTJ/OpenToonzFx)  
+3. "Select Plugin" でプラグインを選択  
+4. プラグイン用のパラメータが表示されるので設定  
 
 右のスクリーンショットは DWANGO_PencilHatching.plugin を選択した例です。
 "Select Plugin" ボタンから下の内容は選択したプラグインによって変わります。
