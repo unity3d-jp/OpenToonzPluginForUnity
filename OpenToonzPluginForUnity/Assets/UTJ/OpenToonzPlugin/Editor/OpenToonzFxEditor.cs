@@ -24,7 +24,7 @@ namespace UTJ
         {
             var t = target as OpenToonzFx;
             var path = EditorUtility.OpenFilePanel("Select OpenToonz plugin", Application.streamingAssetsPath + "OpenToonzPlugin", "plugin");
-            if(path == Application.streamingAssetsPath)
+            if(path == "")
             {
                 return false;
             }
