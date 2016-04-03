@@ -143,9 +143,13 @@ otpCLinkage otpExport int           otpGetParamLength(otpParam *param);
 otpCLinkage otpExport void          otpGetParamValue(otpParam *param, void *dst);
 otpCLinkage otpExport void          otpSetParamValue(otpParam *param, const void *src);
 
-otpCLinkage otpExport void          otpBeginRender(otpInstance *inst, int width, int height);
 // return result image. user *should not* otpImageDestroy() returned image
-otpCLinkage otpExport otpImage*     otpRender(otpInstance *inst, double frame);
+otpCLinkage otpExport otpImage*     otpGetDstImage(otpInstance *inst);
+
+otpCLinkage otpExport void          otpBeginRender(otpInstance *inst, int width, int height);
+otpCLinkage otpExport bool          otpRender(otpInstance *inst, double frame);
 otpCLinkage otpExport void          otpEndRender(otpInstance *inst);
+
+otpCLinkage otpExport int           otpRenderDeferred(otpInstance *inst, double frame, int id);
 
 #endif // OpenToonzPluginForUnity_h

@@ -26,8 +26,10 @@ public:
     void*                   getUserData() const;
     void                    setUsertData(void *v);
 
+    ImageRGBAu8*            getDstImage();
+
     void                    beginRender(int width, int height);
-    otpImage*               render(double frames);
+    bool                    render(double frames);
     void                    endRender();
 
     // Body: [](otpParam *param){} -> void
@@ -42,7 +44,6 @@ public:
     void            setParamInfo(toonz_param_page_t *pages, int num_pages);
     void            addPort(const char *name);
     double          getFrame() const;
-    ImageRGBAu8*    getDstImage();
 
 private:
     typedef std::unique_ptr<otpParam>       otpParamPtr;

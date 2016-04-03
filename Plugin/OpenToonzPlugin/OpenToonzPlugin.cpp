@@ -167,13 +167,18 @@ otpCLinkage otpExport void otpSetParamValue(otpParam *param, const void *src)
     param->setValue(src);
 }
 
+otpCLinkage otpExport otpImage* otpGetDstImage(otpInstance *inst)
+{
+    if (!inst) { return nullptr; }
+    return inst->getDstImage();
+}
 
 otpCLinkage otpExport void otpBeginRender(otpInstance *inst, int width, int height)
 {
     if (!inst) { return; }
     inst->beginRender(width, height);
 }
-otpCLinkage otpExport otpImage* otpRender(otpInstance *inst, double frame)
+otpCLinkage otpExport bool otpRender(otpInstance *inst, double frame)
 {
     if (!inst) { return nullptr; }
     return inst->render(frame);
@@ -182,4 +187,90 @@ otpCLinkage otpExport void otpEndRender(otpInstance *inst)
 {
     if (!inst) { return; }
     inst->endRender();
+}
+
+
+
+
+
+// deferred call impl
+
+typedef std::function<void()> DeferredCall;
+namespace {
+    std::mutex g_deferred_calls_mutex;
+    std::vector<DeferredCall> g_deferred_calls;
+}
+
+otpCLinkage otpExport void otpGuardBegin()
+{
+    g_deferred_calls_mutex.lock();
+}
+
+otpCLinkage otpExport void otpGuardEnd()
+{
+    g_deferred_calls_mutex.unlock();
+}
+
+otpCLinkage otpExport int otpAddDeferredCall(const DeferredCall& dc, int id)
+{
+    if (id <= 0) {
+        // search empty object and return its position if found
+        for (int i = 1; i < (int)g_deferred_calls.size(); ++i) {
+            if (!g_deferred_calls[i]) {
+                g_deferred_calls[i] = dc;
+                return i;
+            }
+        }
+
+        // 0th is "null" object
+        if (g_deferred_calls.empty()) { g_deferred_calls.emplace_back(DeferredCall()); }
+
+        // allocate new one
+        g_deferred_calls.emplace_back(dc);
+        return (int)g_deferred_calls.size() - 1;
+    }
+    else if (id < (int)g_deferred_calls.size()) {
+        g_deferred_calls[id] = dc;
+        return id;
+    }
+    else {
+        utjDebugLog("should not be here");
+        return 0;
+    }
+}
+
+otpCLinkage otpExport void otpEraseDeferredCall(int id)
+{
+    if (id <= 0 || id >= (int)g_deferred_calls.size()) { return; }
+
+    g_deferred_calls[id] = DeferredCall();
+}
+
+// **called from rendering thread**
+otpCLinkage otpExport void otpCallDeferredCall(int id)
+{
+    std::unique_lock<std::mutex> l(g_deferred_calls_mutex);
+    if (id <= 0 || id >= (int)g_deferred_calls.size()) { return; }
+
+    auto& dc = g_deferred_calls[id];
+    if (dc) { dc(); }
+}
+
+otpCLinkage otpExport int otpRenderDeferred(otpInstance *inst, double frame, int id)
+{
+    if (!inst) { return 0; }
+    return otpAddDeferredCall([&]() {
+        return inst->render(frame);
+    }, id);
+}
+
+#include "PluginAPI/IUnityGraphics.h"
+
+static void UNITY_INTERFACE_API UnityRenderEvent(int eventID)
+{
+    otpCallDeferredCall(eventID);
+}
+otpCLinkage otpExport UnityRenderingEvent GetRenderEventFunc()
+{
+    return UnityRenderEvent;
 }

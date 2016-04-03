@@ -135,6 +135,7 @@ namespace UTJ
         [DllImport ("TextureWriter")] public static extern void     twGuardEnd();
         [DllImport ("TextureWriter")] public static extern void     twEraseDeferredCall(int id);
 
+
         public static bool IsCompressed(Texture t)
         {
             var t2d = t as Texture2D;
@@ -152,10 +153,16 @@ namespace UTJ
             return false;
         }
 
+
         [DllImport("TextureWriter")]
         private static extern Bool twWriteTexture(
             IntPtr dst_tex, int dst_width, int dst_height, twPixelFormat dst_fmt,
             IntPtr src, int src_num, twPixelFormat src_fmt);
+
+        [DllImport("TextureWriter")]
+        private static extern int twWriteTextureDeferred(
+            IntPtr dst_tex, int dst_width, int dst_height, twPixelFormat dst_fmt,
+            IntPtr src, int src_num, twPixelFormat src_fmt, int id);
 
         public static bool Write(Texture dst_tex, IntPtr src, int src_num, twPixelFormat src_fmt)
         {
@@ -170,11 +177,29 @@ namespace UTJ
                 twGetPixelFormat(dst_tex), src, src_num, src_fmt);
         }
 
+        public static int WriteDeferred(Texture dst_tex, IntPtr src, int src_num, twPixelFormat src_fmt, int id)
+        {
+            if (IsCompressed(dst_tex))
+            {
+                Debug.LogError("TextureWriter: texture format must be uncompressed");
+                return 0;
+            }
+
+            return twWriteTextureDeferred(
+                dst_tex.GetNativeTexturePtr(), dst_tex.width, dst_tex.height,
+                twGetPixelFormat(dst_tex), src, src_num, src_fmt, id);
+        }
+
 
         [DllImport("TextureWriter")]
         private static extern Bool twReadTexture(
             IntPtr dst, int dst_num, twPixelFormat dst_fmt,
             IntPtr src_tex, int src_width, int src_height, twPixelFormat src_fmt);
+
+        [DllImport("TextureWriter")]
+        private static extern int twReadTextureDeferred(
+            IntPtr dst, int dst_num, twPixelFormat dst_fmt,
+            IntPtr src_tex, int src_width, int src_height, twPixelFormat src_fmt, int id);
 
         public static bool Read(IntPtr dst, int dst_num, twPixelFormat dst_fmt, Texture src_tex)
         {
@@ -187,6 +212,19 @@ namespace UTJ
             return twReadTexture(
                 dst, dst_num, dst_fmt,
                 src_tex.GetNativeTexturePtr(), src_tex.width, src_tex.height, twGetPixelFormat(src_tex));
+        }
+
+        public static int ReadDeferred(IntPtr dst, int dst_num, twPixelFormat dst_fmt, Texture src_tex, int id)
+        {
+            if (IsCompressed(src_tex))
+            {
+                Debug.LogError("TextureWriter: texture format must be uncompressed");
+                return 0;
+            }
+
+            return twReadTextureDeferred(
+                dst, dst_num, dst_fmt,
+                src_tex.GetNativeTexturePtr(), src_tex.width, src_tex.height, twGetPixelFormat(src_tex), id);
         }
     }
 }

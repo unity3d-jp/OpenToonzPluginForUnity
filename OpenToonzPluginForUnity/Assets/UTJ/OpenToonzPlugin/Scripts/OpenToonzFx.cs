@@ -344,15 +344,10 @@ namespace UTJ
 
             UpdateInputImages(rt_src);
             ApplyParams();
-            var img_dst = otpAPI.otpRender(m_inst, Time.time);
-            if(!img_dst)
-            {
-                Graphics.Blit(rt_src, rt_dst);
-                return;
-            }
+            otpAPI.otpRender(m_inst, Time.time);
 
             var dst_data = default(otpAPI.otpImageData);
-            otpAPI.otpGetImageData(img_dst, ref dst_data);
+            otpAPI.otpGetImageData(otpAPI.otpGetDstImage(m_inst), ref dst_data);
 
             if (dst_data.width == rt_dst.width && dst_data.height == rt_dst.height)
             {

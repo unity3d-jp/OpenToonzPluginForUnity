@@ -88,7 +88,8 @@ int main(int argc, char *argv[])
 
     otpBeginRender(inst, 1024, 512);
 
-    otpImage *dst = otpRender(inst, 0.0);
+    otpRender(inst, 0.0);
+    otpImage *dst = otpGetDstImage(inst);
     otpImageData dst_data;
     {
         otpGetImageData(dst, &dst_data);

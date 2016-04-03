@@ -21,6 +21,7 @@ otpInstance::otpInstance(otpModule *module, toonz_plugin_probe_t *probe)
     , m_frame()
     , m_canceled()
 {
+    m_dst_image.reset(new ImageRGBAu8());
     if (m_probe->handler) {
         if (m_probe->handler->setup) {
             m_probe->handler->setup(this);
@@ -132,16 +133,14 @@ otpPort* otpInstance::getPortByName(const char *name)
 
 void* otpInstance::getUserData() const { return m_userdata; }
 void otpInstance::setUsertData(void *v) { m_userdata = v; }
-ImageRGBAu8* otpInstance::getDstImage() { return m_dst_image.get(); }
 double otpInstance::getFrame() const { return m_frame; }
+
+ImageRGBAu8* otpInstance::getDstImage() { return m_dst_image.get(); }
 
 void otpInstance::beginRender(int width, int height)
 {
     m_base_width = width;
     m_base_height = height;
-    if (!m_dst_image) {
-        m_dst_image.reset(new ImageRGBAu8());
-    }
     m_dst_image->resize(m_base_width, m_base_height);
 
     double hw = double(width) / 2.0;
@@ -167,15 +166,13 @@ void otpInstance::beginRender(int width, int height)
     m_probe->handler->start_render(this);
 }
 
-otpImage* otpInstance::render(double frame)
+bool otpInstance::render(double frame)
 {
-    if (!m_dst_image) {
-        utjDebugLog("dst image is null");
-        return nullptr;
+    if (m_base_width == 0 || m_base_height == 0) {
+        utjDebugLog("dst size is zero");
+        return false;
     }
     m_dst_image->resize(m_base_width, m_base_height);
-    auto dst = m_dst_image.get();
-
     m_frame = frame;
     m_canceled = 0;
 
@@ -183,10 +180,10 @@ otpImage* otpInstance::render(double frame)
     size_t mem = m_probe->handler->get_memory_requirement(this, &m_rs, frame, &m_rect);
 
     m_probe->handler->on_new_frame(this, &m_rs, frame);
-    m_probe->handler->do_compute(this, &m_rs, frame, dst);
+    m_probe->handler->do_compute(this, &m_rs, frame, m_dst_image.get());
     m_probe->handler->on_end_frame(this, &m_rs, frame);
 
-    return dst;
+    return true;
 }
 
 void otpInstance::endRender()
