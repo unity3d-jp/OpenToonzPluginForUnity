@@ -17,6 +17,7 @@ namespace UTJ
         public string name;
         public Texture input;
         [NonSerialized] public otpAPI.otpImage image;
+        [NonSerialized] public int tw_read;
     }
 
     [Serializable]
@@ -303,12 +304,19 @@ namespace UTJ
         [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, IntPtr dst);
         [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, IntPtr src);
 
+        // return result image. user *should not* otpImageDestroy() returned image
         [DllImport("OpenToonzPlugin")] public static extern otpImage    otpGetDstImage(otpInstance inst);
 
         [DllImport("OpenToonzPlugin")] public static extern void        otpBeginRender(otpInstance inst, int width, int height);
-        // return result image. user *should not* otpImageDestroy() returned image
         [DllImport("OpenToonzPlugin")] public static extern Bool        otpRender(otpInstance inst, double frame);
         [DllImport("OpenToonzPlugin")] public static extern void        otpEndRender(otpInstance inst);
+
+
+        [DllImport("OpenToonzPlugin")] public static extern IntPtr      GetRenderEventFunc();
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGuardBegin();
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGuardEnd();
+        [DllImport("OpenToonzPlugin")] public static extern void        otpEraseDeferredCall(int id);
+        [DllImport("OpenToonzPlugin")] public static extern int         otpRenderDeferred(otpInstance inst, double frame, int id);
 
 
         [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpDoubleValue v);

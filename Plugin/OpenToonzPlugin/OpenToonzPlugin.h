@@ -150,6 +150,4 @@ otpCLinkage otpExport void          otpBeginRender(otpInstance *inst, int width,
 otpCLinkage otpExport bool          otpRender(otpInstance *inst, double frame);
 otpCLinkage otpExport void          otpEndRender(otpInstance *inst);
 
-otpCLinkage otpExport int           otpRenderDeferred(otpInstance *inst, double frame, int id);
-
 #endif // OpenToonzPluginForUnity_h

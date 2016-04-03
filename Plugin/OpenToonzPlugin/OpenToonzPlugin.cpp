@@ -192,8 +192,15 @@ otpCLinkage otpExport void otpEndRender(otpInstance *inst)
 
 
 
+// deferred call APIs
 
-// deferred call impl
+#include "PluginAPI/IUnityGraphics.h"
+
+otpCLinkage otpExport void  otpGuardBegin();
+otpCLinkage otpExport void  otpGuardEnd();
+otpCLinkage otpExport void  otpEraseDeferredCall(int id);
+otpCLinkage otpExport int   otpRenderDeferred(otpInstance *inst, double frame, int id);
+otpCLinkage otpExport UnityRenderingEvent   GetRenderEventFunc();
 
 typedef std::function<void()> DeferredCall;
 namespace {
@@ -259,12 +266,10 @@ otpCLinkage otpExport void otpCallDeferredCall(int id)
 otpCLinkage otpExport int otpRenderDeferred(otpInstance *inst, double frame, int id)
 {
     if (!inst) { return 0; }
-    return otpAddDeferredCall([&]() {
+    return otpAddDeferredCall([=]() {
         return inst->render(frame);
     }, id);
 }
-
-#include "PluginAPI/IUnityGraphics.h"
 
 static void UNITY_INTERFACE_API UnityRenderEvent(int eventID)
 {

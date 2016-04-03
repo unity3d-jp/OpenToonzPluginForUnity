@@ -70,18 +70,4 @@ twCLinkage twExport bool twReadTexture(
 
 
 
-
-twCLinkage twExport void twGuardBegin();
-twCLinkage twExport void twGuardEnd();
-twCLinkage twExport void twEraseDeferredCall(int id);
-twCLinkage twExport void twCallDeferredCall(int id);
-
-twCLinkage twExport int twWriteTextureDeferred(
-    void *dst_tex, int dst_width, int dst_height, twPixelFormat dst_fmt,
-    const void *src, int src_num, twPixelFormat src_fmt, int id);
-
-twCLinkage twExport int twReadTextureDeferred(
-    void *dst, int dst_num, twPixelFormat dst_fmt,
-    void *src_tex, int src_width, int src_height, twPixelFormat src_fmt, int id);
-
 #endif // TextureWriter_h

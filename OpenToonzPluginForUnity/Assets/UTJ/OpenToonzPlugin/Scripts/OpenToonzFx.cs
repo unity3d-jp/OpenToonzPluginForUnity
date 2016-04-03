@@ -71,6 +71,11 @@ namespace UTJ
         otpAPI.otpImage m_img_src;
         RenderTexture m_rt_tmp;
         bool m_began;
+
+        int m_tw_read;
+        int m_tw_write;
+        int m_otp_render;
+
 #if UNITY_EDITOR
         public bool m_preview = false;
 #endif
@@ -108,14 +113,17 @@ namespace UTJ
             }
         }
 
+
+        IntPtr GetTWEvent() { return TextureWriter.GetRenderEventFunc(); }
+        IntPtr GetOTPEvent() { return otpAPI.GetRenderEventFunc(); }
+
         void UpdateParamList()
         {
             if(m_pluginPath == null) { return; }
             var mod = otpAPI.otpLoadModule(m_pluginPath.GetPath());
             if (!mod)
             {
-                m_ports = null;
-                m_params = null;
+                ReleaseInstance();
                 return;
             }
 
@@ -210,7 +218,9 @@ namespace UTJ
 
                 var src_data = default(otpAPI.otpImageData);
                 otpAPI.otpGetImageData(m_img_src, ref src_data);
-                TextureWriter.Read(src_data.data, src_data.width * src_data.height, TextureWriter.twPixelFormat.RGBAu8, rt_src);
+                m_tw_read = TextureWriter.ReadDeferred(
+                    src_data.data, src_data.width * src_data.height, TextureWriter.twPixelFormat.RGBAu8, rt_src, m_tw_read);
+                GL.IssuePluginEvent(GetTWEvent(), m_tw_read);
             }
 
 
@@ -226,30 +236,43 @@ namespace UTJ
 
                     var idata = default(otpAPI.otpImageData);
                     otpAPI.otpGetImageData(port.image, ref idata);
-                    TextureWriter.Read(idata.data, idata.width * idata.height, TextureWriter.twPixelFormat.RGBAu8, port.input);
-                }
-            }
-        }
-
-        void ReleaseInputImages()
-        {
-            otpAPI.otpDestroyImage(m_img_src);
-            m_img_src = default(otpAPI.otpImage);
-
-            if (m_ports != null)
-            {
-                foreach (var port in m_ports)
-                {
-                    otpAPI.otpDestroyImage(port.image);
-                    port.image = default(otpAPI.otpImage);
+                    port.tw_read =  TextureWriter.ReadDeferred(
+                        idata.data, idata.width * idata.height, TextureWriter.twPixelFormat.RGBAu8, port.input, port.tw_read);
+                    GL.IssuePluginEvent(GetTWEvent(), port.tw_read);
                 }
             }
         }
 
         void ReleaseInstance()
         {
+            TextureWriter.twGuardBegin();
+            otpAPI.otpGuardBegin();
+
+            // release ports & params
+            otpAPI.otpDestroyImage(m_img_src);
+            m_img_src = default(otpAPI.otpImage);
+
+            otpAPI.otpEraseDeferredCall(m_otp_render); m_otp_render = 0;
+            TextureWriter.twEraseDeferredCall(m_tw_read); m_tw_read = 0;
+            TextureWriter.twEraseDeferredCall(m_tw_write); m_tw_write = 0;
+            if (m_ports != null)
+            {
+                foreach (var port in m_ports)
+                {
+                    TextureWriter.twEraseDeferredCall(port.tw_read); port.tw_read = 0;
+                    otpAPI.otpDestroyImage(port.image); port.image = default(otpAPI.otpImage);
+                }
+            }
+
+            m_ports = null;
+            m_params = null;
+
+            // release instance
             otpAPI.otpDestroyInstance(m_inst);
             m_inst.ptr = IntPtr.Zero;
+
+            otpAPI.otpGuardEnd();
+            TextureWriter.twGuardEnd();
         }
 
         otpAPI.otpImage GetInputImage(int i)
@@ -307,9 +330,11 @@ namespace UTJ
                 otpAPI.otpEndRender(m_inst);
                 m_began = false;
             }
+        }
 
+        void OnDestroy()
+        {
             ReleaseInstance();
-            ReleaseInputImages();
         }
 
         [ImageEffectOpaque]
@@ -344,14 +369,17 @@ namespace UTJ
 
             UpdateInputImages(rt_src);
             ApplyParams();
-            otpAPI.otpRender(m_inst, Time.time);
+            m_otp_render = otpAPI.otpRenderDeferred(m_inst, Time.time, m_otp_render);
+            GL.IssuePluginEvent(GetOTPEvent(), m_otp_render);
 
             var dst_data = default(otpAPI.otpImageData);
             otpAPI.otpGetImageData(otpAPI.otpGetDstImage(m_inst), ref dst_data);
 
             if (dst_data.width == rt_dst.width && dst_data.height == rt_dst.height)
             {
-                TextureWriter.Write(rt_dst, dst_data.data, dst_data.width * dst_data.height, TextureWriter.twPixelFormat.RGBAu8);
+                m_tw_write = TextureWriter.WriteDeferred(
+                    rt_dst, dst_data.data, dst_data.width * dst_data.height, TextureWriter.twPixelFormat.RGBAu8, m_tw_write);
+                GL.IssuePluginEvent(GetTWEvent(), m_tw_write);
             }
             else
             {
@@ -362,7 +390,9 @@ namespace UTJ
                     m_rt_tmp.filterMode = FilterMode.Bilinear;
                     m_rt_tmp.Create();
                 }
-                TextureWriter.Write(m_rt_tmp, dst_data.data, dst_data.width * dst_data.height, TextureWriter.twPixelFormat.RGBAu8);
+                m_tw_write = TextureWriter.WriteDeferred(
+                    m_rt_tmp, dst_data.data, dst_data.width * dst_data.height, TextureWriter.twPixelFormat.RGBAu8, m_tw_write);
+                GL.IssuePluginEvent(GetTWEvent(), m_tw_write);
                 Graphics.Blit(m_rt_tmp, rt_dst);
             }
         }
