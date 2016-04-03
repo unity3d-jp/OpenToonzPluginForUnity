@@ -10,11 +10,10 @@ OpenToonz のプラグインがリアルタイム向けではないため、残�
 
 ## How To Use
 <img align="right" src="Screenshots/OpenToonzFx.png">
-1. こちらのパッケージをインポート [OpenToonzPluginForUnity.unitypackage](https://github.com/unity3d-jp/OpenToonzPluginForUnity/blob/master/OpenToonzPluginForUnity.unitypackage?raw=true)
+1. こちらのパッケージをインポート [OpenToonzPluginForUnity.unitypackage](https://github.com/unity3d-jp/OpenToonzPluginForUnity/blob/master/Packages/OpenToonzPluginForUnity.unitypackage?raw=true)  
 2. OpenToonz 用のプラグインを Assets/StreamingAssets/OpenToonzPlugin に配置  
 3. エフェクトを適用したいカメラに OpenToonzFx コンポーネントを追加 (AddComponent -> UTJ/OpenToonzFx)  
-4. "Select Plugin" でプラグインを選択  
-5. プラグイン用のパラメータが表示されるので設定  
+4. "Select Plugin" でプラグインを選択。プラグイン用のパラメータが表示されるので適宜設定  
 
 右のスクリーンショットは DWANGO_PencilHatching.plugin を選択した例です。
 "Select Plugin" ボタンから下の内容は選択したプラグインによって変わります。
