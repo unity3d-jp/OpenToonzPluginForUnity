@@ -143,10 +143,15 @@ otpCLinkage otpExport otpParam* otpGetParamByName(otpInstance *inst, const char 
 
 
 
-otpCLinkage otpExport void otpGetParamInfo(otpParam *param, otpParamInfo *pinfo)
+otpCLinkage otpExport void otpGetParamInfo(otpParam *param, otpParamInfo *dst)
 {
-    if (!param || !pinfo) { return; }
-    *pinfo = param->getRawInfo();
+    if (!param || !dst) { return; }
+    *dst = param->getRawInfo();
+}
+otpCLinkage otpExport void otpGetParamTraits(otpParam *param, void *dst)
+{
+    if (!param || !dst) { return; }
+    param->getTraits(dst);
 }
 
 otpCLinkage otpExport int otpGetParamLength(otpParam *param)
@@ -157,7 +162,7 @@ otpCLinkage otpExport int otpGetParamLength(otpParam *param)
 
 otpCLinkage otpExport void otpGetParamValue(otpParam *param, void *dst)
 {
-    if (!param) { return; }
+    if (!param || !dst) { return; }
     param->getValue(dst);
 }
 

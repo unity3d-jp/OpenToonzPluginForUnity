@@ -131,6 +131,7 @@ namespace UTJ
                         {
                             Undo.RecordObject(target, "Changed Param Value");
                             vp.value.value = v;
+                            vp.Sanitize();
                             repaint = true;
                         }
                     }
@@ -144,16 +145,17 @@ namespace UTJ
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField(new GUIContent(p.name, p.note), options);
                         EditorGUIUtility.labelWidth = label_width_3c;
-                        var vmin = EditorGUILayout.DoubleField("Min", vp.value.min, options);
-                        var vmax = EditorGUILayout.DoubleField("Max", vp.value.max, options);
+                        var vmin = EditorGUILayout.DoubleField("Min", vp.value.a, options);
+                        var vmax = EditorGUILayout.DoubleField("Max", vp.value.b, options);
                         EditorGUILayout.EndHorizontal();
                         EditorGUIUtility.labelWidth = 0.0f;
 
                         if (EditorGUI.EndChangeCheck())
                         {
                             Undo.RecordObject(target, "Changed Param Value");
-                            vp.value.min = vmin;
-                            vp.value.max = vmax;
+                            vp.value.a = vmin;
+                            vp.value.b = vmax;
+                            vp.Sanitize();
                             repaint = true;
                         }
                     }
@@ -180,6 +182,7 @@ namespace UTJ
                             vp.value.c1 = c1;
                             vp.value.c2 = c2;
                             vp.value.m = m;
+                            vp.Sanitize();
                             repaint = true;
                         }
                     }
@@ -203,6 +206,7 @@ namespace UTJ
                             Undo.RecordObject(target, "Changed Param Value");
                             vp.value.x = x;
                             vp.value.y = y;
+                            vp.Sanitize();
                             repaint = true;
                         }
                     }
@@ -219,6 +223,7 @@ namespace UTJ
                         {
                             Undo.RecordObject(target, "Changed Param Value");
                             vp.value.value = v;
+                            vp.Sanitize();
                             repaint = true;
                         }
                     }
@@ -235,6 +240,7 @@ namespace UTJ
                         {
                             Undo.RecordObject(target, "Changed Param Value");
                             vp.value.value = v;
+                            vp.Sanitize();
                             repaint = true;
                         }
                     }
@@ -251,6 +257,7 @@ namespace UTJ
                         {
                             Undo.RecordObject(target, "Changed Param Value");
                             vp.value.value = v ? 1 : 0;
+                            vp.Sanitize();
                             repaint = true;
                         }
                     }
@@ -267,6 +274,7 @@ namespace UTJ
                         {
                             Undo.RecordObject(target, "Changed Param Value");
                             vp.value = v;
+                            vp.Sanitize();
                             repaint = true;
                         }
                     }

@@ -53,62 +53,98 @@ struct otpPluginInfo
     int version_major, version_minor;
 };
 
-struct otpParamInfo
-{
-    const char *name;
-    const char *note;
-    otpParamType type;
-
-    otpParamInfo(
-        const char *name_ = nullptr,
-        const char *note_ = nullptr,
-        otpParamType type_ = otParamType_Unknown)
-        : name(name_), note(note_), type(type_)
-    {}
-};
-
 struct otpPortInfo
 {
     const char *name;
 };
 
 
-struct otpIntValue
+struct otpIntParamValue
 {
     int value;
 };
-typedef otpIntValue otpBoolValue;
-typedef otpIntValue otpEnumValue;
-struct otpDoubleValue
+typedef otpIntParamValue otpBoolParamValue;
+typedef otpIntParamValue otpEnumParamValue;
+struct otpDoubleParamValue
 {
     double value;
 };
-struct otpStringValue
+struct otpRangeParamValue
 {
-    const char *value;
+    double a, b;
 };
-struct otpRangeValue
-{
-    double min, max;
-};
-struct otpColorValue
+struct otpColorParamValue
 {
     int c0, c1, c2, m;
 };
-struct otpPointValue
+struct otpPointParamValue
 {
     double x, y;
 };
-struct otpSpectrumValue
+struct otpStringParamValue
+{
+    char *value;
+};
+struct otpSpectrumParamValue
 {
     double w;
     double c0, c1, c2, m;
 };
-struct otpToneCurveValue
+struct otpToneCurveParamValue
 {
     double x, y;
     int channel;
     int interp;
+};
+
+
+struct otpIntParamTraits
+{
+    typedef int value_type;
+    int def, min, max;
+};
+typedef otpIntParamTraits otpEnumParamTraits;
+typedef otpIntParamTraits otpBoolParamTraits;
+struct otpDoubleParamTraits
+{
+    typedef double value_type;
+    double def, min, max;
+};
+struct otpRangeParamTraits
+{
+    typedef otpRangeParamValue value_type;
+    otpRangeParamValue def, minmax;
+};
+struct otpColorParamTraits
+{
+    typedef otpColorParamValue value_type;
+    otpColorParamValue def;
+};
+struct otpPointParamTraits
+{
+    typedef otpPointParamValue value_type;
+    otpPointParamValue def, min, max;
+};
+struct otpStringParamTraits
+{
+    const char *value;
+};
+struct otpSpectrumParamTraits
+{
+    typedef otpSpectrumParamValue value_type;
+    // todo
+};
+struct otpToneCurveParamTraits
+{
+    typedef otpToneCurveParamValue value_type;
+};
+
+
+struct otpParamInfo
+{
+    const char *name;
+    const char *note;
+    otpParamType type;
 };
 
 
@@ -131,13 +167,14 @@ otpCLinkage otpExport void          otpDestroyInstance(otpInstance *inst);
 otpCLinkage otpExport int           otpGetNumPorts(otpInstance *inst);
 otpCLinkage otpExport otpPort*      otpGetPort(otpInstance *inst, int i);
 otpCLinkage otpExport otpPort*      otpGetPortByName(otpInstance *inst, const char *name);
-otpCLinkage otpExport void          otpGetPortInfo(otpPort *port, otpPortInfo *info);
+otpCLinkage otpExport void          otpGetPortInfo(otpPort *port, otpPortInfo *dst);
 otpCLinkage otpExport void          otpSetInput(otpPort *port, otpImage *src);
 
 otpCLinkage otpExport int           otpGetNumParams(otpInstance *inst);
 otpCLinkage otpExport otpParam*     otpGetParam(otpInstance *inst, int i);
 otpCLinkage otpExport otpParam*     otpGetParamByName(otpInstance *inst, const char *name);
-otpCLinkage otpExport void          otpGetParamInfo(otpParam *param, otpParamInfo *pinfo);
+otpCLinkage otpExport void          otpGetParamInfo(otpParam *param, otpParamInfo *dst);
+otpCLinkage otpExport void          otpGetParamTraits(otpParam *param, void *dst);
 // return count of elements if param type is string or tonecurve. otherwise 1
 otpCLinkage otpExport int           otpGetParamLength(otpParam *param);
 otpCLinkage otpExport void          otpGetParamValue(otpParam *param, void *dst);

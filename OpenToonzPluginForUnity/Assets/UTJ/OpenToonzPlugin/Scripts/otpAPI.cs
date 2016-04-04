@@ -87,95 +87,134 @@ namespace UTJ
             note = info.note;
             type = info.type;
         }
-    }
 
+        public virtual void Sanitize() {}
+    }
     [Serializable]
     public class ToonzDoubleParam : ToonzParam
     {
-        public otpAPI.otpDoubleValue value;
+        public otpAPI.otpDoubleParamTraits traits;
+        public otpAPI.otpDoubleParamValue value;
 
         public ToonzDoubleParam(otpAPI.otpParam p)
             : base(p)
         {
+            otpAPI.otpGetParamTraits(p, ref traits);
             otpAPI.otpGetParamValue(p, ref value);
         }
-    }
 
+        public override void Sanitize()
+        {
+            traits.Sanitize(ref value);
+        }
+    }
     [Serializable]
     public class ToonzRangeParam : ToonzParam
     {
-        public otpAPI.otpRangeValue value;
+        public otpAPI.otpRangeParamTraits traits;
+        public otpAPI.otpRangeParamValue value;
 
         public ToonzRangeParam(otpAPI.otpParam p)
             : base(p)
         {
+            otpAPI.otpGetParamTraits(p, ref traits);
             otpAPI.otpGetParamValue(p, ref value);
         }
-    }
 
+        public override void Sanitize()
+        {
+            traits.Sanitize(ref value);
+        }
+    }
     [Serializable]
     public class ToonzColorParam : ToonzParam
     {
-        public otpAPI.otpColorValue value;
+        public otpAPI.otpColorParamTraits traits;
+        public otpAPI.otpColorParamValue value;
 
         public ToonzColorParam(otpAPI.otpParam p)
             : base(p)
         {
+            otpAPI.otpGetParamTraits(p, ref traits);
             otpAPI.otpGetParamValue(p, ref value);
         }
     }
-
     [Serializable]
     public class ToonzPointParam : ToonzParam
     {
-        public otpAPI.otpPointValue value;
+        public otpAPI.otpPointParamTraits traits;
+        public otpAPI.otpPointParamValue value;
 
         public ToonzPointParam(otpAPI.otpParam p)
             : base(p)
         {
+            otpAPI.otpGetParamTraits(p, ref traits);
             otpAPI.otpGetParamValue(p, ref value);
         }
-    }
 
+        public override void Sanitize()
+        {
+            traits.Sanitize(ref value);
+        }
+    }
     [Serializable]
     public class ToonzEnumParam : ToonzParam
     {
-        public otpAPI.otpEnumValue value;
+        public otpAPI.otpEnumParamTraits traits;
+        public otpAPI.otpEnumParamValue value;
 
         public ToonzEnumParam(otpAPI.otpParam p)
             : base(p)
         {
+            otpAPI.otpGetParamTraits(p, ref traits);
             otpAPI.otpGetParamValue(p, ref value);
         }
-    }
 
+        public override void Sanitize()
+        {
+            traits.Sanitize(ref value);
+        }
+    }
     [Serializable]
     public class ToonzIntParam : ToonzParam
     {
-        public otpAPI.otpIntValue value;
+        public otpAPI.otpIntParamTraits traits;
+        public otpAPI.otpIntParamValue value;
 
         public ToonzIntParam(otpAPI.otpParam p)
             : base(p)
         {
+            otpAPI.otpGetParamTraits(p, ref traits);
             otpAPI.otpGetParamValue(p, ref value);
         }
-    }
 
+        public override void Sanitize()
+        {
+            traits.Sanitize(ref value);
+        }
+    }
     [Serializable]
     public class ToonzBoolParam : ToonzParam
     {
-        public otpAPI.otpBoolValue value;
+        public otpAPI.otpBoolParamTraits traits;
+        public otpAPI.otpBoolParamValue value;
 
         public ToonzBoolParam(otpAPI.otpParam p)
             : base(p)
         {
+            otpAPI.otpGetParamTraits(p, ref traits);
             otpAPI.otpGetParamValue(p, ref value);
         }
-    }
 
+        public override void Sanitize()
+        {
+            traits.Sanitize(ref value);
+        }
+    }
     [Serializable]
     public class ToonzStringParam : ToonzParam
     {
+        public otpAPI.otpStringParamTraits traits;
         public string value;
 
         public ToonzStringParam(otpAPI.otpParam p)
@@ -276,53 +315,149 @@ namespace UTJ
         }
 
         [Serializable]
-        public struct otpIntValue
+        public struct otpIntParamValue
         {
             public int value;
         };
         [Serializable]
-        public struct otpBoolValue
+        public struct otpBoolParamValue
         {
             public int value;
         };
         [Serializable]
-        public struct otpEnumValue
+        public struct otpEnumParamValue
         {
             public int value;
         };
         [Serializable]
-        public struct otpDoubleValue
+        public struct otpDoubleParamValue
         {
             public double value;
         };
         [Serializable]
-        public struct otpRangeValue
+        public struct otpRangeParamValue
         {
-            public double min, max;
+            public double a, b;
         };
         [Serializable]
-        public struct otpColorValue
+        public struct otpColorParamValue
         {
             public int c0, c1, c2, m;
         };
         [Serializable]
-        public struct otpPointValue
+        public struct otpPointParamValue
         {
             public double x, y;
         };
         [Serializable]
-        public struct otpSpectrumValue
+        public struct otpSpectrumParamValue
         {
             public double w;
             public double c0, c1, c2, m;
         };
         [Serializable]
-        public struct otpToneCurveValue
+        public struct otpToneCurveParamValue
         {
             public double x, y;
             public int channel;
             public int interp;
         };
+
+
+        [Serializable]
+        public struct otpIntParamTraits
+        {
+            public int def, min, max;
+            public void Sanitize(ref otpIntParamValue v)
+            {
+                if (min != max)
+                {
+                    v.value = Math.Max(Math.Min(v.value, max), min);
+                }
+            }
+        };
+        [Serializable]
+        public struct otpEnumParamTraits
+        {
+            public int def, min, max;
+            public void Sanitize(ref otpEnumParamValue v)
+            {
+                if (min != max)
+                {
+                    v.value = Math.Max(Math.Min(v.value, max), min);
+                }
+            }
+        };
+        [Serializable]
+        public struct otpBoolParamTraits
+        {
+            public int def, min, max;
+            public void Sanitize(ref otpBoolParamValue v)
+            {
+                if (min != max)
+                {
+                    v.value = Math.Max(Math.Min(v.value, max), min);
+                }
+            }
+        };
+        [Serializable]
+        public struct otpDoubleParamTraits
+        {
+            public double def, min, max;
+            public void Sanitize(ref otpDoubleParamValue v)
+            {
+                if (min != max)
+                {
+                    v.value = Math.Max(Math.Min(v.value, max), min);
+                }
+            }
+        };
+        [Serializable]
+        public struct otpStringParamTraits
+        {
+            public IntPtr def_;
+            public string def { get { return ToS(def_); } }
+        };
+        [Serializable]
+        public struct otpRangeParamTraits
+        {
+            public otpRangeParamValue def, minmax;
+            public void Sanitize(ref otpRangeParamValue v)
+            {
+                if (minmax.a != minmax.b)
+                {
+                    v.a = Math.Max(Math.Min(v.a, minmax.b), minmax.a);
+                    v.b = Math.Max(Math.Min(v.b, minmax.b), minmax.a);
+                }
+            }
+        };
+        [Serializable]
+        public struct otpColorParamTraits
+        {
+            public otpColorParamValue def;
+        };
+        [Serializable]
+        public struct otpPointParamTraits
+        {
+            public otpPointParamValue def, min, max;
+            public void Sanitize(ref otpPointParamValue v)
+            {
+                if (min.x != max.x)
+                {
+                    v.x = Math.Max(Math.Min(v.x, max.x), min.x);
+                    v.y = Math.Max(Math.Min(v.y, max.y), min.y);
+                }
+            }
+        };
+        [Serializable]
+        public struct otpSpectrumParamTraits
+        {
+        };
+        [Serializable]
+        public struct otpToneCurveParamTraits
+        {
+        };
+
 
 
         [DllImport("OpenToonzPlugin")] public static extern otpImage    otpCreateImage();
@@ -369,23 +504,32 @@ namespace UTJ
         [DllImport("OpenToonzPlugin")] public static extern void        otpEraseDeferredCall(int id);
         [DllImport("OpenToonzPlugin")] public static extern int         otpRenderDeferred(otpInstance inst, double frame, int id);
 
+        
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamTraits(otpParam param, ref otpDoubleParamTraits v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamTraits(otpParam param, ref otpRangeParamTraits v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamTraits(otpParam param, ref otpColorParamTraits v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamTraits(otpParam param, ref otpPointParamTraits v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamTraits(otpParam param, ref otpEnumParamTraits v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamTraits(otpParam param, ref otpIntParamTraits v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamTraits(otpParam param, ref otpBoolParamTraits v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamTraits(otpParam param, ref otpStringParamTraits v);
 
-        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpDoubleValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpRangeValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpColorValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpPointValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpEnumValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpIntValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpBoolValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpDoubleParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpRangeParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpColorParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpPointParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpEnumParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpIntParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref otpBoolParamValue v);
         [DllImport("OpenToonzPlugin")] public static extern void        otpGetParamValue(otpParam param, ref byte v);
 
-        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpDoubleValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpRangeValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpColorValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpPointValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpEnumValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpIntValue v);
-        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpBoolValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpDoubleParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpRangeParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpColorParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpPointParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpEnumParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpIntParamValue v);
+        [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, ref otpBoolParamValue v);
         [DllImport("OpenToonzPlugin")] public static extern void        otpSetParamValue(otpParam param, string v);
 
         public static ToonzParam CreateToonzParam(otpParam param)

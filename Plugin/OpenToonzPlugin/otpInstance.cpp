@@ -41,31 +41,6 @@ otpInstance::~otpInstance()
     }
 }
 
-static void otpSetupParam(toonz_param_desc_t& desc, otpParam& dst)
-{
-    otpParamInfo& info = dst.getRawInfo();
-    info.name = desc.key;
-    info.note = desc.note;
-    info.type = (otpParamType)desc.traits_tag;
-
-    switch (info.type) {
-    case otParamType_Double:    dst.setValue(&desc.traits.d.def); break;
-    case otParamType_Range:     dst.setValue(&desc.traits.rd.def); break;
-    case otParamType_Color:     dst.setValue(&desc.traits.c.def); break;
-    case otParamType_Point:     dst.setValue(&desc.traits.p.def); break;
-    case otParamType_Enum:      dst.setValue(&desc.traits.e.def); break;
-    case otParamType_Int:       dst.setValue(&desc.traits.i.def); break;
-    case otParamType_Bool:      dst.setValue(&desc.traits.b.def); break;
-    case otParamType_Spectrum:
-        if (desc.traits.g.points > 0) {
-            dst.setValue(&desc.traits.g.array[0]);
-        }
-        break;
-    case otParamType_String:    dst.setValue(desc.traits.s.def); break;
-    case otParamType_ToneCurve: /* no default value*/ break;
-    }
-}
-
 void otpInstance::setParamInfo(toonz_param_page_t *pages, int num_pages)
 {
     m_params.clear();
@@ -76,9 +51,8 @@ void otpInstance::setParamInfo(toonz_param_page_t *pages, int num_pages)
             for (int i = 0; i < group.num; ++i) {
                 toonz_param_desc_t& desc = group.array[i];
 
-                auto *param = new otpParam(this);
+                auto *param = new otpParam(this, desc);
                 m_params.emplace_back(otpParamPtr(param));
-                otpSetupParam(desc, *param);
             }
         }
     }
