@@ -225,16 +225,14 @@ namespace UTJ
             {
                 if(port.input != null)
                 {
-                    if(!port.image)
-                    {
-                        port.image = otpAPI.otpCreateImage();
-                    }
-                    otpAPI.otpResizeImage(port.image, port.input.width, port.input.height);
+                    var image = port.GetImage();
+                    Texture input = port.GetUncompressedInput();
+                    otpAPI.otpResizeImage(image, input.width, input.height);
 
                     var idata = default(otpAPI.otpImageData);
-                    otpAPI.otpGetImageData(port.image, ref idata);
+                    otpAPI.otpGetImageData(image, ref idata);
                     port.tw_read =  TextureWriter.ReadDeferred(
-                        idata.data, idata.width * idata.height, TextureWriter.twPixelFormat.RGBAu8, port.input, port.tw_read);
+                        idata.data, idata.width * idata.height, TextureWriter.twPixelFormat.RGBAu8, input, port.tw_read);
                     GL.IssuePluginEvent(GetTWEvent(), port.tw_read);
                 }
             }
@@ -256,8 +254,7 @@ namespace UTJ
             {
                 foreach (var port in m_ports)
                 {
-                    TextureWriter.twEraseDeferredCall(port.tw_read); port.tw_read = 0;
-                    otpAPI.otpDestroyImage(port.image); port.image = default(otpAPI.otpImage);
+                    port.Release();
                 }
             }
 

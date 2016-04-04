@@ -16,8 +16,59 @@ namespace UTJ
     {
         public string name;
         public Texture input;
+        [NonSerialized] public RenderTexture rt;
         [NonSerialized] public otpAPI.otpImage image;
         [NonSerialized] public int tw_read;
+
+        public void Release()
+        {
+            if(rt != null)
+            {
+                rt.Release();
+                rt = null;
+            }
+            if(tw_read != 0)
+            {
+                TextureWriter.twEraseDeferredCall(tw_read);
+                tw_read = 0;
+            }
+            if(image)
+            {
+                otpAPI.otpDestroyImage(image);
+                image = default(otpAPI.otpImage);
+            }
+        }
+
+        public otpAPI.otpImage GetImage()
+        {
+            if(!image)
+            {
+                image = otpAPI.otpCreateImage();
+            }
+            return image;
+        }
+
+        public Texture GetUncompressedInput()
+        {
+            Texture ret = input;
+
+            // copy Texture2D content to RenderTexture because Texture2D is compressed in many cases
+            if (input.GetType() == typeof(Texture2D))
+            {
+                if (rt != null && (rt.width != input.width || rt.height != input.height))
+                {
+                    rt.Release();
+                    rt = null;
+                }
+                if (rt == null)
+                {
+                    rt = new RenderTexture(input.width, input.height, 0, RenderTextureFormat.ARGB32);
+                }
+                Graphics.Blit(input, rt);
+                input = rt;
+            }
+            return ret;
+        }
     }
 
     [Serializable]
