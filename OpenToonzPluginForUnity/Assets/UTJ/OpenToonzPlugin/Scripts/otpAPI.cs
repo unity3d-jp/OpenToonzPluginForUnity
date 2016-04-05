@@ -162,12 +162,21 @@ namespace UTJ
     {
         public otpAPI.otpEnumParamTraits traits;
         public otpAPI.otpEnumParamValue value;
+        public string[] names;
 
         public ToonzEnumParam(otpAPI.otpParam p)
             : base(p)
         {
             otpAPI.otpGetParamTraits(p, ref traits);
             otpAPI.otpGetParamValue(p, ref value);
+
+            var names_ptr = new IntPtr[traits.num];
+            Marshal.Copy(traits.names, names_ptr, 0, names_ptr.Length);
+            names = new string[traits.num];
+            for (int i = 0; i < names_ptr.Length; ++i)
+            {
+                names[i] = otpAPI.ToS(names_ptr[i]);
+            }
         }
 
         public override void Sanitize()
@@ -379,25 +388,20 @@ namespace UTJ
         [Serializable]
         public struct otpEnumParamTraits
         {
-            public int def, min, max;
+            public int def, num;
+            public IntPtr names;
             public void Sanitize(ref otpEnumParamValue v)
             {
-                if (min != max)
-                {
-                    v.value = Math.Max(Math.Min(v.value, max), min);
-                }
+                v.value = Math.Max(Math.Min(v.value, num), 0);
             }
         };
         [Serializable]
         public struct otpBoolParamTraits
         {
-            public int def, min, max;
+            public int def;
             public void Sanitize(ref otpBoolParamValue v)
             {
-                if (min != max)
-                {
-                    v.value = Math.Max(Math.Min(v.value, max), min);
-                }
+                v.value = Math.Max(Math.Min(v.value, 1), 0);
             }
         };
         [Serializable]

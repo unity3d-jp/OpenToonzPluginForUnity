@@ -37,9 +37,9 @@ otpParam::otpParam(otpInstance *parent, const toonz_param_desc_t& desc)
         setValue(&desc.traits.p.def);
         break;
     case otParamType_Enum:
-        m_traits.t_int.def = desc.traits.i.def;
-        m_traits.t_enum.min = 0;
-        m_traits.t_enum.max = desc.traits.e.enums;
+        m_traits.t_enum.def = desc.traits.i.def;
+        m_traits.t_enum.num = desc.traits.e.enums;
+        m_traits.t_enum.names = desc.traits.e.array;
         setValue(&desc.traits.e.def);
         break;
     case otParamType_Int:
@@ -49,9 +49,7 @@ otpParam::otpParam(otpInstance *parent, const toonz_param_desc_t& desc)
         setValue(&desc.traits.i.def);
         break;
     case otParamType_Bool:
-        m_traits.t_int.def = desc.traits.i.def;
-        m_traits.t_bool.min = 0;
-        m_traits.t_bool.max = 1;
+        m_traits.t_enum.def = desc.traits.i.def;
         setValue(&desc.traits.b.def);
         break;
     case otParamType_Spectrum:
@@ -170,6 +168,16 @@ static inline void sanitize(const Traits& t, Value& v)
     if (t.min != t.max) {
         v.value = std::max<value_type>(std::min<value_type>(v.value, t.max), t.min);
     }
+}
+template<>
+static inline void sanitize(const otpBoolParamTraits& t, otpBoolParamValue& v)
+{
+    v.value = std::max<int>(std::min<int>(v.value, 1), 0);
+}
+template<>
+static inline void sanitize(const otpEnumParamTraits& t, otpEnumParamValue& v)
+{
+    v.value = std::max<int>(std::min<int>(v.value, t.num), 0);
 }
 template<>
 static inline void sanitize(const otpRangeParamTraits& t, otpRangeParamValue& v)

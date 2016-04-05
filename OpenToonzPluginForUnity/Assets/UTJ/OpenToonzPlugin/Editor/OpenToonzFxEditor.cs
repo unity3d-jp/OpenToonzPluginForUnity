@@ -216,8 +216,13 @@ namespace UTJ
                         var vp = p as ToonzEnumParam;
                         EditorGUI.BeginChangeCheck();
 
-                        var v = EditorGUILayout.IntField(
-                            new GUIContent(p.name, p.note), vp.value.value, options);
+                        string[] names = vp.names;
+                        GUIContent[] list = new GUIContent[names.Length];
+                        for (int i = 0; i < names.Length; ++i)
+                        {
+                            list[i] = new GUIContent(names[i]);
+                        }
+                        int v = EditorGUILayout.Popup(new GUIContent(p.name, p.note), vp.value.value, list, options);
 
                         if (EditorGUI.EndChangeCheck())
                         {

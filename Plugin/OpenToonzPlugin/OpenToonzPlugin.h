@@ -103,8 +103,18 @@ struct otpIntParamTraits
     typedef int value_type;
     int def, min, max;
 };
-typedef otpIntParamTraits otpEnumParamTraits;
-typedef otpIntParamTraits otpBoolParamTraits;
+struct otpEnumParamTraits
+{
+    typedef int value_type;
+    int def;
+    int num;
+    const char **names;
+};
+struct otpBoolParamTraits
+{
+    typedef int value_type;
+    int def;
+};
 struct otpDoubleParamTraits
 {
     typedef double value_type;
