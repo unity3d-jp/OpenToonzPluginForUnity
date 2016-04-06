@@ -18,6 +18,13 @@ twCLinkage twExport void twFree(void *ptr)
     free(ptr);
 }
 
+twCLinkage twExport void twSync()
+{
+    auto *dev = GetGraphicsDevice();
+    if (dev) {
+        GetGraphicsDevice()->sync();
+    }
+}
 
 twCLinkage twExport bool twWriteTexture(
     void *dst_tex, int dst_width, int dst_height, twPixelFormat dst_fmt,
@@ -163,6 +170,15 @@ void RenderEventCallback(int id)
     twCallDeferredCall(id);
 }
 
+twCLinkage twExport int twSyncDeferred(int id)
+{
+    return twAddDeferredCall([=]() {
+        auto *dev = GetGraphicsDevice();
+        if (dev) {
+            GetGraphicsDevice()->sync();
+        }
+    }, id);
+}
 
 twCLinkage twExport int twWriteTextureDeferred(
     void *dst_tex, int dst_width, int dst_height, twPixelFormat dst_fmt,

@@ -226,5 +226,9 @@ namespace UTJ
                 dst, dst_num, dst_fmt,
                 src_tex.GetNativeTexturePtr(), src_tex.width, src_tex.height, twGetPixelFormat(src_tex), id);
         }
+
+
+        [DllImport("TextureWriter")] private static extern void twSync();
+        [DllImport("TextureWriter")] private static extern int  twSyncDeferred(int id);
     }
 }

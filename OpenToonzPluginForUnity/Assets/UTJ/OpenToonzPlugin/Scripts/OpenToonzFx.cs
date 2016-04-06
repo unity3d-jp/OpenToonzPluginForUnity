@@ -70,6 +70,7 @@ namespace UTJ
         otpAPI.otpInstance m_inst;
         otpAPI.otpImage m_img_src;
         RenderTexture m_rt_tmp;
+        RenderTexture m_rt_dst;
         bool m_began;
 
         int m_tw_read;
@@ -314,7 +315,12 @@ namespace UTJ
 
         void OnDisable()
         {
-            if(m_rt_tmp != null)
+            if (m_rt_dst != null)
+            {
+                m_rt_dst.Release();
+                m_rt_dst = null;
+            }
+            if (m_rt_tmp != null)
             {
                 m_rt_tmp.Release();
                 m_rt_tmp = null;
@@ -332,29 +338,41 @@ namespace UTJ
             ReleaseInstance();
         }
 
-        [ImageEffectOpaque]
         void OnRenderImage(RenderTexture rt_src, RenderTexture rt_dst)
         {
-            if (rt_dst == null)
-            {
-                Debug.Log("OpenToonzFx: dst is null");
-                return;
-            }
-
             if (!m_inst && m_pluginPath != null)
             {
                 m_inst = otpAPI.otpCreateInstance(
                     otpAPI.otpLoadModule(m_pluginPath.GetPath()), m_pluginIndex);
             }
-            if (!m_inst )
+            if (!m_inst)
             {
                 Graphics.Blit(rt_src, rt_dst);
                 return;
             }
 
+
+            bool blit_to_null = rt_dst == null;
+            if(rt_dst == null)
+            {
+                if (m_rt_dst != null && (m_rt_dst.width != rt_src.width || m_rt_dst.height != rt_src.height))
+                {
+                    m_rt_dst.Release();
+                    m_rt_dst = null;
+                }
+                if (m_rt_dst == null)
+                {
+                    m_rt_dst = new RenderTexture(rt_src.width, rt_src.height, 0, rt_src.format);
+                    m_rt_dst.Create();
+                }
+                rt_dst = m_rt_dst;
+            }
+
+
             if (!m_began)
             {
                 otpAPI.otpBeginRender(m_inst, rt_src.width, rt_src.height);
+                m_began = true;
             }
 
             UpdateInputImages(rt_src);
@@ -389,6 +407,11 @@ namespace UTJ
                     m_rt_tmp, dst_data.data, dst_data.width * dst_data.height, TextureWriter.twPixelFormat.RGBAu8, m_tw_write);
                 GL.IssuePluginEvent(GetTWEvent(), m_tw_write);
                 Graphics.Blit(m_rt_tmp, rt_dst);
+            }
+
+            if(blit_to_null)
+            {
+                Graphics.Blit(rt_dst, (RenderTexture)null);
             }
         }
 
