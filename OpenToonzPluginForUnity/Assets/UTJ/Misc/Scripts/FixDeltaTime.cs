@@ -12,6 +12,7 @@ namespace UTJ
     public class FixDeltaTime : MonoBehaviour
     {
         public float m_targetFrameRate = 30.0f;
+        public int m_endFrame = 0;
 
 
         public IEnumerator Wait()
@@ -23,6 +24,15 @@ namespace UTJ
             while (Time.realtimeSinceStartup - Time.unscaledTime < wt)
             {
                 System.Threading.Thread.Sleep(1);
+            }
+            if(m_endFrame > 0 && Time.frameCount >= m_endFrame)
+            {
+
+#if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+#else
+                Application.Quit();
+#endif
             }
         }
 

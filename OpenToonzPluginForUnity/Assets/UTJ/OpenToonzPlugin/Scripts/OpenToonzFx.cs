@@ -120,6 +120,7 @@ namespace UTJ
             var mod = otpAPI.otpLoadModule(m_pluginPath.GetPath());
             if (!mod)
             {
+                Debug.LogWarning("OpenToonzFx: failed to load plugin. possibly could not find dependent dlls: " + m_pluginPath.GetPath());
                 ReleaseInstance();
                 return;
             }
