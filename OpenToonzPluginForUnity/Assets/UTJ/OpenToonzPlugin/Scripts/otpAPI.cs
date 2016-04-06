@@ -65,7 +65,7 @@ namespace UTJ
                     rt = new RenderTexture(input.width, input.height, 0, RenderTextureFormat.ARGB32);
                 }
                 Graphics.Blit(input, rt);
-                input = rt;
+                ret = rt;
             }
             return ret;
         }
