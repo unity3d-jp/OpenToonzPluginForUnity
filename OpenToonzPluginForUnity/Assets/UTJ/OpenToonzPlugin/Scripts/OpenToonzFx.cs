@@ -71,6 +71,7 @@ namespace UTJ
         otpAPI.otpImage m_img_src;
         RenderTexture m_rt_tmp;
         RenderTexture m_rt_dst;
+        int m_prev_width, m_prev_height;
         bool m_began;
 
         int m_tw_read;
@@ -352,10 +353,20 @@ namespace UTJ
             }
 
 
-            bool blit_to_null = rt_dst == null;
-            if(rt_dst == null)
+            bool needs_blit = rt_dst == null;
+            bool resolution_changed = false;
+            if(m_prev_width != rt_src.width || m_prev_height != rt_src.height)
             {
-                if (m_rt_dst != null && (m_rt_dst.width != rt_src.width || m_rt_dst.height != rt_src.height))
+                m_prev_width = rt_src.width;
+                m_prev_height = rt_src.height;
+                resolution_changed = true;
+            }
+
+            // rt_dst is null if this OpenToonzFx is last post effect and camera's render target is null
+            // in this case, we must allocate temporary RenderTexture, write result to it, and Blit() to destination.
+            if (rt_dst == null)
+            {
+                if (m_rt_dst != null && resolution_changed)
                 {
                     m_rt_dst.Release();
                     m_rt_dst = null;
@@ -368,7 +379,11 @@ namespace UTJ
                 rt_dst = m_rt_dst;
             }
 
-
+            if(m_began && resolution_changed)
+            {
+                otpAPI.otpEndRender(m_inst);
+                m_began = false;
+            }
             if (!m_began)
             {
                 otpAPI.otpBeginRender(m_inst, rt_src.width, rt_src.height);
@@ -409,7 +424,7 @@ namespace UTJ
                 Graphics.Blit(m_rt_tmp, rt_dst);
             }
 
-            if(blit_to_null)
+            if(needs_blit)
             {
                 Graphics.Blit(rt_dst, (RenderTexture)null);
             }
