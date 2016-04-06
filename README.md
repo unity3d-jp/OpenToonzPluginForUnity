@@ -1,7 +1,7 @@
 # OpenToonzPluginForUnity
 [English](https://translate.google.com/translate?sl=ja&tl=en&u=https://github.com/unity3d-jp/OpenToonzPluginForUnity) (by Google Translate)
 
-![Screenshot](Screenshots/Screenshot.jpg)
+![Screenshot](Screenshots/Screenshot2.jpg)
 
 OpenToonz 用のプラグインを Unity の PostEffect として使えるようにするプラグインです。  
 映像制作用途を想定したもので、デルタタイムを固定して事前に指定しておいた範囲のフレームを書き出す、といった使い方を想定しています。
@@ -40,6 +40,10 @@ otpParam が double、int、Range といったパラメータを渡す役割を�
 ## Issues
 現在 Spectrum や ToneCurve などの一部のパラメータは未対応です。  
 プラグインホストのインターフェースも一部未実装なため、正常に動作しないプラグインもあるかもしれません。
+
+## History
+- 2016/04/06
+  - first release
 
 ## Thanks
 - OpenToonz のソースを大いに参考にしています。  
